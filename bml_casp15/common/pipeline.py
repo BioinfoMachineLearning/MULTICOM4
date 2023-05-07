@@ -4,7 +4,6 @@ from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if
     read_option_file
 from bml_casp15.monomer_alignment_generation.alignment import read_fasta, write_fasta
 from bml_casp15.monomer_alignment_generation.pipeline import *
-from bml_casp15.monomer_structure_generation.pipeline import *
 from bml_casp15.monomer_structure_generation.pipeline_v2 import *
 from bml_casp15.monomer_structure_evaluation.pipeline_sep import *
 from bml_casp15.monomer_structure_evaluation.human_pipeline import *
