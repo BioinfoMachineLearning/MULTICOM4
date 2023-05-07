@@ -176,7 +176,10 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
                        f"--template_stos {','.join(template_stos)} " \
                        f"--env_dir {self.params['alphafold_env_dir']} " \
                        f"--database_dir {self.params['alphafold_database_dir']} " \
-                       f"--output_dir {outdir} "
+                       f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                       f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                       f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
+                       f"--output_dir {outdir}"
 
             print(base_cmd)
             os.system(base_cmd)
@@ -225,12 +228,15 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
 
             cmd = f"python {self.params['alphafold_default_program']} " \
                   f"--fasta_path {fasta_path} " \
-                  f"--bfd_uniclust_a3ms {','.join(bfd_uniref_a3ms)} " \
+                  f"--bfd_uniref_a3ms {','.join(bfd_uniref_a3ms)} " \
                   f"--mgnify_stos {','.join(mgnify_stos)} " \
                   f"--uniref90_stos {','.join(uniref90_stos)} " \
                   f"--uniprot_stos {','.join(uniprot_stos)} " \
                   f"--env_dir {self.params['alphafold_env_dir']} " \
                   f"--database_dir {self.params['alphafold_database_dir']} " \
+                  f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                  f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                  f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                   f"--output_dir {outdir}"
 
             print(cmd)
@@ -270,13 +276,16 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
 
                 cmd = f"python {self.params['alphafold_default_program']} " \
                       f"--fasta_path {fasta_path} " \
-                      f"--bfd_uniclust_a3ms {','.join(bfd_uniclust_a3ms)} " \
+                      f"--bfd_uniref_a3ms {','.join(bfd_uniclust_a3ms)} " \
                       f"--mgnify_stos {','.join(mgnify_stos)} " \
                       f"--uniref90_stos {','.join(uniref90_stos)} " \
                       f"--uniprot_stos {','.join(uniprot_stos)} " \
                       f"--num_multimer_predictions_per_model 5 " \
                       f"--env_dir {self.params['alphafold_env_dir']} " \
                       f"--database_dir {self.params['alphafold_database_dir']} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {outdir}"
 
                 print(cmd)
@@ -315,13 +324,16 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
 
                 cmd = f"python {self.params['alphafold_default_program']} " \
                       f"--fasta_path {fasta_path} " \
-                      f"--bfd_uniclust_a3ms {','.join(bfd_uniclust_a3ms)} " \
+                      f"--bfd_uniref_a3ms {','.join(bfd_uniclust_a3ms)} " \
                       f"--mgnify_stos {','.join(mgnify_stos)} " \
                       f"--uniref90_stos {','.join(uniref90_stos)} " \
                       f"--uniprot_stos {','.join(uniprot_stos)} " \
                       f"--num_multimer_predictions_per_model 5 " \
                       f"--env_dir {self.params['alphafold_env_dir']} " \
                       f"--database_dir {self.params['alphafold_database_dir_newest']} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {outdir}"
 
                 print(cmd)
@@ -361,14 +373,16 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
 
                 cmd = f"python {self.params['alphafold_default_program']} " \
                       f"--fasta_path {fasta_path} " \
-                      f"--bfd_uniclust_a3ms {','.join(bfd_uniclust_a3ms)} " \
+                      f"--bfd_uniref_a3ms {','.join(bfd_uniclust_a3ms)} " \
                       f"--mgnify_stos {','.join(mgnify_stos)} " \
                       f"--uniref90_stos {','.join(uniref90_stos)} " \
                       f"--uniprot_stos {','.join(uniprot_stos)} " \
                       f"--env_dir {self.params['alphafold_env_dir']} " \
                       f"--database_dir {self.params['alphafold_database_dir']} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {outdir}"
-
                 print(cmd)
                 os.system(cmd)
 
@@ -423,7 +437,10 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
                        f"--multimer_a3ms {','.join(a3m_paths)} " \
                        f"--env_dir {self.params['alphafold_env_dir']} " \
                        f"--database_dir {self.params['alphafold_database_dir']} " \
-                       f"--output_dir {outdir} "
+                       f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                       f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                       f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
+                       f"--output_dir {outdir}"
 
             if template_method == "":
                 base_cmd += f"--template_stos {','.join(template_stos)} "

@@ -170,13 +170,15 @@ class Quaternary_structure_prediction_pipeline_v2:
 
                 cmd = f"python {self.params['alphafold_default_program']} " \
                       f"--fasta_path {fasta_path} " \
-                      f"--bfd_uniclust_a3ms {','.join(bfd_uniref_a3ms)} " \
+                      f"--bfd_uniref_a3ms {','.join(bfd_uniref_a3ms)} " \
                       f"--mgnify_stos {','.join(mgnify_stos)} " \
                       f"--uniref90_stos {','.join(uniref90_stos)} " \
                       f"--uniprot_stos {','.join(uniprot_stos)} " \
                       f"--env_dir {self.params['alphafold_env_dir']} " \
                       f"--database_dir {self.params['alphafold_database_dir']} " \
-                      f"--num_multimer_predictions_per_model 75 " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {outdir} "
 
                 if notemplates:
@@ -222,11 +224,13 @@ class Quaternary_structure_prediction_pipeline_v2:
 
                     cmd = f"python {self.params['alphafold_default_program']} " \
                           f"--fasta_path {fasta_path} " \
-                          f"--bfd_uniclust_a3ms {','.join(bfd_uniclust_a3ms)} " \
+                          f"--bfd_uniref_a3ms {','.join(bfd_uniclust_a3ms)} " \
                           f"--mgnify_stos {','.join(mgnify_stos)} " \
                           f"--uniref90_stos {','.join(uniref90_stos)} " \
                           f"--uniprot_stos {','.join(uniprot_stos)} " \
-                          f"--num_multimer_predictions_per_model 5 " \
+                          f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                          f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                          f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                           f"--env_dir {self.params['alphafold_env_dir']} " \
                           f"--database_dir {self.params['alphafold_database_dir']} " \
                           f"--output_dir {outdir}"
@@ -273,11 +277,13 @@ class Quaternary_structure_prediction_pipeline_v2:
 
                     cmd = f"python {self.params['alphafold_default_program']} " \
                           f"--fasta_path {fasta_path} " \
-                          f"--bfd_uniclust_a3ms {','.join(bfd_uniclust_a3ms)} " \
+                          f"--bfd_uniref_a3ms {','.join(bfd_uniclust_a3ms)} " \
                           f"--mgnify_stos {','.join(mgnify_stos)} " \
                           f"--uniref90_stos {','.join(uniref90_stos)} " \
                           f"--uniprot_stos {','.join(uniprot_stos)} " \
-                          f"--num_multimer_predictions_per_model 5 " \
+                          f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                          f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                          f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                           f"--env_dir {self.params['alphafold_env_dir']} " \
                           f"--database_dir {self.params['alphafold_database_dir_newest']} " \
                           f"--output_dir {outdir}"
@@ -325,12 +331,15 @@ class Quaternary_structure_prediction_pipeline_v2:
 
                     cmd = f"python {self.params['alphafold_default_program']} " \
                           f"--fasta_path {fasta_path} " \
-                          f"--bfd_uniclust_a3ms {','.join(bfd_uniclust_a3ms)} " \
+                          f"--bfd_uniref_a3ms {','.join(bfd_uniclust_a3ms)} " \
                           f"--mgnify_stos {','.join(mgnify_stos)} " \
                           f"--uniref90_stos {','.join(uniref90_stos)} " \
                           f"--uniprot_stos {','.join(uniprot_stos)} " \
                           f"--env_dir {self.params['alphafold_env_dir']} " \
                           f"--database_dir {self.params['alphafold_database_dir']} " \
+                          f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                          f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                          f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                           f"--output_dir {outdir}"
 
                     if notemplates:
@@ -418,7 +427,10 @@ class Quaternary_structure_prediction_pipeline_v2:
                            f"--multimer_a3ms {','.join(a3m_paths)} " \
                            f"--msa_pair_file {msa_pair_file} " \
                            f"--env_dir {self.params['alphafold_env_dir']} " \
-                           f"--database_dir {self.params['alphafold_database_dir']} "
+                           f"--database_dir {self.params['alphafold_database_dir']} " \
+                           f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                           f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                           f"--multimer_num_recycle {self.params['multimer_num_recycle']} "
 
                 if template_method == "":
                     base_cmd += f"--template_stos {','.join(template_stos)} "
@@ -429,7 +441,6 @@ class Quaternary_structure_prediction_pipeline_v2:
                         template_file = f"{template_dir}/struct_temp/structure_templates_v2.csv"
                         if len(pd.read_csv(template_file)) == 0:
                             continue
-                        os.chdir(self.params['alphafold_temp_program_dir'])
                         outdir += '_v2'
 
                     base_cmd += f"--temp_struct_csv {template_file} "
@@ -441,7 +452,6 @@ class Quaternary_structure_prediction_pipeline_v2:
                         template_file = f"{template_dir}/pdb_seq/sequence_templates_v2.csv"
                         if len(pd.read_csv(template_file)) == 0:
                             continue
-                        os.chdir(self.params['alphafold_temp_program_dir'])
                         outdir += '_v2'
 
                     base_cmd += f"--temp_struct_csv {template_file} "
@@ -453,7 +463,6 @@ class Quaternary_structure_prediction_pipeline_v2:
                         template_file = f"{template_dir}/complex_pdb_seq/sequence_templates_v2.csv"
                         if len(pd.read_csv(template_file)) == 0:
                             continue
-                        os.chdir(self.params['alphafold_temp_program_dir'])
                         outdir += '_v2'
 
                     base_cmd += f"--temp_struct_csv {template_file} "
@@ -465,7 +474,6 @@ class Quaternary_structure_prediction_pipeline_v2:
                         template_file = f"{template_dir}/pdb70_seq/sequence_templates_v2.csv"
                         if len(pd.read_csv(template_file)) == 0:
                             continue
-                        os.chdir(self.params['alphafold_temp_program_dir'])
                         outdir += '_v2'
 
                     template_hits_files = []

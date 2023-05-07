@@ -68,9 +68,11 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
                               f"--database_dir {self.params['alphafold_database_dir']} " \
-                              f"--bfd_uniclust_a3ms {bfd_uniref30_a3m} " \
+                              f"--bfd_uniref_a3ms {bfd_uniref30_a3m} " \
                               f"--mgnify_stos {mgnify_sto} " \
                               f"--uniref90_stos {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/default"
                         print(cmd)
                         os.system(cmd)
@@ -107,9 +109,11 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
                               f"--database_dir {self.params['alphafold_database_dir']} " \
-                              f"--bfd_uniclust_a3ms {bfd_uniclust30_a3m} " \
+                              f"--bfd_uniref_a3ms {bfd_uniclust30_a3m} " \
                               f"--mgnify_stos {mgnify_sto} " \
                               f"--uniref90_stos {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/default_uniclust"
                         print(cmd)
                         os.system(cmd)
@@ -146,9 +150,11 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
                               f"--database_dir {self.params['alphafold_database_dir']} " \
-                              f"--bfd_uniclust_a3ms {bfd_uniclust30_a3m} " \
+                              f"--bfd_uniref_a3ms {bfd_uniclust30_a3m} " \
                               f"--mgnify_stos {mgnify_sto} " \
                               f"--uniref90_stos {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/default_uniref_22"
                         print(cmd)
                         os.system(cmd)
@@ -185,9 +191,11 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
                               f"--database_dir {self.params['alphafold_database_dir_newest']} " \
-                              f"--bfd_uniclust_a3ms {bfd_uniclust30_a3m} " \
+                              f"--bfd_uniref_a3ms {bfd_uniclust30_a3m} " \
                               f"--mgnify_stos {mgnify_sto} " \
                               f"--uniref90_stos {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/default_newest"
                         print(cmd)
                         os.system(cmd)
@@ -224,11 +232,13 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
                               f"--database_dir {self.params['alphafold_database_dir']} " \
-                              f"--bfd_uniclust_a3m {bfd_uniref30_a3m} " \
+                              f"--bfd_uniref_a3m {bfd_uniref30_a3m} " \
                               f"--mgnify_sto {mgnify_sto} " \
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--temp_struct_csv {template_dir}/sequence_templates.csv " \
                               f"--struct_atom_dir {template_dir}/templates " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/default_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -268,10 +278,12 @@ class Monomer_structure_prediction_pipeline_v2:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
                               f"--database_dir {self.params['alphafold_database_dir']} " \
-                              f"--uniclust_a3m {uniref30_a3m} " \
+                              f"--uniref_a3m {uniref30_a3m} " \
                               f"--bfd_a3m {bfd_a3m} " \
                               f"--mgnify_sto {mgnify_sto} " \
                               f"--uniref90_sto {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/original"
                         print(cmd)
                         os.system(cmd)
@@ -311,12 +323,14 @@ class Monomer_structure_prediction_pipeline_v2:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
                               f"--database_dir {self.params['alphafold_database_dir']} " \
-                              f"--uniclust_a3m {uniref30_a3m} " \
+                              f"--uniref_a3m {uniref30_a3m} " \
                               f"--bfd_a3m {bfd_a3m} " \
                               f"--mgnify_sto {mgnify_sto} " \
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--temp_struct_csv {template_dir}/sequence_templates.csv " \
                               f"--struct_atom_dir {template_dir}/templates " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/ori_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -344,6 +358,8 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--database_dir {self.params['alphafold_database_dir']} " \
                               f"--custom_msa {colabfold_a3m} " \
                               f"--uniref90_sto {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/colabfold"
                         print(cmd)
                         os.system(cmd)
@@ -373,6 +389,8 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--temp_struct_csv {template_dir}/sequence_templates.csv " \
                               f"--struct_atom_dir {template_dir}/templates " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/colab_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -400,6 +418,8 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--database_dir {self.params['alphafold_database_dir']} " \
                               f"--custom_msa {img_a3m} " \
                               f"--uniref90_sto {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/img"
                         print(cmd)
                         os.system(cmd)
@@ -429,6 +449,8 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--temp_struct_csv {template_dir}/sequence_templates.csv " \
                               f"--struct_atom_dir {template_dir}/templates " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/img_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -456,6 +478,8 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--database_dir {self.params['alphafold_database_dir']} " \
                               f"--custom_msa {rosettafold_a3m} " \
                               f"--uniref90_sto {uniref90_sto} " \
+                              f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                              f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                               f"--output_dir {outdir}/rosettafold"
                         print(cmd)
                         os.system(cmd)

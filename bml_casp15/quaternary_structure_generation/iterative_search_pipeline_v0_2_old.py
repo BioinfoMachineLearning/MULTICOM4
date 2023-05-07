@@ -292,6 +292,9 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                       f"--msa_pair_file {msa_pair_file} " \
                       f"--temp_struct_csv {template_files[0]} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
             else:
                 cmd = f"python {self.params['alphafold_multimer_program']} " \
@@ -303,6 +306,9 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                       f"--msa_pair_file {msa_pair_file} " \
                       f"--monomer_temp_csvs {','.join(template_files)} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
 
             try:
@@ -414,6 +420,9 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                       f"--msa_pair_file {msa_pair_file} " \
                       f"--temp_struct_csv {template_files[0]} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
             else:
                 cmd = f"python {self.params['alphafold_multimer_program']} " \
@@ -425,6 +434,9 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                       f"--msa_pair_file {msa_pair_file} " \
                       f"--monomer_temp_csvs {','.join(template_files)} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
 
             try:
@@ -640,6 +652,9 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                       f"--monomer_a3ms {','.join(monomer_msa_files)} " \
                       f"--temp_struct_csv {template_files[0]} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
             else:
                 cmd = f"python {self.params['alphafold_multimer_program']} " \
@@ -650,6 +665,9 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                       f"--monomer_a3ms {','.join(monomer_msa_files)} " \
                       f"--monomer_temp_csvs {','.join(template_files)} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
 
             try:

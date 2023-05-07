@@ -300,6 +300,8 @@ class Monomer_iterative_refinement_pipeline:
                           f"--custom_msa {current_work_dir}/iteration{num_iteration + 1}.a3m " \
                           f"--temp_struct_csv {current_work_dir}/structure_templates.csv " \
                           f"--struct_atom_dir {out_template_dir} " \
+                          f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                          f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                           f"--output_dir {out_model_dir}"
 
                     try:
@@ -541,6 +543,8 @@ class Monomer_iterative_refinement_pipeline:
                       f"--custom_msa {current_work_dir}/iteration{num_iteration + 1}.a3m " \
                       f"--temp_struct_csv {current_work_dir}/structure_templates.csv " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
+                      f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
 
                 try:
