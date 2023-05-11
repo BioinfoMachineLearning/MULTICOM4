@@ -101,15 +101,31 @@ def main(argv):
     print("#################################################################################################")
 
     print("3. Start to generate complex quaternary structures")
-    N2_outdir = FLAGS.output_dir + '/N3_quaternary_structure_generation'
+    N6_outdir = FLAGS.output_dir + '/N6_quaternary_structure_generation'
     makedir_if_not_exists(N2_outdir)
 
     if not run_quaternary_structure_generation_pipeline_default(params=params,
                                                                 fasta_path=FLAGS.fasta_path,
                                                                 chain_id_map=chain_id_map,
                                                                 aln_dir=N1_outdir,
-                                                                output_dir=N2_outdir):
+                                                                output_dir=N6_outdir):
         print("Program failed in step 7")
+
+    print("7. Start to evaluate multimer models")
+
+
+    N9_outdir = FLAGS.output_dir + '/N9_multimer_structure_evaluation'
+    multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
+                                                          params=params, monomer_model_dir="",
+                                                          run_methods=["alphafold"],
+                                                          chain_id_map=chain_id_map,
+                                                          indir=N6_outdir, outdir=N9_outdir,
+                                                          stoichiometry=FLAGS.stoichiometry)
+
+    print("#################################################################################################")
+
+    print("#################################################################################################")
+
 
 
 if __name__ == '__main__':

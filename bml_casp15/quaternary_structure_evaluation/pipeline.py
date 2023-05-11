@@ -16,11 +16,14 @@ from bml_casp15.common.protein import complete_result
 class Quaternary_structure_evaluation_pipeline:
     """Runs the alignment tools and assembles the input features."""
 
-    def __init__(self, params, run_methods=["alphafold", "pairwise", "bfactor", 'multieva'], include_default=True):
+    def __init__(self, params, run_methods=None, include_default=True):
         """Initializes the data pipeline."""
 
         self.params = params
-        self.run_methods = run_methods
+        if run_methods is None:
+            self.run_methods = ["alphafold", "pairwise", "bfactor", 'multieva']
+        else:
+            self.run_methods = run_methods
 
         self.pairwise_qa = Pairwise_dockq_qa(params['dockq_program'])
         self.alphafold_qa = Alphafold_pkl_qa(sort_field='confidence')

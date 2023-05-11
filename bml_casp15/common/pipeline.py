@@ -838,9 +838,9 @@ def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, monomer
 
 
 def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, monomer_model_dir,
-                                     indir, outdir, stoichiometry, is_homomer=False, model_count=5, include_default=True):
+                                     indir, outdir, stoichiometry, is_homomer=False, model_count=5, include_default=True, run_methods=None):
     makedir_if_not_exists(outdir)
-    pipeline = Quaternary_structure_evaluation_pipeline(params=params, include_default=include_default)
+    pipeline = Quaternary_structure_evaluation_pipeline(params=params, include_default=include_default, run_methods=run_methods)
     multimer_qa_result = None
     try:
         multimer_qa_result = pipeline.process(fasta_path=fasta_path,
