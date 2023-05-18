@@ -73,6 +73,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_stos {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/default"
                         print(cmd)
                         os.system(cmd)
@@ -114,6 +115,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_stos {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/default_uniclust"
                         print(cmd)
                         os.system(cmd)
@@ -155,6 +157,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_stos {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/default_uniref_22"
                         print(cmd)
                         os.system(cmd)
@@ -196,6 +199,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_stos {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/default_newest"
                         print(cmd)
                         os.system(cmd)
@@ -239,6 +243,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--struct_atom_dir {template_dir}/templates " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/default_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -284,6 +289,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/original"
                         print(cmd)
                         os.system(cmd)
@@ -331,6 +337,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--struct_atom_dir {template_dir}/templates " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/ori_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -360,6 +367,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/colabfold"
                         print(cmd)
                         os.system(cmd)
@@ -391,6 +399,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--struct_atom_dir {template_dir}/templates " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/colab_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -420,6 +429,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/img"
                         print(cmd)
                         os.system(cmd)
@@ -451,6 +461,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--struct_atom_dir {template_dir}/templates " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/img_seq_temp"
                         print(cmd)
                         os.system(cmd)
@@ -480,6 +491,7 @@ class Monomer_structure_prediction_pipeline_v2:
                               f"--uniref90_sto {uniref90_sto} " \
                               f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                               f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                               f"--output_dir {outdir}/rosettafold"
                         print(cmd)
                         os.system(cmd)

@@ -300,10 +300,11 @@ def select_models_with_multimer(qa_result, outputdir):
 
 
 def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monomer_dir, outputdir, input_multimer_dir="",
-                                    generate_egnn_models=False, model_count=5):
+                                    generate_egnn_models=False, model_count=5, run_methods=None):
     makedir_if_not_exists(outputdir)
     qa_result = None
     pipeline = Monomer_structure_evaluation_pipeline(params=params,
+                                                     run_methods=run_methods,
                                                      use_gpu=True)
     try:
         qa_result = pipeline.process(targetname=targetname, fasta_file=fasta_file,

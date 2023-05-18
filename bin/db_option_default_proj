@@ -63,7 +63,8 @@ monomer_num_ensemble = 1
 monomer_num_recycle = 3
 multimer_num_ensemble = 1
 multimer_num_recycle = 3
-num_multimer_predictions_per_model = 15
+num_multimer_predictions_per_model = 30
+num_monomer_predictions_per_model = 30
 
 ################################MSA generation tool###########################
 
