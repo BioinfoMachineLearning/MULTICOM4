@@ -6,16 +6,7 @@ from bml_casp15.common.util import makedir_if_not_exists, check_dirs
 import pandas as pd
 from multiprocessing import Pool
 import pathlib
-
-
-def complete_result(outputdir):
-    complete = True
-    for i in range(0, 5):
-        model = f'{outputdir}/ranked_{i}.pdb'
-        if not os.path.exists(model):
-            complete = False
-            break
-    return complete
+from bml_casp15.common.protein import complete_result
 
 
 class Monomer_structure_prediction_pipeline_v2:
@@ -42,7 +33,7 @@ class Monomer_structure_prediction_pipeline_v2:
 
         if "default" in self.run_methods:
 
-            os.chdir(self.params['alphafold_default_program_dir'])
+            os.chdir(self.params['alphafold_program_dir'])
 
             errormsg = ""
 
@@ -62,7 +53,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/default"):
+                if not complete_result(f"{outdir}/default", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_default_program']} " \
                               f"--fasta_path {fasta_path} " \
@@ -84,7 +75,7 @@ class Monomer_structure_prediction_pipeline_v2:
 
         if "default_uniclust" in self.run_methods:
 
-            os.chdir(self.params['alphafold_default_program_dir'])
+            os.chdir(self.params['alphafold_program_dir'])
 
             errormsg = ""
 
@@ -104,7 +95,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/default_uniclust"):
+                if not complete_result(f"{outdir}/default_uniclust", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_default_program']} " \
                               f"--fasta_path {fasta_path} " \
@@ -126,7 +117,7 @@ class Monomer_structure_prediction_pipeline_v2:
 
         if "default_uniref_22" in self.run_methods:
 
-            os.chdir(self.params['alphafold_default_program_dir'])
+            os.chdir(self.params['alphafold_program_dir'])
 
             errormsg = ""
 
@@ -146,7 +137,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/default_uniref_22"):
+                if not complete_result(f"{outdir}/default_uniref_22", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_default_program']} " \
                               f"--fasta_path {fasta_path} " \
@@ -168,7 +159,7 @@ class Monomer_structure_prediction_pipeline_v2:
 
         if "default_newest" in self.run_methods:
 
-            os.chdir(self.params['alphafold_default_program_dir'])
+            os.chdir(self.params['alphafold_program_dir'])
 
             errormsg = ""
 
@@ -188,7 +179,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/default_newest"):
+                if not complete_result(f"{outdir}/default_newest", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_default_program']} " \
                               f"--fasta_path {fasta_path} " \
@@ -230,7 +221,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/default_seq_temp"):
+                if not complete_result(f"{outdir}/default_seq_temp", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} " \
                               f"--fasta_path {fasta_path} " \
@@ -278,7 +269,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/original"):
+                if not complete_result(f"{outdir}/original", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
@@ -324,7 +315,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/ori_seq_temp"):
+                if not complete_result(f"{outdir}/ori_seq_temp", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
@@ -358,7 +349,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {colabfold_a3m}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/colabfold"):
+                if not complete_result(f"{outdir}/colabfold", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
@@ -388,7 +379,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {colabfold_a3m}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/colab_seq_temp"):
+                if not complete_result(f"{outdir}/colab_seq_temp", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
@@ -420,7 +411,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/img"):
+                if not complete_result(f"{outdir}/img", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
@@ -450,7 +441,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/img_seq_temp"):
+                if not complete_result(f"{outdir}/img_seq_temp", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \
@@ -482,7 +473,7 @@ class Monomer_structure_prediction_pipeline_v2:
                 errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {rosettafold_a3m}\n"
 
             if len(errormsg) == 0:
-                if not complete_result(f"{outdir}/rosettafold"):
+                if not complete_result(f"{outdir}/rosettafold", 5 * int(self.params['num_monomer_predictions_per_model'])):
                     try:
                         cmd = f"python {self.params['alphafold_program']} --fasta_path {fasta_path} " \
                               f"--env_dir {self.params['alphafold_env_dir']} " \

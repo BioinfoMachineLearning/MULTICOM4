@@ -140,8 +140,8 @@ class Quaternary_structure_prediction_pipeline_v2:
             # run alphafold default pipeline:
             outdir = f"{output_dir}/default_multimer"
             monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-            if not complete_result(outdir, 375):
-                os.chdir(self.params['alphafold_default_program_dir'])
+            if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                os.chdir(self.params['alphafold_program_dir'])
                 bfd_uniref_a3ms = []
                 mgnify_stos = []
                 uniref90_stos = []
@@ -193,8 +193,8 @@ class Quaternary_structure_prediction_pipeline_v2:
                 # run alphafold default pipeline:
                 outdir = f"{output_dir}/default_uniref30_22"
                 monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-                if not complete_result(outdir):
-                    os.chdir(self.params['alphafold_default_program_dir'])
+                if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                    os.chdir(self.params['alphafold_program_dir'])
                     bfd_uniclust_a3ms = []
                     mgnify_stos = []
                     uniref90_stos = []
@@ -246,8 +246,8 @@ class Quaternary_structure_prediction_pipeline_v2:
                 # run alphafold default pipeline:
                 outdir = f"{output_dir}/default_mul_newest"
                 monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-                if not complete_result(outdir):
-                    os.chdir(self.params['alphafold_default_program_dir'])
+                if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                    os.chdir(self.params['alphafold_program_dir'])
                     bfd_uniclust_a3ms = []
                     mgnify_stos = []
                     uniref90_stos = []
@@ -300,8 +300,8 @@ class Quaternary_structure_prediction_pipeline_v2:
             if "default_uniclust30" in self.run_methods:
                 outdir = f"{output_dir}/default_uniclust30"
                 monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-                if not complete_result(outdir):
-                    os.chdir(self.params['alphafold_default_program_dir'])
+                if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                    os.chdir(self.params['alphafold_program_dir'])
                     bfd_uniclust_a3ms = []
                     mgnify_stos = []
                     uniref90_stos = []
@@ -499,7 +499,7 @@ class Quaternary_structure_prediction_pipeline_v2:
                 if notemplates:
                     base_cmd += "--notemplate=true"  
 
-                if complete_result(outdir):
+                if complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                     continue
 
                 makedir_if_not_exists(outdir)
@@ -511,7 +511,7 @@ class Quaternary_structure_prediction_pipeline_v2:
 
             rerun = False
             for result_dir in result_dirs:
-                if not complete_result(result_dir):
+                if not complete_result(result_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                     rerun = True
 
             if not rerun:

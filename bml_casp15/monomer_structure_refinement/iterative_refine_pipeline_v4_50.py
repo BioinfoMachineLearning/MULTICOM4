@@ -12,7 +12,7 @@ import numpy as np
 from bml_casp15.complex_templates_search.sequence_based_pipeline import assess_hhsearch_hit, PrefilterError
 from bml_casp15.complex_templates_search.parsers import TemplateHit
 from bml_casp15.monomer_structure_refinement.util import *
-
+from bml_casp15.common.protein import complete_result
 
 class Monomer_iterative_refinement_pipeline:
 
@@ -273,7 +273,7 @@ class Monomer_iterative_refinement_pipeline:
                 model_iteration_tmscores += [ref_tmscore]
 
                 out_model_dir = f"{current_work_dir}/alphafold"
-                if not complete_result(out_model_dir):
+                if not complete_result(out_model_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
 
                     foldseek_res = self.search_templates(inpdb=start_pdb, outdir=current_work_dir + '/foldseek')
 
@@ -293,7 +293,7 @@ class Monomer_iterative_refinement_pipeline:
                                               outdir=out_template_dir)
 
                     makedir_if_not_exists(out_model_dir)
-                    cmd = f"python run_alphafold_custom_sim.py " \
+                    cmd = f"python {self.params['alphafold_program']} " \
                           f"--fasta_path {fasta_file} " \
                           f"--env_dir {self.params['alphafold_env_dir']} " \
                           f"--database_dir {self.params['alphafold_database_dir']} " \
@@ -302,6 +302,7 @@ class Monomer_iterative_refinement_pipeline:
                           f"--struct_atom_dir {out_template_dir} " \
                           f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                           f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                          f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                           f"--output_dir {out_model_dir}"
 
                     try:
@@ -516,7 +517,7 @@ class Monomer_iterative_refinement_pipeline:
             model_iteration_scores += [ref_avg_lddt]
 
             out_model_dir = f"{current_work_dir}/alphafold"
-            if not complete_result(out_model_dir):
+            if not complete_result(out_model_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
 
                 foldseek_res = self.search_templates(inpdb=start_pdb, outdir=current_work_dir + '/foldseek')
 
@@ -536,7 +537,7 @@ class Monomer_iterative_refinement_pipeline:
                                           outdir=out_template_dir)
 
                 makedir_if_not_exists(out_model_dir)
-                cmd = f"python run_alphafold_custom.py " \
+                cmd = f"python {self.params['alphafold_program']} " \
                       f"--fasta_path {fasta_path} " \
                       f"--env_dir {self.params['alphafold_env_dir']} " \
                       f"--database_dir {self.params['alphafold_database_dir']} " \
@@ -545,6 +546,7 @@ class Monomer_iterative_refinement_pipeline:
                       f"--struct_atom_dir {out_template_dir} " \
                       f"--monomer_num_ensemble {self.params['monomer_num_ensemble']} " \
                       f"--monomer_num_recycle {self.params['monomer_num_recycle']} " \
+                      f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
                       f"--output_dir {out_model_dir}"
 
                 try:

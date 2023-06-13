@@ -5,6 +5,7 @@ from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if
 from bml_casp15.monomer_alignment_generation.alignment import read_fasta, write_fasta
 from bml_casp15.monomer_alignment_generation.pipeline import *
 from bml_casp15.monomer_structure_generation.pipeline_v2 import *
+from bml_casp15.monomer_structure_generation.pipeline_default import *
 from bml_casp15.monomer_structure_evaluation.pipeline_sep import *
 from bml_casp15.monomer_structure_evaluation.human_pipeline import *
 from bml_casp15.monomer_templates_search.sequence_based_pipeline_pdb import *
@@ -29,7 +30,7 @@ from bml_casp15.monomer_structure_refinement.util import cal_tmscore
 from bml_casp15.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
 
 
-def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
+def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, only_default=False):
     uniref30 = params['uniref_db_dir'] + '/' + params['uniref_db']
     uniref30_new = params['uniref_db_dir_new'] + '/' + params['uniref_db_new']
     uniclust30 = params['uniclust_db_dir'] + '/' + params['uniclust_db']
@@ -43,17 +44,24 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     hhfilter_binary = params['hhfilter_program']
     jackhmmer_binary = params['jackhmmer_program']
 
-    colabfold_search_binary = params['colabfold_search_program']
-    colabfold_split_msas_binary = params['colabfold_split_msas_program']
-    colabfold_databases = params['colabfold_databases']
-    mmseq_binary = params['mmseq_program']
-
     if only_monomer:
         uniprot_fasta = ""
         uniprot_fasta_newest = ""
     else:
         uniprot_fasta = params['uniprot_fasta']
         uniprot_fasta_newest = params['uniprot_fasta_newest']
+    
+    if not only_default:
+        colabfold_search_binary = ""
+        colabfold_split_msas_binary = ""
+        colabfold_databases = ""
+        mmseq_binary = ""
+    else:
+        colabfold_search_binary = params['colabfold_search_program']
+        colabfold_split_msas_binary = params['colabfold_split_msas_program']
+        colabfold_databases = params['colabfold_databases']
+        mmseq_binary = params['mmseq_program']
+
 
     result = None
     try:
@@ -161,6 +169,18 @@ def run_monomer_structure_generation_pipeline_v2(params, fasta_path, alndir, tem
         pipeline.process_single(fasta_path=fasta_path,
                                 alndir=alndir,
                                 template_dir=templatedir,
+                                outdir=outdir)
+    except Exception as e:
+        print(e)
+        return False
+    return True
+
+
+def run_monomer_structure_generation_pipeline_default(params, fasta_path, alndir, outdir):
+    try:
+        pipeline = Monomer_structure_prediction_pipeline_default(params)
+        pipeline.process_single(fasta_path=fasta_path,
+                                alndir=alndir,
                                 outdir=outdir)
     except Exception as e:
         print(e)

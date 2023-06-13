@@ -10,7 +10,7 @@ from bml_casp15.tool.foldseek import *
 import pickle
 import numpy as np
 from bml_casp15.quaternary_structure_refinement.util import *
-
+from bml_casp15.common.protein import complete_result
 
 def search_templates_foldseek(foldseek_program, databases, inpdb, outdir):
     makedir_if_not_exists(outdir)
@@ -334,7 +334,7 @@ class Multimer_iterative_refinement_pipeline:
 
                 out_model_dir = f"{current_work_dir}/alphafold"
 
-                if not complete_result(out_model_dir):
+                if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
 
                     chain_pdbs = split_pdb(start_pdb, current_work_dir)
 
@@ -655,7 +655,7 @@ class Multimer_iterative_refinement_pipeline:
 
             out_model_dir = f"{current_work_dir}/alphafold"
 
-            if not complete_result(out_model_dir):
+            if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
 
                 chain_pdbs = split_pdb_unrelax2relax(start_pdb, current_work_dir)
 

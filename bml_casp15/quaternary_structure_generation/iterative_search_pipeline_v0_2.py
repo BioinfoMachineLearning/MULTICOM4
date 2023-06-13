@@ -14,7 +14,7 @@ from bml_casp15.complex_templates_search.parsers import TemplateHit
 from bml_casp15.quaternary_structure_refinement.iterative_refine_pipeline_v1 import *
 from bml_casp15.quaternary_structure_refinement.util import *
 from bml_casp15.monomer_alignment_generation.alignment import read_a3m
-
+from bml_casp15.common.protein import complete_result, parse_fasta
 
 def search_templates_foldseek(foldseek_program, databases, inpdb, outdir):
     makedir_if_not_exists(outdir)
@@ -225,7 +225,7 @@ class Multimer_iterative_generation_pipeline_monomer:
         tmscores = [0] * 5
         tmaligns = [0] * 5
 
-        if not complete_result(out_model_dir):
+        if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
             out_template_dir = outdir + '/templates'
 
             makedir_if_not_exists(out_template_dir)
@@ -358,7 +358,7 @@ class Multimer_iterative_generation_pipeline_monomer:
 
         makedir_if_not_exists(prepare_dir)
 
-        if not complete_result(out_model_dir):
+        if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
 
             out_template_dir = prepare_dir + '/templates'
 
@@ -420,6 +420,9 @@ class Multimer_iterative_generation_pipeline_monomer:
                       f"--msa_pair_file {msa_pair_file} " \
                       f"--temp_struct_csv {template_files[0]} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
             else:
                 cmd = f"python {self.params['alphafold_multimer_program']} " \
@@ -431,6 +434,9 @@ class Multimer_iterative_generation_pipeline_monomer:
                       f"--msa_pair_file {msa_pair_file} " \
                       f"--monomer_temp_csvs {','.join(template_files)} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
 
             try:
@@ -629,7 +635,7 @@ class Multimer_iterative_generation_pipeline_monomer:
 
         makedir_if_not_exists(prepare_dir)
 
-        if not complete_result(out_model_dir):
+        if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
 
             out_template_dir = prepare_dir + '/templates'
 
@@ -690,6 +696,9 @@ class Multimer_iterative_generation_pipeline_monomer:
                       f"--monomer_a3ms {','.join(monomer_msa_files)} " \
                       f"--temp_struct_csv {template_files[0]} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
             else:
                 cmd = f"python {self.params['alphafold_multimer_program']} " \
@@ -700,6 +709,9 @@ class Multimer_iterative_generation_pipeline_monomer:
                       f"--monomer_a3ms {','.join(monomer_msa_files)} " \
                       f"--monomer_temp_csvs {','.join(template_files)} " \
                       f"--struct_atom_dir {out_template_dir} " \
+                      f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                      f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                      f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                       f"--output_dir {out_model_dir}"
 
             try:
@@ -710,3 +722,4 @@ class Multimer_iterative_generation_pipeline_monomer:
                 print(e)
 
         os.chdir(cwd)
+

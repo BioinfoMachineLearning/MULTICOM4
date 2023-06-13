@@ -135,7 +135,7 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
                     output_dir):
 
         outdir = f"{output_dir}/img_multimer"
-        if not complete_result(outdir):
+        if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
             monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
             img_a3ms = [f"{aln_dir}/{monomer}/{monomer}.a3m" for monomer in monomers]
             template_stos = [f"{aln_dir}/{monomer}/{monomer}_uniref90.sto" for monomer in monomers]
@@ -148,13 +148,16 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
                        f"--template_stos {','.join(template_stos)} " \
                        f"--env_dir {self.params['alphafold_env_dir']} " \
                        f"--database_dir {self.params['alphafold_database_dir']} " \
+                       f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
+                       f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
+                       f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
                        f"--output_dir {outdir} "
 
             print(base_cmd)
             os.system(base_cmd)
 
         outdir = f"{output_dir}/default_img"
-        if not complete_result(outdir):
+        if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
             monomers = []
             img_default_a3ms = []
             template_stos = []
@@ -198,8 +201,8 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
         # run alphafold default pipeline:
         outdir = f"{output_dir}/default_multimer"
         monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-        if not complete_result(outdir):
-            os.chdir(self.params['alphafold_default_program_dir'])
+        if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+            os.chdir(self.params['alphafold_program_dir'])
             bfd_uniref_a3ms = []
             mgnify_stos = []
             uniref90_stos = []
@@ -246,8 +249,8 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
         if "default_uniref30_22" in self.run_methods:
             outdir = f"{output_dir}/default_uniref30_22"
             monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-            if not complete_result(outdir):
-                os.chdir(self.params['alphafold_default_program_dir'])
+            if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                os.chdir(self.params['alphafold_program_dir'])
                 bfd_uniclust_a3ms = []
                 mgnify_stos = []
                 uniref90_stos = []
@@ -294,8 +297,8 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
         if "default_mul_newest" in self.run_methods:
             outdir = f"{output_dir}/default_mul_newest"
             monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-            if not complete_result(outdir):
-                os.chdir(self.params['alphafold_default_program_dir'])
+            if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                os.chdir(self.params['alphafold_program_dir'])
                 bfd_uniclust_a3ms = []
                 mgnify_stos = []
                 uniref90_stos = []
@@ -343,8 +346,8 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
             # run alphafold default pipeline:
             outdir = f"{output_dir}/default_uniclust30"
             monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
-            if not complete_result(outdir):
-                os.chdir(self.params['alphafold_default_program_dir'])
+            if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                os.chdir(self.params['alphafold_program_dir'])
                 bfd_uniclust_a3ms = []
                 mgnify_stos = []
                 uniref90_stos = []
@@ -426,7 +429,7 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
 
             outdir = f"{output_dir}/{self.method2dir[method]}"
 
-            if complete_result(outdir):
+            if complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                 continue
 
             makedir_if_not_exists(outdir)
@@ -488,7 +491,7 @@ class Quaternary_structure_prediction_homo_pipeline_v2:
                     monomer_paths += [monomer_path]
                 base_cmd += f"--monomer_model_paths {','.join(monomer_paths)} "
 
-            if complete_result(outdir):
+            if complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                 continue
 
             print(base_cmd)
