@@ -51,7 +51,7 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, only_def
         uniprot_fasta = params['uniprot_fasta']
         uniprot_fasta_newest = params['uniprot_fasta_newest']
     
-    if not only_default:
+    if only_default:
         colabfold_search_binary = ""
         colabfold_split_msas_binary = ""
         colabfold_databases = ""
@@ -61,7 +61,6 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, only_def
         colabfold_split_msas_binary = params['colabfold_split_msas_program']
         colabfold_databases = params['colabfold_databases']
         mmseq_binary = params['mmseq_program']
-
 
     result = None
     try:
