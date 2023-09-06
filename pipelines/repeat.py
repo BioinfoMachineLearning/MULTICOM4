@@ -4,7 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
-from bml_casp15.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
+from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
 
 
 if __name__ == '__main__':

@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 import pickle
 from scipy.stats import pearsonr
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file, is_file, is_dir
-from bml_casp15.quaternary_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
+from multicom_dev.quaternary_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
 
 
 def get_avg_factor(infile):

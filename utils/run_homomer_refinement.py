@@ -1,15 +1,15 @@
 import os, sys, argparse, time, copy, pathlib
 from multiprocessing import Pool
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from bml_casp15.monomer_structure_refinement import iterative_refine_pipeline
-from bml_casp15.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
-from bml_casp15.common.pipeline import run_multimer_refinement_pipeline
+from multicom_dev.monomer_structure_refinement import iterative_refine_pipeline
+from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom_dev.common.pipeline import run_multimer_refinement_pipeline
 import pandas as pd
 from absl import flags
 from absl import app
-from bml_casp15.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
-from bml_casp15.quaternary_structure_refinement import iterative_refine_pipeline_multimer
+from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
+from multicom_dev.quaternary_structure_refinement import iterative_refine_pipeline_multimer
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fastas')

@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 import pickle
 from scipy.stats import pearsonr
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file, is_file, is_dir
-from bml_casp15.complex_templates_search import parsers
+from multicom_dev.complex_templates_search import parsers
 import json
 
 def make_msa_features(msas, msa_output_dir, msa_save_path):

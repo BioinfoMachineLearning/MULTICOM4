@@ -1,10 +1,10 @@
 import os, sys, argparse, time, copy, pathlib
 from multiprocessing import Pool
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from bml_casp15.monomer_structure_refinement import iterative_refine_pipeline
-from bml_casp15.common.protein import read_qa_txt_as_df, complete_result
-from bml_casp15.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
+from multicom_dev.monomer_structure_refinement import iterative_refine_pipeline
+from multicom_dev.common.protein import read_qa_txt_as_df, complete_result
+from multicom_dev.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_default, run_monomer_evaluation_pipeline, \
     run_monomer_refinement_pipeline, run_monomer_msa_pipeline_img
 import pandas as pd

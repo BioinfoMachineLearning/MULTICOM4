@@ -4,8 +4,8 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
-from bml_casp15.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
-from bml_casp15.quaternary_structure_evaluation.pairwise_mmalign import *
+from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
+from multicom_dev.quaternary_structure_evaluation.pairwise_mmalign import *
 
 def run_command(inparams):
     tmscore_program, input_dir, pdb1, pdb2, workdir = inparams

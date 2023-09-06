@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 import pickle
 from scipy.stats import pearsonr
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file, is_file, is_dir
-from bml_casp15.quaternary_structure_evaluation.human_pipeline import extract_multimer_pdbs
-from bml_casp15.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom_dev.quaternary_structure_evaluation.human_pipeline import extract_multimer_pdbs
+from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
 
 def get_sequence(contents):
     """Enclosing logic in a function to simplify code"""

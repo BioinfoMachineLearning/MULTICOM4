@@ -1,10 +1,10 @@
 import os, sys, argparse, time
 from multiprocessing import Pool
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from bml_casp15.monomer_alignment_generation.alignment import write_fasta
-from bml_casp15.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
-from bml_casp15.common.pipeline import rerun_multimer_evaluation_pipeline_human
+from multicom_dev.monomer_alignment_generation.alignment import write_fasta
+from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom_dev.common.pipeline import rerun_multimer_evaluation_pipeline_human
 
 from absl import flags
 from absl import app

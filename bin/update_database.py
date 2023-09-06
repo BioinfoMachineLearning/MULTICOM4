@@ -1,10 +1,10 @@
 import os, sys, argparse, time
 from multiprocessing import Pool
 from tqdm import tqdm
-from bml_casp15.complex_alignment_generation.database.uniprot2geno import *
-from bml_casp15.complex_alignment_generation.database.uniprot2pdb import *
-from bml_casp15.complex_alignment_generation.database.uniprot2string import *
-from bml_casp15.common.util import check_file, check_dir, makedir_if_not_exists, check_contents, read_option_file, is_file
+from multicom_dev.monomer_alignments_concatenation.database.uniprot2geno import *
+from multicom_dev.monomer_alignments_concatenation.database.uniprot2pdb import *
+from multicom_dev.monomer_alignments_concatenation.database.uniprot2string import *
+from multicom_dev.common.util import check_file, check_dir, makedir_if_not_exists, check_contents, read_option_file, is_file
 
 
 def direct_download(tools_dir, address, tool):  ####Tools don't need to be configured after downloading and configuring

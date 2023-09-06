@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 import pickle
 from scipy.stats import pearsonr
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file, is_file, is_dir
-from bml_casp15.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
 
 
 def cal_tmscore(inpdb, nativepdb, outfile):
