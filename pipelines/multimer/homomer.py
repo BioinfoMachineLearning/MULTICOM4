@@ -3,7 +3,7 @@ from multiprocessing import Pool
 from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
 from multicom_dev.monomer_alignment_generation.alignment import write_fasta
-from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map, get_stoichiometry_from_sequences
 from multicom_dev.multimer_structure_refinement import iterative_refine_pipeline_multimer
 from multicom_dev.monomer_structure_refinement import iterative_refine_pipeline
 from multicom_dev.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
@@ -66,6 +66,8 @@ def main(argv):
     input_seqs, input_descs = parse_fasta(input_fasta_str)
     chain_id_map, chain_id_seq_map = make_chain_id_map(sequences=input_seqs,
                                                        descriptions=input_descs)
+
+    stoichiometry = get_stoichiometry_from_sequences(input_seqs)
 
     processed_seuqences = {}
     monomer_qas_res = {}
@@ -349,8 +351,11 @@ def main(argv):
     N8_outdir = FLAGS.output_dir + '/N8_multimer_structure_evaluation'
     multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
                                                           params=params,
-                                                          chain_id_map=chain_id_map,
-                                                          indir=N6_outdir, outdir=N8_outdir, is_homomer=True)
+                                                          chain_id_map=chain_id_map, 
+                                                          monomer_model_dir=qa_result_dir,
+                                                          indir=N6_outdir, outdir=N8_outdir,
+                                                          stoichiometry=stoichiometry, 
+                                                          is_homomer=True)
 
     print("#################################################################################################")
 

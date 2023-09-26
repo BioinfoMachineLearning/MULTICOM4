@@ -1,1 +1,1 @@
-from bml_casp15.monomer_templates_concatenation import *
+from multicom_dev.monomer_templates_concatenation import *

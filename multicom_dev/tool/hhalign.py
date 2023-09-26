@@ -20,7 +20,7 @@ import subprocess
 from typing import Sequence
 
 from absl import logging
-from bml_casp15.tool import utils
+from multicom_dev.tool import utils
 
 
 # Internal import (7716).

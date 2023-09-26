@@ -4,18 +4,18 @@ import sys
 import time
 from multiprocessing import Pool
 
-from bml_casp15.common.util import is_dir, is_file, read_option_file, makedir_if_not_exists
-from bml_casp15.common.util import makedir_if_not_exists
-from bml_casp15.monomer_alignments_concatenation.colabfold_interact_v3 import colabfold_interact_v3
-from bml_casp15.monomer_alignments_concatenation.geno_dist import Geno_interact
-from bml_casp15.monomer_alignments_concatenation.pdb_interact_v3 import PDB_interact_v3
-from bml_casp15.monomer_alignments_concatenation.species_interact_v3 import Species_interact_v3
-from bml_casp15.monomer_alignments_concatenation.string_interact_v3 import STRING_interact_v3
-from bml_casp15.monomer_alignments_concatenation.uniclust_oxmatch_v3 import UNICLUST_oxmatch_v3
-from bml_casp15.monomer_alignments_concatenation.uniprot_distance_v3 import UNIPROT_distance_v3
-from bml_casp15.monomer_alignments_concatenation.combine_v1 import Combine_alignments_v1
-from bml_casp15.monomer_alignments_concatenation.combine_v2 import Combine_alignments_v2
-from bml_casp15.monomer_alignment_generation.alignment import *
+from multicom_dev.common.util import is_dir, is_file, read_option_file, makedir_if_not_exists
+from multicom_dev.common.util import makedir_if_not_exists
+from multicom_dev.monomer_alignments_concatenation.colabfold_interact_v3 import colabfold_interact_v3
+from multicom_dev.monomer_alignments_concatenation.geno_dist import Geno_interact
+from multicom_dev.monomer_alignments_concatenation.pdb_interact_v3 import PDB_interact_v3
+from multicom_dev.monomer_alignments_concatenation.species_interact_v3 import Species_interact_v3
+from multicom_dev.monomer_alignments_concatenation.string_interact_v3 import STRING_interact_v3
+from multicom_dev.monomer_alignments_concatenation.uniclust_oxmatch_v3 import UNICLUST_oxmatch_v3
+from multicom_dev.monomer_alignments_concatenation.uniprot_distance_v3 import UNIPROT_distance_v3
+from multicom_dev.monomer_alignments_concatenation.combine_v1 import Combine_alignments_v1
+from multicom_dev.monomer_alignments_concatenation.combine_v2 import Combine_alignments_v2
+from multicom_dev.monomer_alignment_generation.alignment import *
 from tqdm import tqdm
 
 mapping = {'-': 21, 'A': 1, 'B': 21, 'C': 2, 'D': 3, 'E': 4, 'F': 5,

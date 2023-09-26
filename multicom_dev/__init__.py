@@ -1,5 +1,5 @@
 """
-This is bml_casp15
+This is multicom_dev
 """
 
 __all__ = ["monomer_alignment_generation", "monomer_templates_search", "monomer_structure_generation",

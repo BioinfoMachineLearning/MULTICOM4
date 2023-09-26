@@ -2,12 +2,12 @@ import copy
 import os
 import sys
 import time
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
 import pandas as pd
 from multiprocessing import Pool
-from bml_casp15.monomer_templates_concatenation import parsers
-from bml_casp15.tool import hhsearch
-from bml_casp15.tool import hhalign
+from multicom_dev.monomer_templates_concatenation import parsers
+from multicom_dev.tool import hhsearch
+from multicom_dev.tool import hhalign
 import dataclasses
 import numpy as np
 

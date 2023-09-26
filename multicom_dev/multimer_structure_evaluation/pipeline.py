@@ -1,16 +1,16 @@
 import os, sys, argparse, time, json
 from multiprocessing import Pool
 from tqdm import tqdm
-from bml_casp15.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
+from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
 import pandas as pd
-from bml_casp15.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
-from bml_casp15.multimer_structure_evaluation.pairwise_dockq import Pairwise_dockq_qa
-from bml_casp15.multimer_structure_evaluation.dproq_ranking import DPROQ
-from bml_casp15.multimer_structure_evaluation.enqa_ranking import En_qa
-from bml_casp15.monomer_structure_evaluation.bfactor_ranking import Bfactor_qa
-from bml_casp15.multimer_structure_evaluation.multieva_qa import MultiEva_qa
-from bml_casp15.multimer_structure_evaluation.foldseek_ranking import FoldSeek_qa
-from bml_casp15.common.protein import complete_result
+from multicom_dev.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
+from multicom_dev.multimer_structure_evaluation.pairwise_dockq import Pairwise_dockq_qa
+from multicom_dev.multimer_structure_evaluation.dproq_ranking import DPROQ
+from multicom_dev.multimer_structure_evaluation.enqa_ranking import En_qa
+from multicom_dev.monomer_structure_evaluation.bfactor_ranking import Bfactor_qa
+from multicom_dev.multimer_structure_evaluation.multieva_qa import MultiEva_qa
+from multicom_dev.multimer_structure_evaluation.foldseek_ranking import FoldSeek_qa
+from multicom_dev.common.protein import complete_result
 
 
 class Multimer_structure_evaluation_pipeline:
@@ -65,11 +65,11 @@ class Multimer_structure_evaluation_pipeline:
                 model_name = list(ranking_json["order"])[i]
                 os.system(f"cp {model_dir}/{method}/result_{model_name}.pkl {pkldir}/{method}_{i}.pkl")
                 for chain_id in chain_id_map:
-                    msa_chain_outdir = msadir + '/' + chain_id_map[chain_id].description
+                    msa_chain_outdir = msadir + '/' + chain_id
                     makedir_if_not_exists(msa_chain_outdir)
                     os.system(f"cp {model_dir}/{method}/msas/{chain_id}/monomer_final.a3m "
                               f"{msa_chain_outdir}/{method}_{i}.monomer.a3m")
-                    os.system(f"cp {model_dir}/{method}/msas/{chain_id_map[chain_id].description}.paired.a3m "
+                    os.system(f"cp {model_dir}/{method}/msas/{chain_id}.paired.a3m "
                               f"{msa_chain_outdir}/{method}_{i}.paired.a3m")
 
         result_dict = {}
@@ -117,9 +117,8 @@ class Multimer_structure_evaluation_pipeline:
                 makedir_if_not_exists(refdir)
 
                 for chain_id in chain_id_map:
-                    default_chain_model = monomer_model_dir + '/' + chain_id_map[
-                        chain_id].description + '/pdb/default_0.pdb'
-                    os.system(f"cp {default_chain_model} {refdir}/{chain_id_map[chain_id].description}.pdb")
+                    default_chain_model = monomer_model_dir + '/' + chain_id + '/pdb/default_0.pdb'
+                    os.system(f"cp {default_chain_model} {refdir}/{chain_id}.pdb")
 
                 multieva_csv = self.multieva.run(chain_id_map=chain_id_map,
                                                  fasta_path=fasta_path,
@@ -260,9 +259,8 @@ class Multimer_structure_evaluation_pipeline:
                 makedir_if_not_exists(refdir)
 
                 for chain_id in chain_id_map:
-                    default_chain_model = monomer_model_dir + '/' + chain_id_map[
-                        chain_id].description + '/pdb/default_0.pdb'
-                    os.system(f"cp {default_chain_model} {refdir}/{chain_id_map[chain_id].description}.pdb")
+                    default_chain_model = monomer_model_dir + '/' + chain_id + '/pdb/default_0.pdb'
+                    os.system(f"cp {default_chain_model} {refdir}/{chain_id}.pdb")
 
                 multieva_csv = self.multieva.run(chain_id_map=chain_id_map,
                                                  fasta_path=fasta_path,

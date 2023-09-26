@@ -4,7 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 import pickle
-from bml_casp15.common.protein import parse_pdb_row
+from multicom_dev.common.protein import parse_pdb_row
 
 
 def get_avg_factor(infile):

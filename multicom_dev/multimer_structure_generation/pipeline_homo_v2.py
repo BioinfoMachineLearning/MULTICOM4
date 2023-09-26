@@ -2,8 +2,8 @@ import copy
 import os
 import sys
 import time
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
-from bml_casp15.common.protein import complete_result, parse_fasta
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.protein import complete_result, parse_fasta
 import pandas as pd
 from multiprocessing import Pool
 import pathlib
@@ -71,9 +71,9 @@ class Multimer_structure_prediction_homo_pipeline_v2:
 
         if run_methods is None:
             self.run_methods = ['default',
-                                'default_mul_newest',
-                                'default_uniref30_22',
-                                'default_uniclust30',
+                                #'default_mul_newest',
+                                #'default_uniref30_22',
+                                #'default_uniclust30',
                                 'default+sequence_based_template_pdb70',
                                 'default+structure_based_template',
                                 'default+sequence_based_template_pdb',
@@ -136,7 +136,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
 
         outdir = f"{output_dir}/img_multimer"
         if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
-            monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
+            monomers = [chain_id for chain_id in chain_id_map]
             img_a3ms = [f"{aln_dir}/{monomer}/{monomer}.a3m" for monomer in monomers]
             template_stos = [f"{aln_dir}/{monomer}/{monomer}_uniref90.sto" for monomer in monomers]
             makedir_if_not_exists(outdir)
@@ -162,7 +162,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
             img_default_a3ms = []
             template_stos = []
             for chain_id in chain_id_map:
-                monomer = chain_id_map[chain_id].description
+                monomer = chain_id
                 monomers += [monomer]
                 img_a3m = f"{aln_dir}/{monomer}/{monomer}.a3m"
                 default_a3m = f"{output_dir}/default_multimer/msas/{chain_id}/monomer_final.a3m"
@@ -200,7 +200,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
 
         # run alphafold default pipeline:
         outdir = f"{output_dir}/default_multimer"
-        monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
+        monomers = [chain_id for chain_id in chain_id_map]
         if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
             os.chdir(self.params['alphafold_program_dir'])
             bfd_uniref_a3ms = []
@@ -208,7 +208,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
             uniref90_stos = []
             uniprot_stos = []
             for chain_id in chain_id_map:
-                monomer = chain_id_map[chain_id].description
+                monomer = chain_id
                 monomer_bfd_uniref_a3m = f"{aln_dir}/{monomer}/{monomer}_uniref30_bfd.a3m"
                 if not os.path.exists(monomer_bfd_uniref_a3m):
                     raise Exception(f"Cannot find bfd and uniclust a3m for {monomer}: {monomer_bfd_uniref_a3m}")
@@ -248,7 +248,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
         # run alphafold default pipeline:
         if "default_uniref30_22" in self.run_methods:
             outdir = f"{output_dir}/default_uniref30_22"
-            monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
+            monomers = [chain_id for chain_id in chain_id_map]
             if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                 os.chdir(self.params['alphafold_program_dir'])
                 bfd_uniclust_a3ms = []
@@ -256,7 +256,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
                 uniref90_stos = []
                 uniprot_stos = []
                 for chain_id in chain_id_map:
-                    monomer = chain_id_map[chain_id].description
+                    monomer = chain_id
                     monomer_bfd_uniclust_a3m = f"{aln_dir}/{monomer}/{monomer}_uniref30_22_bfd.a3m"
                     if not os.path.exists(monomer_bfd_uniclust_a3m):
                         raise Exception(f"Cannot find bfd and uniclust a3m for {monomer}: {monomer_bfd_uniclust_a3m}")
@@ -296,7 +296,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
 
         if "default_mul_newest" in self.run_methods:
             outdir = f"{output_dir}/default_mul_newest"
-            monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
+            monomers = [chain_id for chain_id in chain_id_map]
             if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                 os.chdir(self.params['alphafold_program_dir'])
                 bfd_uniclust_a3ms = []
@@ -304,7 +304,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
                 uniref90_stos = []
                 uniprot_stos = []
                 for chain_id in chain_id_map:
-                    monomer = chain_id_map[chain_id].description
+                    monomer = chain_id
                     monomer_bfd_uniclust_a3m = f"{aln_dir}/{monomer}/{monomer}_uniref30_22_bfd.a3m"
                     if not os.path.exists(monomer_bfd_uniclust_a3m):
                         raise Exception(f"Cannot find bfd and uniclust a3m for {monomer}: {monomer_bfd_uniclust_a3m}")
@@ -345,7 +345,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
         if "default_uniclust30" in self.run_methods:
             # run alphafold default pipeline:
             outdir = f"{output_dir}/default_uniclust30"
-            monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
+            monomers = [chain_id for chain_id in chain_id_map]
             if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                 os.chdir(self.params['alphafold_program_dir'])
                 bfd_uniclust_a3ms = []
@@ -353,7 +353,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
                 uniref90_stos = []
                 uniprot_stos = []
                 for chain_id in chain_id_map:
-                    monomer = chain_id_map[chain_id].description
+                    monomer = chain_id
                     monomer_bfd_uniclust_a3m = f"{aln_dir}/{monomer}/{monomer}_uniclust30_bfd.a3m"
                     if not os.path.exists(monomer_bfd_uniclust_a3m):
                         raise Exception(f"Cannot find bfd and uniclust a3m for {monomer}: {monomer_bfd_uniclust_a3m}")
@@ -395,7 +395,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
         default_alphafold_monomer_a3ms = []
         template_stos = []
         for chain_id in chain_id_map:
-            monomer = chain_id_map[chain_id].description
+            monomer = chain_id
             monomer_template_sto = f"{aln_dir}/{monomer}/{monomer}_uniref90.sto"
             if not os.path.exists(monomer_template_sto):
                 raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
@@ -443,7 +443,7 @@ class Multimer_structure_prediction_homo_pipeline_v2:
                        f"--num_multimer_predictions_per_model {self.params['num_multimer_predictions_per_model']} " \
                        f"--multimer_num_ensemble {self.params['multimer_num_ensemble']} " \
                        f"--multimer_num_recycle {self.params['multimer_num_recycle']} " \
-                       f"--output_dir {outdir}"
+                       f"--output_dir {outdir} "
 
             if template_method == "":
                 base_cmd += f"--template_stos {','.join(template_stos)} "

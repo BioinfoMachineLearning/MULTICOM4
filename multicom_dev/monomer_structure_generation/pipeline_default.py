@@ -2,11 +2,11 @@ import copy
 import os
 import sys
 import time
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
 import pandas as pd
 from multiprocessing import Pool
 import pathlib
-from bml_casp15.common.protein import complete_result
+from multicom_dev.common.protein import complete_result
 
 
 class Monomer_structure_prediction_pipeline_default:

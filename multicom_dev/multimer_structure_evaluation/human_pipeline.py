@@ -1,17 +1,17 @@
 import os, sys, argparse, time, json
 from multiprocessing import Pool
 from tqdm import tqdm
-from bml_casp15.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
+from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
 import pandas as pd
-from bml_casp15.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
-from bml_casp15.multimer_structure_evaluation.pairwise_dockq import Pairwise_dockq_qa
-from bml_casp15.multimer_structure_evaluation.dproq_ranking import DPROQ
-from bml_casp15.multimer_structure_evaluation.enqa_ranking import En_qa
-from bml_casp15.monomer_structure_evaluation.bfactor_ranking import Bfactor_qa
-from bml_casp15.multimer_structure_evaluation.multieva_qa import MultiEva_qa
-from bml_casp15.multimer_structure_evaluation.foldseek_ranking import FoldSeek_qa
-from bml_casp15.common.protein import complete_result
-from bml_casp15.monomer_structure_evaluation.pipeline_sep import extract_monomer_pdbs
+from multicom_dev.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
+from multicom_dev.multimer_structure_evaluation.pairwise_dockq import Pairwise_dockq_qa
+from multicom_dev.multimer_structure_evaluation.dproq_ranking import DPROQ
+from multicom_dev.multimer_structure_evaluation.enqa_ranking import En_qa
+from multicom_dev.monomer_structure_evaluation.bfactor_ranking import Bfactor_qa
+from multicom_dev.multimer_structure_evaluation.multieva_qa import MultiEva_qa
+from multicom_dev.multimer_structure_evaluation.foldseek_ranking import FoldSeek_qa
+from multicom_dev.common.protein import complete_result
+from multicom_dev.monomer_structure_evaluation.pipeline_sep import extract_monomer_pdbs
 from Bio.PDB.PDBParser import PDBParser
 import numpy as np
 import pickle

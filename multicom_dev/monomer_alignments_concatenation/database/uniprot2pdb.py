@@ -1,5 +1,5 @@
 import os, sys, argparse, time
-from bml_casp15.common.util import is_dir, is_file, die, makedir_if_not_exists, clean_dir
+from multicom_dev.common.util import is_dir, is_file, die, makedir_if_not_exists, clean_dir
 from multiprocessing import Pool
 from tqdm import tqdm
 

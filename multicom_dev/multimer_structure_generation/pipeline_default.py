@@ -2,8 +2,8 @@ import copy
 import os
 import sys
 import time
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
-from bml_casp15.common.protein import complete_result, parse_fasta
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.protein import complete_result, parse_fasta
 import pandas as pd
 from multiprocessing import Pool
 import pathlib
@@ -25,7 +25,7 @@ class Multimer_structure_prediction_pipeline_default:
 
         # run alphafold default pipeline:
         outdir = f"{output_dir}/default_multimer"
-        monomers = [chain_id_map[chain_id].description for chain_id in chain_id_map]
+        monomers = [chain_id for chain_id in chain_id_map]
         if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
             os.chdir(self.params['alphafold_program_dir'])
             bfd_uniclust_a3ms = []
@@ -33,7 +33,7 @@ class Multimer_structure_prediction_pipeline_default:
             uniref90_stos = []
             uniprot_stos = []
             for chain_id in chain_id_map:
-                monomer = chain_id_map[chain_id].description
+                monomer = chain_id
                 monomer_bfd_uniclust_a3m = f"{aln_dir}/{monomer}/{monomer}_uniref30_bfd.a3m"
                 if not os.path.exists(monomer_bfd_uniclust_a3m):
                     raise Exception(f"Cannot find bfd and uniclust a3m for {monomer}: {monomer_bfd_uniclust_a3m}")

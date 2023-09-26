@@ -1,12 +1,12 @@
 import os, sys, argparse, time
 from multiprocessing import Pool
 from tqdm import tqdm
-from bml_casp15.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
+from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
 import pandas as pd
-from bml_casp15.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
-from bml_casp15.monomer_structure_evaluation.enqa_ranking import En_qa
-from bml_casp15.monomer_structure_evaluation.bfactor_ranking import Bfactor_qa
-from bml_casp15.common.protein import read_qa_txt_as_df
+from multicom_dev.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
+from multicom_dev.monomer_structure_evaluation.enqa_ranking import En_qa
+from multicom_dev.monomer_structure_evaluation.bfactor_ranking import Bfactor_qa
+from multicom_dev.common.protein import read_qa_txt_as_df
 import copy
 import pickle
 import json

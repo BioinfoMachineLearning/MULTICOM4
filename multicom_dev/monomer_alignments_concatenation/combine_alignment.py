@@ -3,8 +3,8 @@ from collections import OrderedDict, defaultdict
 from copy import deepcopy
 import numpy as np
 import pandas as pd
-from bml_casp15.monomer_alignment_generation.alignment import *
-from bml_casp15.monomer_alignments_concatenation.pipeline import *
+from multicom_dev.monomer_alignment_generation.alignment import *
+from multicom_dev.monomer_alignments_concatenation.pipeline import *
 
 class Combine_alignment:
 

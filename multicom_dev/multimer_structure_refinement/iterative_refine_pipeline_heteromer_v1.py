@@ -2,15 +2,15 @@ import copy
 import os
 import sys
 import time, json
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
 import pandas as pd
 from multiprocessing import Pool
 import dataclasses
-from bml_casp15.tool.foldseek import *
+from multicom_dev.tool.foldseek import *
 import pickle
 import numpy as np
-from bml_casp15.multimer_structure_refinement.util import *
-from bml_casp15.common.protein import complete_result
+from multicom_dev.multimer_structure_refinement.util import *
+from multicom_dev.common.protein import complete_result
 
 def search_templates_foldseek(foldseek_program, databases, inpdb, outdir):
     makedir_if_not_exists(outdir)
@@ -42,7 +42,7 @@ class Multimer_iterative_refinement_pipeline:
         for evalue_threshold, tmscore_threshold in zip(evalue_thresholds, tmscore_thresholds):
             chain_template_msas = {}
             for chain_id in chain_id_map:
-                chain_template_msas[chain_id] = {'desc': [chain_id_map[chain_id].description],
+                chain_template_msas[chain_id] = {'desc': [chain_id],
                                                  'seq': [chain_id_map[chain_id].sequence]}
 
             complex_templates_df = None
@@ -145,14 +145,14 @@ class Multimer_iterative_refinement_pipeline:
 
         out_msas = []
         for chain_id in chain_id_map:
-            start_msa = start_msa_path + '/' + chain_id_map[chain_id].description + '.start.a3m'
+            start_msa = start_msa_path + '/' + chain_id + '.start.a3m'
             fasta_chunks = (f">{chain_template_msas[chain_id]['desc'][i]}\n{chain_template_msas[chain_id]['seq'][i]}"
                             for i in range(len(chain_template_msas[chain_id]['desc'])))
             with open(start_msa + '.temp', 'w') as fw:
                 fw.write('\n'.join(fasta_chunks) + '\n')
             combine_a3ms([start_msa, f"{start_msa}.temp"],
-                         f"{msa_out_path}/{chain_id_map[chain_id].description}.iteration{iteration}.a3m")
-            out_msas += [f"{msa_out_path}/{chain_id_map[chain_id].description}.iteration{iteration}.a3m"]
+                         f"{msa_out_path}/{chain_id}.iteration{iteration}.a3m")
+            out_msas += [f"{msa_out_path}/{chain_id}.iteration{iteration}.a3m"]
 
         interact_dict = {}
         msa_len = -1
@@ -171,10 +171,10 @@ class Multimer_iterative_refinement_pipeline:
         top_template_files = []
         for template_result, chain_id in zip(template_results, chain_id_map):
             check_and_rank_monomer_templates_local_and_global(template_result=template_result,
-                                                              outfile=f"{outpath}/{chain_id_map[chain_id].description}.top{self.max_template_count}",
+                                                              outfile=f"{outpath}/{chain_id}.top{self.max_template_count}",
                                                               query_sequence=chain_id_map[chain_id].sequence,
                                                               max_template_count=self.max_template_count)
-            top_template_files += [f"{outpath}/{chain_id_map[chain_id].description}.top{self.max_template_count}"]
+            top_template_files += [f"{outpath}/{chain_id}.top{self.max_template_count}"]
         return top_template_files, out_msas, interact_csv
         #
         # prev_df.iloc[keep_indices].to_csv(outpath + '/complex_templates.csv')
@@ -213,11 +213,11 @@ class Multimer_iterative_refinement_pipeline:
         native_pdb = ""
         if os.path.exists(native_pdb_dir):
             native_pdb = outdir + '/' + '_'.join(
-                [chain_id_map[chain_id].description for chain_id in chain_id_map]) + '.atom'
+                [chain_id for chain_id in chain_id_map]) + '.atom'
             combine_pdb(
-                [native_pdb_dir + '/' + chain_id_map[chain_id].description + '.atom'
-                 if os.path.exists(native_pdb_dir + '/' + chain_id_map[chain_id].description + '.atom')
-                 else native_pdb_dir + '/' + chain_id_map[chain_id].description + '.pdb'
+                [native_pdb_dir + '/' + chain_id + '.atom'
+                 if os.path.exists(native_pdb_dir + '/' + chain_id + '.atom')
+                 else native_pdb_dir + '/' + chain_id + '.pdb'
                  for chain_id in chain_id_map],
                 native_pdb)
 
@@ -285,8 +285,8 @@ class Multimer_iterative_refinement_pipeline:
                 makedir_if_not_exists(start_msa_path)
 
                 for chain_id in chain_id_map:
-                    os.system(f"cp {current_ref_dir}/msas/{chain_id_map[chain_id].description}.paired.a3m "
-                              f"{start_msa_path}/{chain_id_map[chain_id].description}.start.a3m")
+                    os.system(f"cp {current_ref_dir}/msas/{chain_id}.paired.a3m "
+                              f"{start_msa_path}/{chain_id}.start.a3m")
 
                 with open(start_pkl, 'rb') as f:
                     ref_avg_lddt = np.mean(pickle.load(f)['ranking_confidence'])
@@ -318,19 +318,19 @@ class Multimer_iterative_refinement_pipeline:
                         if chain_id not in chain_id_map:
                             raise Exception("Multimer fasta file and model doesn't match!")
 
-                        monomer_work_dir = current_work_dir + '/' + chain_id_map[chain_id].description
+                        monomer_work_dir = current_work_dir + '/' + chain_id
                         makedir_if_not_exists(monomer_work_dir)
                         os.system(
-                            f"mv {chain_pdbs[chain_id]} {monomer_work_dir}/{chain_id_map[chain_id].description}.pdb")
+                            f"mv {chain_pdbs[chain_id]} {monomer_work_dir}/{chain_id}.pdb")
                         foldseek_res = search_templates_foldseek(
                             foldseek_program=self.params['foldseek_program'],
                             databases=[self.params['foldseek_pdb_database'], self.params['foldseek_af_database']],
-                            inpdb=f"{monomer_work_dir}/{chain_id_map[chain_id].description}.pdb",
+                            inpdb=f"{monomer_work_dir}/{chain_id}.pdb",
                             outdir=monomer_work_dir + '/foldseek')
 
                         if len(foldseek_res['all_alignment']) == 0:
                             print(
-                                f"Cannot find any templates for {chain_id_map[chain_id].description} in iteration {num_iteration + 1}")
+                                f"Cannot find any templates for {chain_id} in iteration {num_iteration + 1}")
                             break
 
                         # os.system(f"cp {foldseek_res} {monomer_work_dir}/structure_templates.csv")
@@ -354,7 +354,7 @@ class Multimer_iterative_refinement_pipeline:
                     for chain_id, template_file in zip(chain_id_map, template_files):
                         if len(pd.read_csv(template_file, sep='\t')) == 0:
                             print(
-                                f"Cannot find any templates for {chain_id_map[chain_id].description} in iteration {num_iteration + 1}")
+                                f"Cannot find any templates for {chain_id} in iteration {num_iteration + 1}")
                             find_templates = False
 
                     if not find_templates:
@@ -615,7 +615,7 @@ class Multimer_iterative_refinement_pipeline:
 
             for chain_id in chain_id_map:
                 os.system(f"cp {ref_start_msa_paths[chain_id]['paired_msa']} "
-                          f"{start_msa_path}/{chain_id_map[chain_id].description}.start.a3m")
+                          f"{start_msa_path}/{chain_id}.start.a3m")
 
             os.system(f"cp {ref_start_pdb} {start_pdb}")
             os.system(f"cp {ref_start_pkl} {start_pkl}")
@@ -638,19 +638,19 @@ class Multimer_iterative_refinement_pipeline:
                     if chain_id not in chain_id_map:
                         raise Exception("Multimer fasta file and model doesn't match!")
 
-                    monomer_work_dir = current_work_dir + '/' + chain_id_map[chain_id].description
+                    monomer_work_dir = current_work_dir + '/' + chain_id
                     makedir_if_not_exists(monomer_work_dir)
                     os.system(
-                        f"mv {chain_pdbs[chain_id]} {monomer_work_dir}/{chain_id_map[chain_id].description}.pdb")
+                        f"mv {chain_pdbs[chain_id]} {monomer_work_dir}/{chain_id}.pdb")
                     foldseek_res = search_templates_foldseek(
                         foldseek_program=self.params['foldseek_program'],
                         databases=[self.params['foldseek_pdb_database'], self.params['foldseek_af_database']],
-                        inpdb=f"{monomer_work_dir}/{chain_id_map[chain_id].description}.pdb",
+                        inpdb=f"{monomer_work_dir}/{chain_id}.pdb",
                         outdir=monomer_work_dir + '/foldseek')
 
                     if len(foldseek_res['all_alignment']) == 0:
                         print(
-                            f"Cannot find any templates for {chain_id_map[chain_id].description} in iteration {num_iteration + 1}")
+                            f"Cannot find any templates for {chain_id} in iteration {num_iteration + 1}")
                         break
 
                     # os.system(f"cp {foldseek_res} {monomer_work_dir}/structure_templates.csv")
@@ -674,7 +674,7 @@ class Multimer_iterative_refinement_pipeline:
                 for chain_id, template_file in zip(chain_id_map, template_files):
                     if len(pd.read_csv(template_file, sep='\t')) == 0:
                         print(
-                            f"Cannot find any templates for {chain_id_map[chain_id].description} in iteration {num_iteration + 1}")
+                            f"Cannot find any templates for {chain_id} in iteration {num_iteration + 1}")
                         find_templates = False
 
                 if not find_templates:
@@ -734,7 +734,7 @@ class Multimer_iterative_refinement_pipeline:
                 ref_start_msa_paths = {}
                 for chain_id in chain_id_map:
                     ref_start_msa_paths[chain_id] = dict(
-                        paired_msa=f"{out_model_dir}/msas/{chain_id_map[chain_id].description}.paired.a3m")
+                        paired_msa=f"{out_model_dir}/msas/{chain_id}.paired.a3m")
                     # monomer_msa=f"{out_model_dir}/msas/{chain_id}/monomer_final.a3m")
 
                 print('##################################################')
@@ -751,7 +751,7 @@ class Multimer_iterative_refinement_pipeline:
                     ref_start_msa_paths = {}
                     for chain_id in chain_id_map:
                         ref_start_msa_paths[chain_id] = dict(
-                            paired_msa=f"{out_model_dir}/msas/{chain_id_map[chain_id].description}.paired.a3m")
+                            paired_msa=f"{out_model_dir}/msas/{chain_id}.paired.a3m")
                         # monomer_msa=f"{out_model_dir}/msas/{chain_id}/monomer_final.a3m")
                     model_iteration_scores += [max_lddt_score]
                 break
@@ -771,9 +771,9 @@ class Multimer_iterative_refinement_pipeline:
 
         for chain_id in chain_id_map:
             os.system(f"cp {ref_start_msa_paths[chain_id]['paired_msa']} "
-                      f"{final_model_dir}/{chain_id_map[chain_id].description}.paired.a3m")
+                      f"{final_model_dir}/{chain_id}.paired.a3m")
             # os.system(f"cp {ref_start_msa_paths[chain_id]['monomer_msa']} "
-            #           f"{final_model_dir}/{chain_id_map[chain_id].description}.monomer.a3m")
+            #           f"{final_model_dir}/{chain_id}.monomer.a3m")
 
         os.chdir(cwd)
 

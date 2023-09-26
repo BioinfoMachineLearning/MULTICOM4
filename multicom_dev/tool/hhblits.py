@@ -7,7 +7,7 @@ import os
 import subprocess
 from typing import Any, Mapping, Optional, Sequence
 from absl import logging
-from bml_casp15.tool import utils
+from multicom_dev.tool import utils
 
 _HHBLITS_DEFAULT_P = 20
 _HHBLITS_DEFAULT_Z = 500

@@ -1,3 +1,3 @@
-from bml_casp15.common.util import *
-from bml_casp15.common.protein import *
-from bml_casp15.common.pipeline import *
+from multicom_dev.common.util import *
+from multicom_dev.common.protein import *
+from multicom_dev.common.pipeline import *

@@ -3,8 +3,8 @@ from collections import OrderedDict, defaultdict
 from copy import deepcopy
 import numpy as np
 import pandas as pd
-from bml_casp15.monomer_alignment_generation.alignment import *
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.monomer_alignment_generation.alignment import *
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
 
 

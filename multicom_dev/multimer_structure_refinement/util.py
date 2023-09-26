@@ -2,13 +2,13 @@ import copy
 import os
 import sys
 import time, json
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
 import pandas as pd
 import dataclasses
 import numpy as np
-from bml_casp15.monomer_templates_concatenation.sequence_based_pipeline import assess_hhsearch_hit
-from bml_casp15.monomer_templates_concatenation.parsers import TemplateHit
-from bml_casp15.monomer_structure_refinement.util import build_alignment_indices, PrefilterError
+from multicom_dev.monomer_templates_concatenation.sequence_based_pipeline import assess_hhsearch_hit
+from multicom_dev.monomer_templates_concatenation.parsers import TemplateHit
+from multicom_dev.monomer_structure_refinement.util import build_alignment_indices, PrefilterError
 
 # need to add A if using relaxation in alphafold
 PDB_CHAIN_IDS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

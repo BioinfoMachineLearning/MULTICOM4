@@ -1,1 +1,1 @@
-from bml_casp15.multimer_structure_refinement import *
+from multicom_dev.multimer_structure_refinement import *

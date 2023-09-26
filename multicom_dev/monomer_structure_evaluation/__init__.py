@@ -1,1 +1,1 @@
-from bml_casp15.monomer_structure_evaluation import *
+from multicom_dev.monomer_structure_evaluation import *

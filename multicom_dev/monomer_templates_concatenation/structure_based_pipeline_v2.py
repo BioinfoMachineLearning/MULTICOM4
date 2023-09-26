@@ -2,15 +2,15 @@ import copy
 import os
 import sys
 import time
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
 import pandas as pd
 from multiprocessing import Pool
 import dataclasses
 import pathlib
-from bml_casp15.tool.foldseek import *
-from bml_casp15.monomer_templates_concatenation.sequence_based_pipeline import assess_hhsearch_hit, PrefilterError
-from bml_casp15.monomer_templates_concatenation.parsers import TemplateHit
-from bml_casp15.monomer_structure_refinement.util import *
+from multicom_dev.tool.foldseek import *
+from multicom_dev.monomer_templates_concatenation.sequence_based_pipeline import assess_hhsearch_hit, PrefilterError
+from multicom_dev.monomer_templates_concatenation.parsers import TemplateHit
+from multicom_dev.monomer_structure_refinement.util import *
 
 
 def search_templates_foldseek(foldseek_program, databases, inpdb, outdir):

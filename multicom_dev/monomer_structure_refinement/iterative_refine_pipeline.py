@@ -2,11 +2,11 @@ import copy
 import os
 import sys
 import time, json
-from bml_casp15.common.util import makedir_if_not_exists, check_dirs
+from multicom_dev.common.util import makedir_if_not_exists, check_dirs
 import dataclasses
-from bml_casp15.monomer_structure_refinement.iterative_refine_pipeline_v4_50 import *
+from multicom_dev.monomer_structure_refinement.iterative_refine_pipeline_v4_50 import *
 import pandas as pd
-from bml_casp15.monomer_structure_refinement.util import cal_tmscore
+from multicom_dev.monomer_structure_refinement.util import cal_tmscore
 
 class refinement_input:
     def __init__(self, fasta_path, pdb_path, pkl_path, msa_path):

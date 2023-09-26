@@ -1,39 +1,39 @@
 import os, sys, argparse, time, copy
 from multiprocessing import Pool
-from bml_casp15.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from bml_casp15.monomer_alignment_generation.alignment import read_fasta, write_fasta
-from bml_casp15.monomer_alignment_generation.pipeline import *
-from bml_casp15.monomer_structure_generation.pipeline_v2 import *
-from bml_casp15.monomer_structure_generation.pipeline_default import *
-from bml_casp15.monomer_structure_evaluation.pipeline_sep import *
-from bml_casp15.monomer_structure_evaluation.human_pipeline import *
-from bml_casp15.monomer_templates_search.sequence_based_pipeline_pdb import *
-from bml_casp15.monomer_structure_refinement import iterative_refine_pipeline
-from bml_casp15.multimer_structure_refinement import iterative_refine_pipeline_multimer
-from bml_casp15.monomer_alignments_concatenation.pipeline_v3 import *
-from bml_casp15.monomer_templates_concatenation import sequence_based_pipeline_complex_pdb, \
+from multicom_dev.monomer_alignment_generation.alignment import read_fasta, write_fasta
+from multicom_dev.monomer_alignment_generation.pipeline import *
+from multicom_dev.monomer_structure_generation.pipeline_v2 import *
+from multicom_dev.monomer_structure_generation.pipeline_default import *
+from multicom_dev.monomer_structure_evaluation.pipeline_sep import *
+from multicom_dev.monomer_structure_evaluation.human_pipeline import *
+from multicom_dev.monomer_templates_search.sequence_based_pipeline_pdb import *
+from multicom_dev.monomer_structure_refinement import iterative_refine_pipeline
+from multicom_dev.multimer_structure_refinement import iterative_refine_pipeline_multimer
+from multicom_dev.monomer_alignments_concatenation.pipeline_v3 import *
+from multicom_dev.monomer_templates_concatenation import sequence_based_pipeline_complex_pdb, \
     sequence_based_pipeline_pdb, sequence_based_pipeline, structure_based_pipeline_v2
-# from bml_casp15.multimer_structure_generation.pipeline import *
-from bml_casp15.multimer_structure_generation.pipeline_v2 import *
-from bml_casp15.multimer_structure_generation.pipeline_default import *
-# from bml_casp15.multimer_structure_generation.pipeline_homo import *
-from bml_casp15.multimer_structure_generation.pipeline_homo_v2 import *
-from bml_casp15.multimer_structure_generation.iterative_search_pipeline_v0_2 import *
-from bml_casp15.multimer_structure_generation.iterative_search_pipeline_v0_2_old import *
-from bml_casp15.multimer_structure_evaluation.pipeline import *
-from bml_casp15.multimer_structure_evaluation.human_pipeline import *
-from bml_casp15.common.protein import *
+# from multicom_dev.multimer_structure_generation.pipeline import *
+from multicom_dev.multimer_structure_generation.pipeline_v2 import *
+from multicom_dev.multimer_structure_generation.pipeline_default import *
+# from multicom_dev.multimer_structure_generation.pipeline_homo import *
+from multicom_dev.multimer_structure_generation.pipeline_homo_v2 import *
+from multicom_dev.multimer_structure_generation.iterative_search_pipeline_v0_2 import *
+from multicom_dev.multimer_structure_generation.iterative_search_pipeline_v0_2_old import *
+from multicom_dev.multimer_structure_evaluation.pipeline import *
+from multicom_dev.multimer_structure_evaluation.human_pipeline import *
+from multicom_dev.common.protein import *
 import pandas as pd
 import numpy as np
-from bml_casp15.monomer_structure_refinement.util import cal_tmscore
-from bml_casp15.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
+from multicom_dev.monomer_structure_refinement.util import cal_tmscore
+from multicom_dev.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
 
 
 def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, only_default=False):
-    uniref30 = params['uniref_db_dir'] + '/' + params['uniref_db']
-    uniref30_new = params['uniref_db_dir_new'] + '/' + params['uniref_db_new']
-    uniclust30 = params['uniclust_db_dir'] + '/' + params['uniclust_db']
+    uniref30 = params['uniref_db']
+    # uniref30_new = params['uniref_db_dir_new'] + '/' + params['uniref_db_new']
+    uniclust30 = params['uniclust_db']
     uniref90_fasta = params['uniref90_fasta']
 
     smallbfd = ""  # params['smallbfd_database']
@@ -46,10 +46,10 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, only_def
 
     if only_monomer:
         uniprot_fasta = ""
-        uniprot_fasta_newest = ""
+        # uniprot_fasta_newest = ""
     else:
         uniprot_fasta = params['uniprot_fasta']
-        uniprot_fasta_newest = params['uniprot_fasta_newest']
+        # uniprot_fasta_newest = params['uniprot_fasta_newest']
     
     if only_default:
         colabfold_search_binary = ""
@@ -71,15 +71,15 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, only_def
                                                          colabfold_split_msas_binary=colabfold_split_msas_binary,
                                                          mmseq_binary=mmseq_binary,
                                                          uniref90_database_path=uniref90_fasta,
-                                                         uniref90_database_path_new=params['uniref90_fasta_newest'],
+                                                         uniref90_database_path_new="",
                                                          mgnify_database_path=mgnify,
                                                          small_bfd_database_path=smallbfd,
                                                          bfd_database_path=bfd,
                                                          uniref30_database_path=uniref30,
-                                                         uniref30_database_path_new=uniref30_new,
+                                                         uniref30_database_path_new="",
                                                          uniclust30_database_path=uniclust30,
                                                          uniprot_database_path=uniprot_fasta,
-                                                         uniprot_database_path_new=uniprot_fasta_newest,
+                                                         uniprot_database_path_new="",
                                                          colabfold_databases=colabfold_databases)
         result = pipeline.process(fasta, outdir)
     except Exception as e:
@@ -90,36 +90,38 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, only_def
 
 def copy_same_sequence_msas(srcdir, trgdir, srcname, trgname):
     for msa in os.listdir(srcdir):
+        if msa[0] != srcname:
+            continue
         if msa.find('.a3m') > 0 or msa.find('.fasta') > 0:
-            print(f"cp {srcdir}/{msa} {trgdir}/{msa}")
-            os.system(f"cp {srcdir}/{msa} {trgdir}/{msa}")
-            contents = open(f"{trgdir}/{msa}")
+            # print(f"cp {srcdir}/{msa} {trgdir}/{msa}")
+            # os.system(f"cp {srcdir}/{msa} {trgdir}/{msa}")
+            contents = open(f"{srcdir}/{msa}")
             new_contents = []
             for i, line in enumerate(contents):
                 if i == 0:
                     new_contents += [f">{trgname}\n"]
                 else:
                     new_contents += [line]
-            fw = open(f"{trgdir}/{msa}", 'w')
+            fw = open(f"{trgdir}/{trgname}{msa[1:]}", 'w')
             fw.writelines(new_contents)
         elif msa.find('.sto') > 0:
-            os.system(f"cp {srcdir}/{msa} {trgdir}/{msa}")
+            # os.system(f"cp {srcdir}/{msa} {trgdir}/{msa}")
             contents = []
-            for line in open(f"{trgdir}/{msa}"):
+            for line in open(f"{srcdir}/{msa}"):
                 if line[:7] == "#=GF ID":
                     line = line.replace(srcname, trgname)
 
                 tmp = line.split()
                 if len(tmp) > 0 and tmp[0] == srcname:
-                    line = line.replace(srcname, trgname)
+                    line = line[0].replace(srcname, trgname) + line[1:]
                 contents += [line]
-            fw = open(f"{trgdir}/{msa}", 'w')
+            fw = open(f"{trgdir}/{trgname}{msa[1:]}", 'w')
             fw.writelines(contents)
-    cwd = os.getcwd()
-    os.chdir(trgdir)
-    print(f"rename {srcname} {trgname} *")
-    os.system(f"rename {srcname} {trgname} *")
-    os.chdir(cwd)
+    # cwd = os.getcwd()
+    # os.chdir(trgdir)
+    # print(f"rename {srcname} {trgname} *")
+    # os.system(f"rename {srcname} {trgname} *")
+    # os.chdir(cwd)
 
 
 def run_monomer_msa_pipeline_img(fasta, outdir, params):
@@ -550,7 +552,7 @@ def run_monomer_refinement_pipeline_human(params, ranking_df, refinement_inputs,
     pipeline.select_v2(indir=outdir, outdir=finaldir, ranking_df=ranking_df, prefix=prefix, refpdb=refpdb)
 
 
-def run_concatenate_dimer_msas_pipeline(multimer, run_methods, monomer_aln_dir, outputdir, params, is_homomers=False):
+def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_dir, outputdir, params, is_homomers=False):
     chains = multimer.split(',')
     # alignment = {'outdir': f"{outputdir}/{'_'.join(chains)}"}
     alignment = {'outdir': outputdir}
@@ -602,7 +604,7 @@ def run_concatenate_dimer_msas_pipeline(multimer, run_methods, monomer_aln_dir, 
         print("The a3ms for dimers are not complete!")
 
 
-def run_complex_template_search_pipeline(multimers, monomer_aln_dir, monomer_model_dir, outdir, params):
+def run_monomer_templates_concatenation_pipeline(multimers, monomer_aln_dir, monomer_model_dir, outdir, params):
     monomer_template_inputs = []
     monomer_sequences = []
     for chain in multimers:
@@ -847,7 +849,7 @@ def extract_monomer_models_from_complex(complex_pdb, complex_pkl, chain_id_map, 
 def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, monomer_model_dir,
                                        outdir, stoichiometry):
     makedir_if_not_exists(outdir)
-    pipeline = multimer_structure_evaluation_pipeline(params=params)
+    pipeline = Multimer_structure_evaluation_pipeline(params=params)
     multimer_qa_result = None
     try:
         multimer_qa_result = pipeline.reprocess(fasta_path=fasta_path,
@@ -860,7 +862,7 @@ def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, monomer
 def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, monomer_model_dir,
                                      indir, outdir, stoichiometry, is_homomer=False, model_count=5, include_default=True, run_methods=None):
     makedir_if_not_exists(outdir)
-    pipeline = multimer_structure_evaluation_pipeline(params=params, include_default=include_default, run_methods=run_methods)
+    pipeline = Multimer_structure_evaluation_pipeline(params=params, include_default=include_default, run_methods=run_methods)
     multimer_qa_result = None
     try:
         multimer_qa_result = pipeline.process(fasta_path=fasta_path,
@@ -903,7 +905,7 @@ def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, monomer_m
 def run_multimer_evaluation_pipeline_human(params, fasta_path, chain_id_map, monomer_model_dir,
                                            indir, extract_dir, outdir, stoichiometry, is_homomer=False, model_count=5):
     makedir_if_not_exists(outdir)
-    pipeline = multimer_structure_evaluation_pipeline_human(params=params)
+    pipeline = Multimer_structure_evaluation_pipeline_human(params=params)
     multimer_qa_result = None
     try:
         multimer_qa_result = pipeline.process(fasta_path=fasta_path,
@@ -947,7 +949,7 @@ def run_multimer_evaluation_pipeline_human(params, fasta_path, chain_id_map, mon
 def rerun_multimer_evaluation_pipeline_human(params, fasta_path, chain_id_map, monomer_model_dir,
                                              outdir, stoichiometry):
     makedir_if_not_exists(outdir)
-    pipeline = multimer_structure_evaluation_pipeline_human(params=params)
+    pipeline = Multimer_structure_evaluation_pipeline_human(params=params)
     multimer_qa_result = None
     try:
         multimer_qa_result = pipeline.reprocess(fasta_path=fasta_path,

@@ -4,13 +4,13 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 import pickle
-from bml_casp15.common.util import makedir_if_not_exists
-from bml_casp15.common.protein import extract_pdb
+from multicom_dev.common.util import makedir_if_not_exists
+from multicom_dev.common.protein import extract_pdb
 import glob
 import itertools
-from bml_casp15.tool.foldseek import *
+from multicom_dev.tool.foldseek import *
 import copy
-from bml_casp15.multimer_structure_refinement.util import cal_tmscore
+from multicom_dev.multimer_structure_refinement.util import cal_tmscore
 
 
 def search_templates_foldseek(foldseek_program, databases, inpdb, outdir):

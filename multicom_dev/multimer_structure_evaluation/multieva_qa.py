@@ -4,7 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 import pickle
-from bml_casp15.common.util import makedir_if_not_exists
+from multicom_dev.common.util import makedir_if_not_exists
 import glob
 import pathlib
 

@@ -153,18 +153,17 @@ def extract_pdb(pdb, newpdb, start, end):
             f.write(row)
         f.write("END\n")
 
-def get_stoichiometry_from_fasta(chain_id_map, sequences):
-    stoichiometry_counts = []
-    processed_sequences = []
-    for chain_id in chain_id_map:
-        chain_sequence = chain_id_map[chain_id].sequence
-        if chain_sequence in processed_sequences:
-            continue
-        stoichiometry_counts += [len([index for index, sequence in enumerate(sequences) if sequence == chain_sequence])]
-        processed_sequences += [chain_sequence]
-    
-    stoichiometry = ""
-    for chain_id, count in zip(PDB_CHAIN_IDS, stoichiometry_counts):
-        stoichiometry += f"{chain_id}{count}"
+def get_stoichiometry_from_sequences(sequences):
+    chain_counter = 0
+    sequence_id_map = {}
+    for sequence in sequences:
+        if sequence not in sequence_id_map:
+            sequence_id_map[sequence] = dict(chain_id=PDB_CHAIN_IDS[chain_counter], count=1)
+            chain_counter += 1
+        else:
+            sequence_id_map[sequence]['count'] += 1
+
+    stoichiometry = ''.join([sequence_id_map[sequence]['chain_id'] + str(sequence_id_map[sequence]['count']) 
+                            for sequence in sequence_id_map])
     return stoichiometry
 
