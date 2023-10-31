@@ -1,12 +1,12 @@
 import os, sys, argparse, time
 from multiprocessing import Pool
-from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from multicom_dev.monomer_alignment_generation.alignment import write_fasta
-from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
-from multicom_dev.multimer_structure_refinement import iterative_refine_pipeline_multimer
-from multicom_dev.monomer_structure_refinement import iterative_refine_pipeline
-from multicom_dev.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
+from multicom4.monomer_alignment_generation.alignment import write_fasta
+from multicom4.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer
+from multicom4.monomer_structure_refinement import iterative_refine_pipeline
+from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, run_monomer_refinement_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_v2, \

@@ -1,13 +1,13 @@
 import os, sys, argparse, time
 from multiprocessing import Pool
-from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from multicom_dev.monomer_alignment_generation.alignment import write_fasta
-from multicom_dev.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
-from multicom_dev.quaternary_structure_refinement import iterative_refine_pipeline_multimer
-from multicom_dev.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
+from multicom4.monomer_alignment_generation.alignment import write_fasta
+from multicom4.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer
+from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_evaluation_pipeline, run_monomer_refinement_pipeline, \
-    run_concatenate_dimer_msas_pipeline, run_complex_template_search_pipeline, \
+    run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_foldseek, run_multimer_refinement_pipeline, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
     copy_same_sequence_msas, run_multimer_structure_generation_pipeline_default
@@ -63,7 +63,7 @@ def main(argv):
     processed_seuqences = {}
     monomer_qas_res = {}
     for chain_id in chain_id_map:
-        monomer_id = chain_id_map[chain_id].description
+        monomer_id = chain_id
         monomer_sequence = chain_id_map[chain_id].sequence
 
         if monomer_sequence not in processed_seuqences:
@@ -101,10 +101,10 @@ def main(argv):
     print("#################################################################################################")
 
     print("3. Start to generate complex quaternary structures")
-    N6_outdir = FLAGS.output_dir + '/N6_quaternary_structure_generation'
+    N6_outdir = FLAGS.output_dir + '/N6_multimer_structure_generation'
     makedir_if_not_exists(N2_outdir)
 
-    if not run_quaternary_structure_generation_pipeline_default(params=params,
+    if not run_multimer_structure_generation_pipeline_default(params=params,
                                                                 fasta_path=FLAGS.fasta_path,
                                                                 chain_id_map=chain_id_map,
                                                                 aln_dir=N1_outdir,
@@ -116,11 +116,9 @@ def main(argv):
 
     N9_outdir = FLAGS.output_dir + '/N9_multimer_structure_evaluation'
     multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
-                                                          params=params, monomer_model_dir="",
-                                                          run_methods=["alphafold"],
+                                                          params=params,
                                                           chain_id_map=chain_id_map,
-                                                          indir=N6_outdir, outdir=N9_outdir,
-                                                          stoichiometry=FLAGS.stoichiometry)
+                                                          indir=N6_outdir, outdir=N9_outdir)
 
     print("#################################################################################################")
 

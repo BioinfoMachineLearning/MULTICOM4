@@ -1,5 +1,5 @@
-source /home/bml_casp15/anaconda3/bin/activate
+source /bmlfast/bml_casp16/anaconda3/bin/activate
 
-conda activate bml_casp15 
+conda activate multicom4 
 
-export PYTHONPATH=/home/bml_casp15/MULTICOM_dev
+export PYTHONPATH=/bmlfast/bml_casp16/MULTICOM4
