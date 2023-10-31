@@ -1,5 +1,5 @@
-# MULTICOM_dev
-This is the internal development repository for the MULTICOM protein structure prediction system. It includes all the programs used in the CASP15 experiment and new programs developed for the CASP16 experiment. 
+# MULTICOM4
+This is the development repository for the MULTICOM protein structure prediction system for the CASP16 competition. It includes all the programs used in the CASP15 experiment and new programs developed for the CASP16 experiment. 
 
 
 (1) The Google directory of the design and results of this project: https://drive.google.com/drive/u/2/folders/1tBRoalU3LhpGwiOvf-Bt9fpkEYYgTgpE
