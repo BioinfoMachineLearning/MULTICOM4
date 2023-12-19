@@ -4,12 +4,18 @@ This is the development repository for the MULTICOM protein structure prediction
 Before CASP16:
 
 1. Add new predictors into MULTICOM4
+
      a. Pawan's predictor
+
      b. DeepFold (https://github.com/newtonjoo/deepfold), docker-based?
+
      c. MEGAFold (https://gitee.com/mindspore/mindscience/tree/master/MindSPONGE/applications/MEGAProtein)
    
 2. Update AlphaFold software (if available)
 3. Update sequence/template databases
+
      a. AlphaFold2 databases (bfd, mgnify, uniref90, uniref30, uniprot, pdb_seqres, pdb70, pdb_mmcifs)
+
      b. Additional sequence databases from DeepMSA (TaraDB, MetaSourceDB)
+
      c. Inhouse template databases (pdb_sort90, pdb_complex)
