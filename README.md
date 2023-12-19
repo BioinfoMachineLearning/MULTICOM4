@@ -3,12 +3,13 @@ This is the development repository for the MULTICOM protein structure prediction
 
 Before CASP16:
 
-1. Update AlphaFold software
-2. Update sequence/template databases
-
-(1) The Google directory of the design and results of this project: https://drive.google.com/drive/u/2/folders/1tBRoalU3LhpGwiOvf-Bt9fpkEYYgTgpE
-
-(2) Google sheet for the evaluation of different complex alignment concatenation methods: https://docs.google.com/spreadsheets/d/1znMO4tRwbvbwXYfN-3OqtoDpfQ8BbmgU2pDJm-Kk7x8/edit#gid=0
-
-(3) Google sheet for the evaluation of different template search methods: https://docs.google.com/spreadsheets/d/1R4HrfeqF-AzEYBSQC34d8_5uI0hYWQrta6mMxIpTi_E/edit#gid=0
-
+1. Add new predictors into MULTICOM4
+     a. Pawan's predictor
+     b. DeepFold (https://github.com/newtonjoo/deepfold), docker-based?
+     c. MEGAFold (https://gitee.com/mindspore/mindscience/tree/master/MindSPONGE/applications/MEGAProtein)
+   
+2. Update AlphaFold software (if available)
+3. Update sequence/template databases
+     a. AlphaFold2 databases (bfd, mgnify, uniref90, uniref30, uniprot, pdb_seqres, pdb70, pdb_mmcifs)
+     b. Additional sequence databases from DeepMSA (TaraDB, MetaSourceDB)
+     c. Inhouse template databases (pdb_sort90, pdb_complex)
