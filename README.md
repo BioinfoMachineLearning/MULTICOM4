@@ -19,3 +19,6 @@ Before CASP16:
      b. Additional sequence databases from DeepMSA (TaraDB, MetaSourceDB)
 
      c. Inhouse template databases (pdb_sort90, pdb_complex)
+
+     d. AlphaFoldDB template database
+     
