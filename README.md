@@ -16,9 +16,9 @@ Before CASP16:
 
      a. AlphaFold2 databases (bfd, mgnify, uniref90, uniref30, uniprot, pdb_seqres, pdb70, pdb_mmcifs)
 
-     b. Additional sequence databases from DeepMSA (TaraDB, MetaSourceDB)
+     b. Additional sequence databases from DeepMSA (TaraDB (https://zenodo.org/records/3380712), MetaSourceDB(https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/README.txt?))
 
      c. Inhouse template databases (pdb_sort90, pdb_complex)
 
-     d. AlphaFoldDB template database
+     d. AlphaFoldDB template database (https://github.com/google-deepmind/alphafold/tree/main/afdb) ~ 23TB?
      
