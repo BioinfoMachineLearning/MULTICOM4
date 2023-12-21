@@ -24,7 +24,7 @@ Before CASP16:
 
      d. AlphaFoldDB template database (https://github.com/google-deepmind/alphafold/tree/main/afdb) ~ 23TB?
      
-5. Update interaction databases
+5. Update interaction databases (lower priority)
 
      a. String database
      b. Uniprot to pdb id mapping
