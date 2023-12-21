@@ -10,9 +10,11 @@ Before CASP16:
      b. DeepFold (https://github.com/newtonjoo/deepfold), docker-based?
 
      c. MEGAFold (https://gitee.com/mindspore/mindscience/tree/master/MindSPONGE/applications/MEGAProtein)
+
+     d. ESMFold
    
-2. Update AlphaFold software (if available)
-3. Update sequence/template databases
+3. Update AlphaFold software (if available)
+4. Update sequence/template databases
 
      a. AlphaFold2 databases (bfd, mgnify, uniref90, uniref30, uniprot, pdb_seqres, pdb70, pdb_mmcifs)
 
@@ -22,7 +24,7 @@ Before CASP16:
 
      d. AlphaFoldDB template database (https://github.com/google-deepmind/alphafold/tree/main/afdb) ~ 23TB?
      
-4. Update interaction databases
+5. Update interaction databases
 
      a. String database
      b. Uniprot to pdb id mapping
