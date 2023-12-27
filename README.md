@@ -22,6 +22,9 @@ Before CASP16:
 
      c. Inhouse template databases (pdb_sort90, pdb_complex)
 
+5. Possible tools
+   
+     a. Improving deep learning protein monomer and complex structure prediction using DeepMSA2 with huge metagenomics data.  Wei Zheng,  Qiqige Wuyun, Yang Li, Chengxin Zhang, P.  Lydia Freddolino*, and Yang Zhang. Nature Methods, in press.
      d. AlphaFoldDB template database (https://github.com/google-deepmind/alphafold/tree/main/afdb) ~ 23TB?
      
 5. Update interaction databases (lower priority)
