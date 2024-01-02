@@ -19,18 +19,19 @@ Before CASP16:
 
      a. AlphaFold2 databases (Updated on Hellbender on December 27)
    
-          *   [BFD](https://bfd.mmseqs.com/),
-          *   [MGnify]([https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/2023_02/)),
-          *   [PDB70](http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/),
-          *   [PDB](https://www.rcsb.org/) (structures in the mmCIF format),
-          *   [PDB seqres](https://www.rcsb.org/)
-          *   [UniRef30](https://gwdu111.gwdg.de/~compbiol/uniclust/2023_02/),
-          *   [UniProt](https://www.uniprot.org/uniprot/),
-          *   [UniRef90](https://www.uniprot.org/help/uniref).
+     *   [BFD](https://bfd.mmseqs.com/),
+     *   [MGnify v2023_02]([https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/2023_02/),
+     *   [PDB70](http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/),
+     *   [PDB](https://www.rcsb.org/) (structures in the mmCIF format),
+     *   [PDB seqres](https://www.rcsb.org/)
+     *   [UniRef30 v2023_02](https://gwdu111.gwdg.de/~compbiol/uniclust/2023_02/),
+     *   [UniProt](https://www.uniprot.org/uniprot/),
+     *   [UniRef90](https://www.uniprot.org/help/uniref).
 
      b. Additional sequence databases from DeepMSA
-          *   [TaraDB](https://zenodo.org/records/3380712)
-          *   [MetaSourceDB](https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/README.txt)
+          
+     *   [TaraDB](https://zenodo.org/records/3380712)
+     *   [MetaSourceDB v2023_02](https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/2023_02/)
    
      c. Inhouse template databases (pdb_sort90, pdb_complex)
 
