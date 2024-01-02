@@ -14,21 +14,34 @@ Before CASP16:
      d. ESMFold
    
 3. Update AlphaFold software (if available)
+   
 4. Update sequence/template databases
 
-     a. AlphaFold2 databases (bfd, mgnify, uniref90, uniref30, uniprot, pdb_seqres, pdb70, pdb_mmcifs)
+     a. AlphaFold2 databases (Updated on Hellbender on December 27)
+   
+          *   [BFD](https://bfd.mmseqs.com/),
+          *   [MGnify]([https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/2023_02/)),
+          *   [PDB70](http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/),
+          *   [PDB](https://www.rcsb.org/) (structures in the mmCIF format),
+          *   [PDB seqres](https://www.rcsb.org/)
+          *   [UniRef30](https://gwdu111.gwdg.de/~compbiol/uniclust/2023_02/),
+          *   [UniProt](https://www.uniprot.org/uniprot/),
+          *   [UniRef90](https://www.uniprot.org/help/uniref).
 
-     b. Additional sequence databases from DeepMSA (TaraDB (https://zenodo.org/records/3380712), MetaSourceDB(https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/README.txt?))
-
+     b. Additional sequence databases from DeepMSA
+          *   [TaraDB](https://zenodo.org/records/3380712)
+          *   [MetaSourceDB](https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/README.txt)
+   
      c. Inhouse template databases (pdb_sort90, pdb_complex)
 
      d. AlphaFoldDB template database (https://github.com/google-deepmind/alphafold/tree/main/afdb) ~ 23TB?
      
-5. Update interaction databases (lower priority)
+6. Update interaction databases (lower priority)
 
-     a. String database
+     a. [String database v12.0](https://string-db.org/cgi/download?sessionId=bZgGNwyipdWy)
+ 
      b. Uniprot to pdb id mapping
 
-6. Possible tools
+7. Possible tools
 
      a. Improving deep learning protein monomer and complex structure prediction using DeepMSA2 with huge metagenomics data.  Wei Zheng,  Qiqige Wuyun, Yang Li, Chengxin Zhang, P.  Lydia Freddolino*, and Yang Zhang. Nature Methods, in press.
