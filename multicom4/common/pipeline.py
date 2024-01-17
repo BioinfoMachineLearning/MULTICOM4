@@ -44,6 +44,13 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     colabfold_databases = params['colabfold_databases']
     mmseq_binary = params['mmseq_program']
 
+    deepmsa2_path = params['deepmsa2_path']
+    JGIclust_database_path = params['JGIclust_database']
+    metaclust_database_path = params['metaclust_database']
+    
+    dhr_program_path = params['DHR_program_path']
+    dhr_database_path = params['DHR_database_path']
+
     if only_monomer:
         uniprot_fasta = ""
     else:
@@ -57,6 +64,8 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
                                                          colabfold_search_binary=colabfold_search_binary,
                                                          colabfold_split_msas_binary=colabfold_split_msas_binary,
                                                          mmseq_binary=mmseq_binary,
+                                                         deepmsa2_path=deepmsa2_path,
+                                                         dhr_program_path=dhr_program_path,
                                                          uniref90_database_path=uniref90_fasta,
                                                          mgnify_database_path=mgnify,
                                                          small_bfd_database_path=smallbfd,
@@ -64,7 +73,10 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
                                                          uniref30_database_path=uniref30,
                                                          uniclust30_database_path=uniclust30,
                                                          uniprot_database_path=uniprot_fasta,
-                                                         colabfold_databases=colabfold_databases)
+                                                         JGIclust_database_path=JGIclust_database_path,
+                                                         metaclust_database_path=metaclust_database_path,
+                                                         colabfold_databases=colabfold_databases,
+                                                         dhr_database_path=dhr_database_path)
         result = pipeline.process(fasta, outdir)
     except Exception as e:
         print(e)

@@ -6,9 +6,12 @@ from multicom4.monomer_alignment_generation.alignment import *
 from multicom4.monomer_alignment_generation.rosettafold_msa_runner import *
 from multicom4.monomer_alignment_generation.colabfold_msa_runner import *
 from multicom4.monomer_alignment_generation.img_msa_runner import *
+from multicom4.monomer_alignment_generation.deepmsa2_runner import *
+from multicom4.monomer_alignment_generation.dhr_runner import *
 from multicom4.tool import hhblits
 from multicom4.tool import jackhmmer
 import pathlib
+from multicom4.monomer_templates_concatenation import parsers
 
 def run_msa_tool(inparams):
     msa_runner, input_fasta_path, msa_out_path, msa_out_name, msa_key = inparams
@@ -17,11 +20,31 @@ def run_msa_tool(inparams):
     if not os.path.exists(msa_out_file) or len(open(msa_out_file).readlines()) == 0:
         workdir = os.path.join(msa_out_path, msa_key)
         makedir_if_not_exists(workdir)
-        temp_msa_out_file = os.path.join(workdir, msa_out_name)
-        result = msa_runner.query(input_fasta_path, temp_msa_out_file)
-        os.system(f"cp {temp_msa_out_file} {msa_out_file}")
+        if msa_key == "DeepMSA2_a3m":
+            result = msa_runner.query(input_fasta_path, workdir)
+            os.system(f"cp {result} {msa_out_file}")
+        else:
+            temp_msa_out_file = os.path.join(workdir, msa_out_name)
+            result = msa_runner.query(input_fasta_path, temp_msa_out_file)
+            os.system(f"cp {temp_msa_out_file} {msa_out_file}")
+
     return msa_key, msa_out_file
 
+def combine_a3ms(msas, msa_save_path):
+    seen_desc = []
+    seen_sequences = []
+    for msa_index, msa in enumerate(msas):
+        if not msa:
+            raise ValueError(f'MSA {msa_index} must contain at least one sequence.')
+        for sequence_index, sequence in enumerate(msa.sequences):
+            if sequence in seen_sequences:
+                continue
+            seen_sequences += [sequence]
+            seen_desc += [msa.descriptions[sequence_index]]
+
+    with open(msa_save_path, 'w') as fw:
+        for (desc, seq) in zip(seen_desc, seen_sequences):
+            fw.write(f'>{desc}\n{seq}\n')
 
 class Monomer_alignment_generation_pipeline:
     """Runs the alignment tools and assembles the input features."""
@@ -32,6 +55,8 @@ class Monomer_alignment_generation_pipeline:
                  colabfold_search_binary,
                  colabfold_split_msas_binary,
                  mmseq_binary,
+                 deepmsa2_path,
+                 dhr_program_path,
                  uniref90_database_path,
                  mgnify_database_path,
                  small_bfd_database_path,
@@ -39,7 +64,10 @@ class Monomer_alignment_generation_pipeline:
                  uniref30_database_path,
                  uniclust30_database_path,
                  uniprot_database_path,
+                 JGIclust_database_path,
+                 metaclust_database_path,
                  colabfold_databases,
+                 dhr_database_path,
                  hhfilter_binary_path="",
                  mgnify_max_hits: int = 501,
                  uniref_max_hits: int = 10000,
@@ -47,6 +75,8 @@ class Monomer_alignment_generation_pipeline:
         """Initializes the data pipeline."""
 
         # alignment generation pipeline from alphafold
+        self.mgnify_max_hits = mgnify_max_hits
+        self.uniref_max_hits = uniref_max_hits
 
         self.jackhmmer_uniref90_runner = None
         self.hhblits_bfd_runner = None
@@ -60,6 +90,8 @@ class Monomer_alignment_generation_pipeline:
         self.colabfold_msa_runner = None
         self.uniref30_bfd_msa_runner = None
         self.unclust30_bfd_msa_runner = None
+        self.deepmsa2_runner = None
+        self.dhr_runner = None
 
         if len(uniref90_database_path) > 0:
             self.jackhmmer_uniref90_runner = jackhmmer.Jackhmmer(
@@ -128,6 +160,19 @@ class Monomer_alignment_generation_pipeline:
                                                              colabfold_split_msas_binary_path=colabfold_split_msas_binary,
                                                              mmseq_binary_path=mmseq_binary,
                                                              colabfold_databases=colabfold_databases)
+        
+        if len(JGIclust_database_path) > 0:
+            self.deepmsa2_runner = DeepMSA2_runner(tool_path=deepmsa2_path,
+                                                   bfd_database_path=bfd_database_path,
+                                                   metaclust_database_path=metaclust_database_path,
+                                                   mgnify_database_path=mgnify_database_path,
+                                                   uniref90_database_path=uniref90_database_path,
+                                                   uniref30_database_path=uniref30_database_path,
+                                                   uniclust30_database_path=uniclust30_database_path,
+                                                   JGIclust_database_path=JGIclust_database_path)
+
+        if len(dhr_database_path) > 0:
+            self.dhr_runner = DHR_runner(DHR_program_path=dhr_program_path, DHR_database_path=dhr_database_path)
 
     def process(self, input_fasta_path, msa_output_dir, multiprocess=True):
         """Runs alignment tools on the input sequence and creates features."""
@@ -193,6 +238,16 @@ class Monomer_alignment_generation_pipeline:
                 [self.uniref30_bfd_msa_runner, input_fasta_path,
                  msa_output_dir, f'{targetname}_uniref30_bfd.a3m', 'uniref30_bfd_a3m'])
 
+        if self.deepmsa2_runner is not None:
+            msa_process_list.append(
+                [self.deepmsa2_runner, input_fasta_path,
+                 msa_output_dir, f'{targetname}_DeepMSA2.a3m', 'DeepMSA2_a3m'])
+
+        if self.dhr_runner is not None:
+            msa_process_list.append(
+                [self.dhr_runner, input_fasta_path, msa_output_dir, 
+                f'{targetname}_dhr.a3m', 'dhr_a3m'])
+
         if multiprocess:
             pool = Pool(processes=len(msa_process_list))
             results = pool.map(run_msa_tool, msa_process_list)
@@ -210,6 +265,26 @@ class Monomer_alignment_generation_pipeline:
                 msa_key, msa_out_path = run_msa_tool(msa_process_params)
                 if os.path.exists(msa_out_path):
                     result_dict[msa_key] = msa_out_path
+
+        # Need to combine dhr a3m with other default a3ms
+
+        with open(result_dict['uniref90_sto']) as f:
+            uniref90_msa = parsers.parse_stockholm(f.read())
+            uniref90_msa = uniref90_msa.truncate(max_seqs=self.uniref_max_hits)
+
+        with open(result_dict['mgnify_sto']) as f:
+            mgnify_msa = parsers.parse_stockholm(f.read())
+            mgnify_msa = mgnify_msa.truncate(max_seqs=self.mgnify_max_hits)
+        
+        with open(result_dict['uniref30_bfd_a3m']) as f:
+            bfd_msa = parsers.parse_a3m(f.read())
+
+        with open(result_dict['dhr_a3m']) as f:
+            dhr_msa = parsers.parse_a3m(f.read())
+        
+        dhr_af_a3m = os.path.join(msa_output_dir, f'{targetname}_dhr_af.a3m')
+        combine_a3ms([dhr_msa, uniref90_msa, bfd_msa, mgnify_msa], dhr_af_a3m)
+        result_dict['dhr_af_a3m'] = dhr_af_a3m
 
         return result_dict
 

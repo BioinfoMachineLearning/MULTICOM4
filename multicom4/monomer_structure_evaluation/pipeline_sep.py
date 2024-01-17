@@ -282,6 +282,8 @@ class Monomer_structure_evaluation_pipeline:
         if os.path.exists(monomer_model_dir):
             for method in os.listdir(monomer_model_dir):
                 ranking_json_file = os.path.join(monomer_model_dir, method, "ranking_debug.json")
+                if not os.path.exists(ranking_json_file):
+                    continue
                 ranking_json = json.loads(open(ranking_json_file).read())
                 for i in range(model_count):
                     pdbname = f"{method}_{i}"

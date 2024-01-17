@@ -3,63 +3,69 @@
 ################################tools option#########################################
 
 # hhblits program path
-hhblits_program = /bmlfast/bml_casp16/anaconda3/envs/MULTICOM_dev/bin/hhblits
+hhblits_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/hhblits
 
 # hhfilter program path
-hhfilter_program = /bmlfast/bml_casp16/anaconda3/envs/MULTICOM_dev/bin/hhfilter
+hhfilter_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/hhfilter
 
 # hhmake program path
-hhmake_program = /bmlfast/bml_casp16/anaconda3/envs/MULTICOM_dev/bin/hhmake
+hhmake_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/hhmake
 
 # hhalign program path
-hhalign_program = /bmlfast/bml_casp16/anaconda3/envs/MULTICOM_dev/bin/hhalign
+hhalign_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/hhalign
 
 # jackhmmer program path
-jackhmmer_program = /bmlfast/bml_casp16/anaconda3/envs/MULTICOM_dev/bin/jackhmmer
+jackhmmer_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/jackhmmer
 
 # hhsearch program path
-hhsearch_program = /bmlfast/bml_casp16/MULTICOM3/tools/hhsuite-3.2.0/bin/hhsearch
+hhsearch_program = /bmlfast/bml_casp16/MULTICOM4/tools/hhsuite-3.2.0/bin/hhsearch
 
 # deepmsa2 program path
-deepmsa2_program = /bmlfast/bml_casp16/MULTICOM3/tools/deepmsa/hhsuite2/scripts/build_MSA2.py
+deepmsa2_program = /bmlfast/bml_casp16/MULTICOM4/tools/deepmsa/hhsuite2/scripts/build_MSA2.py
 
 # tmalign program path
-tmalign_program = /bmlfast/bml_casp16/MULTICOM3/tools/tmalign/TMalign
+tmalign_program = /bmlfast/bml_casp16/MULTICOM4/tools/tmalign/TMalign
 
 # mmalign program path
-mmalign_program = /bmlfast/bml_casp16/MULTICOM3/tools/mmalign/MMalign
+mmalign_program = /bmlfast/bml_casp16/MULTICOM4/tools/mmalign/MMalign
 
 # dockq program
-dockq_program = /bmlfast/bml_casp16/MULTICOM3/tools/DockQ/DockQ.py
+dockq_program = /bmlfast/bml_casp16/MULTICOM4/tools/DockQ/DockQ.py
 
 # qscore program
-qscore_program = /bmlfast/bml_casp16/MULTICOM3/tools/pairwiseQA/q_score
+qscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/pairwiseQA/q_score
 
 # tmscore program
-tmscore_program = /bmlfast/bml_casp16/MULTICOM3/tools/tmscore/TMscore
+tmscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/tmscore/TMscore
 
 ################################MSA generation tool###########################
 
-colabfold_search_program = /bmlfast/bml_casp16/MULTICOM3/tools/colabfold/search.py
+colabfold_search_program = /bmlfast/bml_casp16/MULTICOM4/tools/colabfold/search.py
 
-colabfold_split_msas_program = /bmlfast/bml_casp16/MULTICOM3/tools/colabfold/split_msas.py
+colabfold_split_msas_program = /bmlfast/bml_casp16/MULTICOM4/tools/colabfold/split_msas.py
 
 colabfold_databases = /bmlfast/bml_casp16/tools/multicom3_db/colabfold
 
-mmseq_program = /bmlfast/bml_casp16/anaconda3/envs/MULTICOM_dev/bin/mmseqs
+mmseq_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/mmseqs
+
+deepmsa2_path = /bmlfast/bml_casp16/tools/DeepMSA2
+
+DHR_program_path = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR.sh
+
+DHR_database_path = /bmlfast/DHR/DHR_DATABASE/
 
 ################################QA option#####################################
 
 #########################Customized alphafold program###########################
 
 # alphafold environment directory
-alphafold_env_dir = /bmlfast/bml_casp16/anaconda3/envs/MULTICOM_dev/bin/
+alphafold_env_dir = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/
 
 # alphafold database directory
 alphafold_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3
 
 # alphafold program path
-alphafold_program_dir = /bmlfast/bml_casp16/MULTICOM3/tools/alphafold-v2.3.2
+alphafold_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/alphafold-v2.3.2
 
 # alphafold tertiary structure prediction script
 alphafold_program = run_alphafold_custom.py
@@ -87,21 +93,36 @@ alphafold_benchmark = True
 use_gpu_relax = True
 
 # ALL, BEST, NONE
-models_to_relax = BEST
+models_to_relax = ALL
 
 max_template_date = 9999-06-01
 
 pdb_release_date_file = /bmlfast/bml_casp16/tools/multicom3_db/pdb_release_date_filtered.csv
 
+
+# Other tools
+
+paddle_helix_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/paddle_helix.sh
+
+esmfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold.sh
+
+megafold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold.sh
+
+megafold_data_yaml_template = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_data.yaml
+
+deepfold_program_dir = /bmlfast/bml_casp16/tools/deepfold/
+
+deepfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/run_deepfold.py
+
 ######################Monomer template search option#################################
 
-foldseek_program = /bmlfast/bml_casp16/MULTICOM3/tools/foldseek/bin/foldseek
+foldseek_program = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/bin/foldseek
 
-foldseek_pdb_database = /bmlfast/bml_casp16/MULTICOM3/tools/foldseek/databases/complex
+foldseek_pdb_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex
 
 foldseek_pdb_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/pdb_complex/pdb
 
-foldseek_af_database = /bmlfast/bml_casp16/MULTICOM3/tools/foldseek/databases/af_db
+foldseek_af_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/af_db
 
 foldseek_af_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/af_pdbs
 
@@ -109,11 +130,13 @@ foldseek_af_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/af_pdbs
 
 bfd_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
 
-mgnify_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2022_05.fa
+mgnify_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
 
 metaclust_database = /bmlfast/bml_casp16/tools/multicom3_db/Metaclust_2018_06/metaclust_50
 
 img_database = /bmlfast/bml_casp16/tools/multicom3_db/img/img_new.fasta
+
+JGIclust_database = /bmlfast/bml_casp16/tools/DeepMSA2/database/JGIclust
 
 ###########################Complex alignment generation option#######################
 
@@ -123,7 +146,7 @@ img_database = /bmlfast/bml_casp16/tools/multicom3_db/img/img_new.fasta
 uniclust_db = /bmlfast/bml_casp16/tools/multicom3_db/uniclust30_2018_08/uniclust30_2018_08
 
 # uniref database
-uniref_db = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/uniref30/UniRef30_2021_03
+uniref_db = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/uniref30/UniRef30_2023_02
 
 uniref90_fasta = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/uniref90/uniref90.fasta
 

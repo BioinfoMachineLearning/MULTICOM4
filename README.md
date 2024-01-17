@@ -5,25 +5,22 @@ Before CASP16:
 
 1. Add new predictors into MULTICOM4
 
-     a. Pawan's predictor
+     a. Pawan's predictor (integrated into the system)
 
-     b. DeepFold (https://github.com/newtonjoo/deepfold), docker-based?
+     b. DeepFold (https://github.com/newtonjoo/deepfold), surprisingly can use our conda environment to run
 
-     ```
-     # Installation
-
-     cd /bmlfast/bml_casp16/tools/deepfold
-
-     docker build -f docker/Dockerfile -t deepfold .
-
-     ```
      c. MEGAFold (https://gitee.com/mindspore/mindscience/tree/master/MindSPONGE/applications/MEGAProtein)
 
      ```
      # Installation
-     mamba install -c anaconda cudnn 
 
-     mamba install mindspore -c mindspore -c conda-forge 
+     conda create -n magafold python=3.7
+
+     conda install -c anaconda cudnn 
+   
+     conda install nvidia::cuda-nvcc
+
+     conda install mindspore -c mindspore -c conda-forge 
 
      python -c "import mindspore;mindspore.set_context(device_target='GPU');mindspore.run_check()" 
 
@@ -35,6 +32,8 @@ Before CASP16:
 
      pip install -r requirements.txt 
 
+     mamba install -y -c bioconda hhsuite==3.3.0 kalign2
+
      ```
 
      d. ESMFold (https://github.com/facebookresearch/esm)
@@ -43,9 +42,9 @@ Before CASP16:
      # Installation
      cd /bmlfast/bml_casp16/tools/esm
 
-     mamba env create -f environment.yml
+     conda env create -f environment.yml
 
-     mamba activate esmfold
+     conda activate esmfold
 
      pip install "fair-esm[esmfold]"
 
@@ -57,21 +56,21 @@ Before CASP16:
 
      ```
      # Installation
-     mamba create -n paddle python=3.7
-     mamba activate paddle
+     conda create -n paddle python=3.7
+     conda activate paddle
      cd /bmlfast/bml_casp16/tools/PaddleHelix/apps/protein_folding/helixfold-single
      pip install paddlepaddle_gpu-2.4.2.post117-cp37-cp37m-linux_x86_64.whl
-     mamba install ml-collections dm-tree biopython scipy
+     conda install ml-collections dm-tree biopython scipy
 
      python helixfold_single_inference.py --init_model=./helixfold-single.pdparams --fasta_file=data/7O9F_B.fasta --output_dir="./output"
 
      # If it returns error of cannot find /usr/local/cuda/lib64/libcudnn.so
-     mamba install -c anaconda cudnn
+     conda install -c anaconda cudnn
      export LD_LIBRARY_PATH=YOUR_ENV_DIR/lib/:$LD_LIBRARY_PATH
 
      ```     
      
-     f. DMFold (https://zhanggroup.org/DMFold/)
+     ~~f. DMFold (https://zhanggroup.org/DMFold/)~~
 
 2. Update tools 
 
@@ -124,7 +123,7 @@ Before CASP16:
 
      d. AlphaFoldDB template database (https://github.com/google-deepmind/alphafold/tree/main/afdb) ~ 23TB?
 
-     e. ColabFold Database (https://github.com/sokrypton/ColabFold/blob/main/setup_databases.sh)
+     e. ColabFold Database (2021_08) (https://github.com/sokrypton/ColabFold/blob/main/setup_databases.sh)
      
 4. Update interaction databases (lower priority)
 
@@ -153,7 +152,7 @@ Before CASP16:
 
 6. Current predictors
 
-     a. Monomer
+     a. Monomer (31 predictors)
 
      | Predictor  | Note |
      | -------------| -----| 
@@ -166,7 +165,7 @@ Before CASP16:
      |img | IMG alignment (keep?) |
      |img_seq_temp | Inhouse template database|
 
-     To be added:
+     Added:
      
      | Predictor  | Note |
      | -------------| -----| 
@@ -176,6 +175,7 @@ Before CASP16:
      |MEGAFold | MEGAFold |
      |DMFold | DMFold|
      |16 kinds of MSA in DeepMSA2 | DeepMSA2| 
+     |5 variants in AFsample | AFsample| 
      
 
      b. Multimer

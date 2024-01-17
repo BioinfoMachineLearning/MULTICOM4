@@ -45,35 +45,38 @@ class ColabFold_Msa_runner:
         if not os.path.exists(tmp_dir):
             os.makedirs(tmp_dir)
 
-        cmd = [
-            'python',
-            self.colabfold_search_binary_path,
-            input_fasta_path,
-            self.colabfold_databases,
-            os.path.join(tmp_dir, 'search_result')
-        ]
+        final_a3m = os.path.join(tmp_dir, 'search_result', 'final.a3m')
+        if not os.path.exists(final_a3m):
+            cmd = [
+                'python',
+                self.colabfold_search_binary_path,
+                input_fasta_path,
+                self.colabfold_databases,
+                os.path.join(tmp_dir, 'search_result')
+            ]
 
-        logging.info('Colabfold subprocess "%s"', ' '.join(cmd))
+            logging.info('Colabfold subprocess "%s"', ' '.join(cmd))
 
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        with utils.timing('Colabfold query'):
-            stdout, stderr = process.communicate()
-            retcode = process.wait()
+            with utils.timing('Colabfold query'):
+                stdout, stderr = process.communicate()
+                retcode = process.wait()
 
-        if retcode:
-            # Logs have a 15k character limit, so log HHblits error line by line.
-            logging.error('HHblits failed. Colabfold stderr begin:')
-            for error_line in stderr.decode('utf-8').splitlines():
-                if error_line.strip():
-                    logging.error(error_line.strip())
-            logging.error('Colabfold stderr end')
-            raise RuntimeError('Colabfold failed\nstdout:\n%s\n\nstderr:\n%s\n' % (
-                stdout.decode('utf-8'), stderr[:500_000].decode('utf-8')))
+            if retcode:
+                # Logs have a 15k character limit, so log HHblits error line by line.
+                logging.error('HHblits failed. Colabfold stderr begin:')
+                for error_line in stderr.decode('utf-8').splitlines():
+                    if error_line.strip():
+                        logging.error(error_line.strip())
+                logging.error('Colabfold stderr end')
+                raise RuntimeError('Colabfold failed\nstdout:\n%s\n\nstderr:\n%s\n' % (
+                    stdout.decode('utf-8'), stderr[:500_000].decode('utf-8')))
 
         os.system(f"python {self.colabfold_split_msas_binary_path} {tmp_dir}/search_result {tmp_dir}/msas")
 
-        out_temp_msa = os.path.join(tmp_dir, 'msas', targetname + ".a3m")
+        # out_temp_msa = os.path.join(tmp_dir, 'msas', targetname + ".a3m")
+        out_temp_msa = os.path.join(tmp_dir, 'msas', "101.a3m")
         if not os.path.exists(out_temp_msa):
             raise RuntimeError(f"Cannot find the generated a3m file for {targetname}")
 
