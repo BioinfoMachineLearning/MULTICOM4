@@ -1,12 +1,12 @@
 import os, sys, argparse, time
 from multiprocessing import Pool
-from multicom3.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from multicom3.monomer_alignment_generation.alignment import write_fasta
-from multicom3.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
-from multicom3.multimer_structure_refinement import iterative_refine_pipeline_multimer
-from multicom3.monomer_structure_refinement import iterative_refine_pipeline
-from multicom3.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
+from multicom4.monomer_alignment_generation.alignment import write_fasta
+from multicom4.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer
+from multicom4.monomer_structure_refinement import iterative_refine_pipeline
+from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, run_monomer_refinement_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_v2, \
@@ -140,11 +140,12 @@ def main(argv):
 
     try:
         concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
-                          'string_interact', 'uniprot_distance']
+                           'string_interact', 'uniprot_distance']
+        #concat_methods = ['species_interact']
         run_monomer_msas_concatenation_pipeline(
             multimer=','.join([chain_id for chain_id in chain_id_map]),
             run_methods=concat_methods,
-            monomer_aln_dir=N1_outdir, outputdir=N4_outdir, params=params)
+            monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params)
     except Exception as e:
         print(e)
         print("Program failed in step 5")

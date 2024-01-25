@@ -56,19 +56,25 @@ def write_aln(sequences, fileobj):
 
 ID_EXTRACTION_REGEX = [
     # example: >UniRef100_H6SNJ6/11-331
-    "^Uni\w+\_(\w+).*/",
+    "Uni\w+\_(\w+).*/",
 
-    # example: >UniRef100_H6SNJ6
-    "^Uni\w+\_(\w+).*",
+    # example: >UniRef100_H6SNJ6, jac0_UniRef90_A0A6S5C6M6, hms0_jac0_UniRef90_UPI001AE0BA3E
+    "Uni\w+\_(\w+).*",
 
-    # example: >Q60019|NQO8_THET8/1-365
+    # example: >Q60019|NQO8_THET8/1-365, bfd0_tr|A0A0R3C8K3|A0A0R3C8K3_9BRAD
     "^\w+\|(\w+)\|\w+",
 
     # example: >tr|Q1NYN0|Q1NYN0_9FLAO
     "^\w+\|(\w+)\|\w+\/",
 
-    # example: MGYP000191463914/8-90
-    "^MGYP(\w+).*/",
+    # example: MGYP000191463914/8-90, hms0_hms0_MGYP003619651687
+    "MGYP(\w+).*/",
+
+    # example: hms0_bfd0_SRR3954468_10467049, 
+    "bfd0_(\w+).*",
+    
+    # example: hms0_2523533611_1022, 
+    "hms0_(\w+).*",
 
     #
     # # example: >NQO8_THET8/1-365
@@ -86,7 +92,7 @@ def retrieve_sequence_ids(ids, regex=None):
 
     for current_id in ids:
         for pattern in regex:
-            m = re.match(pattern, current_id)
+            m = re.search(pattern, current_id)
             # require a non-None match and at least one extracted pattern
             if m and len(m.groups()) > 0:
                 # this extracts the parenthesized match
@@ -218,7 +224,7 @@ def read_a3m(fileobj, inserts="first"):
             # since each sequence must have same number of
             # uppercase letters or match gaps -, this gives
             # the final sequence in alignment
-            seq = "".join([c for c in seq if c == c.upper() and c != "."])
+            filled_seq = "".join([c for c in seq if c == c.upper() and c != "."])
         else:
             raise ValueError(
                 "Invalid option for inserts: {}".format(inserts)
@@ -310,6 +316,7 @@ class Alignment:
         self.N = len(self.seqs)
 
         if len(self.ids) != self.N:
+            print(self.ids)
             print(ids)
             raise ValueError(
                 f"Number of sequence IDs and length of alignment do not match: {self.N} and {len(self.ids)}"
@@ -360,7 +367,7 @@ class Alignment:
             seqs = read_a3m(fileobj, inserts=a3m_inserts)
         else:
             raise ValueError("Invalid alignment format: {}".format(format))
-
+        
         return cls.from_dict(seqs, annotation)
 
     def __getitem__(self, index):

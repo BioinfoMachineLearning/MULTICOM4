@@ -38,6 +38,8 @@ qscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/pairwiseQA/q_score
 # tmscore program
 tmscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/tmscore/TMscore
 
+calNf_program = /bmlfast/bml_casp16/MULTICOM4/tools/calNf
+
 ################################MSA generation tool###########################
 
 colabfold_search_program = /bmlfast/bml_casp16/MULTICOM4/tools/colabfold/search.py
@@ -116,7 +118,7 @@ deepfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_gen
 
 ######################Monomer template search option#################################
 
-foldseek_program = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/bin/foldseek
+foldseek_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 
 foldseek_pdb_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex
 

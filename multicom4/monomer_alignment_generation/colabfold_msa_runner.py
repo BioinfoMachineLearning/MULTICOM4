@@ -83,5 +83,5 @@ class ColabFold_Msa_runner:
         # need to remove the first line
         open(output_a3m_path, 'w').writelines(open(out_temp_msa).readlines()[1:])
         # os.system(f"cp {tmp_dir}/msas/{targetname}.a3m {output_a3m_path}")
-        os.system(f"rm -rf {tmp_dir}")
+        # os.system(f"rm -rf {tmp_dir}")
         return dict(a3m=output_a3m_path)

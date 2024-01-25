@@ -11,6 +11,7 @@ from multicom4.monomer_alignments_concatenation.species_interact_v3 import Speci
 from multicom4.monomer_alignments_concatenation.string_interact_v3 import STRING_interact_v3
 from multicom4.monomer_alignments_concatenation.uniclust_oxmatch_v3 import UNICLUST_oxmatch_v3
 from multicom4.monomer_alignments_concatenation.uniprot_distance_v3 import UNIPROT_distance_v3
+from multicom4.monomer_alignments_concatenation.deepmsa2_pairing import DeepMSA2_pairing
 from multicom4.monomer_alignment_generation.alignment import *
 from tqdm import tqdm
 
@@ -112,9 +113,9 @@ def write_concatenated_alignment(paired_rows, alignments):
                 seq = alignments[j].seqs[index]
                 header, start, end = parse_header(alignments[j].headers[index])
                 header = f"{header}_{start}-{end}"
-            
+
             headers += [header]
-            seqs += [seq]            
+            seqs += [seq]
             filter_pair_ids[f'id_{j + 1}'] += [header]
             filter_pair_ids[f'index_{j + 1}'] += [pair_id_count + 1]
 
@@ -206,10 +207,11 @@ def write_multimer_a3ms(pair_ids, alignments, outdir, method, is_homomers=False)
 
 
 def concatenate_alignments(inparams):
-    runners, alignment, methods, hhfilter, is_homomers = inparams
+    runners, alignment, methods, hhfilter, calNf, is_homomers = inparams
 
     outdir = alignment['outdir']
     print(f"Concatenating {' and '.join([alignment[chain]['name'] for chain in alignment if chain != 'outdir'])}")
+
     try:
 
         makedir_if_not_exists(outdir)
@@ -220,6 +222,8 @@ def concatenate_alignments(inparams):
         uniprot_sto_alignments = []
         colabfold_alignments = []
 
+        deepmsa_chain_alignments = {}
+        deepmsa_ranking_files = []
         for chain in alignment:
             if chain == "outdir":
                 continue
@@ -232,6 +236,16 @@ def concatenate_alignments(inparams):
             with open(alignment[chain]["uniprot_sto"]) as f:
                 uniprot_sto_alignments += [Alignment.from_file(f, format="stockholm")]
             colabfold_alignments += [alignment[chain]["colabfold_a3m"]]
+
+            deepmsa_a3m_dict = {}
+            for aln_name in alignment[chain]:
+                if aln_name.find('deepmsa_') < 0 or aln_name == "deepmsa_ranking_file":
+                    continue
+                with open(alignment[chain][aln_name]) as f:
+                    deepmsa_a3m_dict[aln_name.replace('deepmsa_', '')] = Alignment.from_file(f, format="a3m", a3m_inserts="delete")
+                    
+            deepmsa_chain_alignments[chain] = deepmsa_a3m_dict
+            deepmsa_ranking_files += [alignment[chain]['deepmsa_ranking_file']]
 
         for method in methods:
             if method == "pdb_interact":
@@ -280,6 +294,26 @@ def concatenate_alignments(inparams):
                                                                                     'species_interact_uniprot_sto',
                                                                                     is_homomers)
                     print(f"species_interact_uniprot_sto: {len(pair_ids)} pairs")
+
+                if len(list(deepmsa_chain_alignments.keys())) > 0:
+
+                    comb_pairs = DeepMSA2_pairing.get_pairs(deepmsa_chain_alignments)
+                    #print(comb_pairs)
+
+                    method_outdir = os.path.join(outdir, 'deepmsa_species')
+                    for comb_msa_name in comb_pairs:
+                        print(comb_msa_name)
+                        pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
+                        alignment[comb_msa_name] = write_multimer_a3ms(pair_ids,
+                                                                       comb_pairs[comb_msa_name],
+                                                                       method_outdir,
+                                                                       comb_msa_name,
+                                                                       is_homomers)
+                        print(f"{comb_msa_name}: {len(pair_ids)} pairs")
+
+                    print("Start to generate deepmsa ranking")
+                    ranking_file = os.path.join(method_outdir, 'deepmsa_paired_ranking.csv')
+                    DeepMSA2_pairing.rank_msas(method_outdir, deepmsa_ranking_files, ranking_file, calNf)
 
             elif method == "string_interact":
                 if len(uniref_a3m_alignments) > 0:
@@ -335,7 +369,7 @@ def concatenate_alignments(inparams):
                                                                                     'uniprot_distance_uniprot_sto',
                                                                                     is_homomers)
                     print(f"uniprot_distance_uniprot_sto: {len(pair_ids)} pairs")
-        
+
         os.system("touch " + os.path.join(outdir, "DONE"))
 
     except Exception as e:
@@ -348,6 +382,8 @@ class Monomer_alignments_concatenation_pipeline:
     def __init__(self, params, run_methods, multiprocess=False, process_num=1):
 
         self.params = params
+        self.hhfilter = params['hhfilter_program']
+        self.calNf = params['calNf_program']
 
         self.methods = run_methods
 
@@ -370,12 +406,12 @@ class Monomer_alignments_concatenation_pipeline:
         self.multiprocess = multiprocess
         self.process_num = process_num
 
-    def concatenate(self, alignments, hhfilter, is_homomers):
+    def concatenate(self, alignments, is_homomers):
         res_alignments = []
         if self.multiprocess:
             concatenate_list = []
             for alignment in alignments:
-                concatenate_list.append([self.runners, alignment, self.methods, hhfilter, is_homomers])
+                concatenate_list.append([self.runners, alignment, self.methods, self.hhfilter, self.calNf, is_homomers])
             pool = Pool(processes=self.process_num)
             res_alignments = pool.map(concatenate_alignments, concatenate_list)
             pool.close()
@@ -383,5 +419,5 @@ class Monomer_alignments_concatenation_pipeline:
         else:
             for alignment in alignments:
                 res_alignments += [
-                    concatenate_alignments([self.runners, alignment, self.methods, hhfilter, is_homomers])]
+                    concatenate_alignments([self.runners, alignment, self.methods, self.hhfilter, self.calNf, is_homomers])]
         return res_alignments

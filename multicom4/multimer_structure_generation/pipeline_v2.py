@@ -71,7 +71,9 @@ class Multimer_structure_prediction_pipeline_v2:
                                 # 'pdb_interact_uniprot_sto',
                                 'species_interact_uniprot_sto',
                                 'uniprot_distance_uniprot_sto',
-                                'string_interact_uniprot_sto']
+                                'string_interact_uniprot_sto',
+                                
+                                'deepmsa']
         else:
             self.run_methods = run_methods
 
@@ -124,7 +126,6 @@ class Multimer_structure_prediction_pipeline_v2:
         makedir_if_not_exists(output_dir)
 
         result_dirs = []
-
 
         common_parameters =   f"--fasta_path={fasta_path} " \
                               f"--env_dir={self.params['alphafold_env_dir']} " \
@@ -211,8 +212,9 @@ class Multimer_structure_prediction_pipeline_v2:
 
                 os.chdir(self.params['alphafold_program_dir'])
 
-                if method == "default" or method == "default_uniclust30" or method == "default_uniref30_22" or method == "default_mul_newest":
+                if method == "default":
                     continue
+
                 concatenate_method = ""
                 template_method = ""
                 if method.find('+') > 0:
@@ -334,6 +336,94 @@ class Multimer_structure_prediction_pipeline_v2:
                 os.system(base_cmd)
 
                 result_dirs += [outdir]
+
+            rerun = False
+            for result_dir in result_dirs:
+                if not complete_result(result_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                    rerun = True
+
+            if not rerun:
+                break
+
+            print("end")
+
+        print("The multimer structure generation for multimers has finished!")
+
+    def process_deepmsa(self,
+                        fasta_path,
+                        chain_id_map,
+                        aln_dir,
+                        complex_aln_dir,
+                        output_dir):
+
+        makedir_if_not_exists(output_dir)
+
+        result_dirs = []
+
+        common_parameters =   f"--fasta_path={fasta_path} " \
+                              f"--env_dir={self.params['alphafold_env_dir']} " \
+                              f"--database_dir={self.params['alphafold_database_dir']} " \
+                              f"--multimer_num_ensemble={self.params['multimer_num_ensemble']} " \
+                              f"--multimer_num_recycle={self.params['multimer_num_recycle']} " \
+                              f"--num_multimer_predictions_per_model={self.params['num_multimer_predictions_per_model']} " \
+                              f"--model_preset={self.params['multimer_model_preset']} " \
+                              f"--benchmark={self.params['alphafold_benchmark']} " \
+                              f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                              f"--models_to_relax={self.params['models_to_relax']} " \
+                              f"--max_template_date={self.params['max_template_date']} "
+
+        monomers = [chain_id for chain_id in chain_id_map]
+
+        while True:
+            
+            deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa_species')
+
+            for concatenate_method in os.listdir(deepmsa_complex_aln_dir):
+                
+                method_outdir = os.path.join(output_dir, concatenate_method)
+
+                os.chdir(self.params['alphafold_program_dir'])
+
+                msa_pair_file = os.path.join(deepmsa_complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
+                if len(pd.read_csv(msa_pair_file)) <= 1:
+                    continue
+
+                paired_a3m_paths = [os.path.join(deepmsa_complex_aln_dir, concatenate_method, monomer + "_con.a3m") for monomer in monomers]
+                monomer_a3m_paths = []
+                template_stos = []
+
+                monomer_a3m_names = concatenate_method.split('_')
+                for chain_idx, chain_id in enumerate(chain_id_map):
+
+                    monomer = chain_id
+
+                    monomer_a3m_path = os.path.join(aln_dir, monomer, 'DeepMSA2_a3m', 'finalMSAs', monomer_a3m_names[chain_idx] + '.a3m')
+                    if not os.path.exists(monomer_a3m_path):
+                        raise Exception(f"Cannot find deepmsa a3m for {monomer}: {monomer_a3m_path}")
+
+                    monomer_a3m_paths += [monomer_a3m_path]
+
+                    monomer_template_sto = os.path.join(aln_dir, monomer, f"{monomer}_uniref90.sto")
+                    if not os.path.exists(monomer_template_sto):
+                        raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
+                    template_stos += [monomer_template_sto]
+
+                base_cmd = f"python {self.params['alphafold_multimer_program']} " \
+                           f"--monomer_a3ms={','.join(monomer_a3m_paths)} " \
+                           f"--multimer_a3ms={','.join(paired_a3m_paths)} " \
+                           f"--msa_pair_file={msa_pair_file} " \
+                           f"--template_stos {','.join(template_stos)} " \
+                           f"--output_dir={method_outdir} " + common_parameters
+
+                if complete_result(method_outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                    continue
+
+                makedir_if_not_exists(method_outdir)
+
+                print(base_cmd)
+                os.system(base_cmd)
+
+                result_dirs += [method_outdir]
 
             rerun = False
             for result_dir in result_dirs:

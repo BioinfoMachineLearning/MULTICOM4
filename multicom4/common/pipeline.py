@@ -1,4 +1,4 @@
-import os, sys, argparse, time, copy
+import os, sys, argparse, time, copy, math
 from multiprocessing import Pool
 from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
@@ -344,9 +344,20 @@ def run_monomer_refinement_pipeline(params, refinement_inputs, outdir, finaldir,
     pipeline.select_v1(indir=outdir, outdir=finaldir, prefix=prefix)
 
 
-def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_dir, outputdir, params, is_homomers=False):
+def getTopN(maxP, chainN, is_homomers):
+    topN = 10
+    if is_homomers:
+        topN = 50
+    else:
+        topN = math.floor(math.pow(maxP, 1.0 / chainN))
+    return topN
+
+def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_dir, monomer_model_dir,
+                                            outputdir, params, is_homomers=False):
     chains = multimer.split(',')
     alignment = {'outdir': outputdir}
+    topN = getTopN(20, len(chains), is_homomers)
+
     for i in range(len(chains)):
         chain = chains[i]
         chain_aln_dir = os.path.join(monomer_aln_dir, chain)
@@ -357,6 +368,16 @@ def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_d
                           'uniref90_sto': os.path.join(chain_aln_dir, f"{chain}_uniref90.sto"),
                           'uniprot_sto': os.path.join(chain_aln_dir, f"{chain}_uniprot.sto"),
                           'uniclust30_a3m': os.path.join(chain_aln_dir, f"{chain}_uniclust30.a3m")}
+
+            deepmsa_ranking_file = os.path.join(monomer_model_dir, chain, 'deepmsa.rank')
+            contents = open(deepmsa_ranking_file).readlines()
+            for index, line in enumerate(contents):
+                if index >= topN:
+                    break
+                line = line.rstrip('\n')
+                msa_name, plddt = line.split()
+                chain_a3ms['deepmsa_' + msa_name] = os.path.join(chain_aln_dir, 'DeepMSA2_a3m', 'finalMSAs', msa_name + '.a3m')
+            chain_a3ms['deepmsa_ranking_file'] = deepmsa_ranking_file
         else:
             chain_a3ms = {'name': chain}
         alignment[f"chain{i + 1}"] = chain_a3ms
@@ -387,8 +408,7 @@ def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_d
         if not os.path.exists(os.path.join(alignment['outdir'], 'DONE')):
             monomer_alignments_concatenation_pipeline = Monomer_alignments_concatenation_pipeline(params=params,
                                                                                                 run_methods=run_methods)
-            alignments = monomer_alignments_concatenation_pipeline.concatenate(alignments, params['hhfilter_program'],
-                                                                              is_homomers=is_homomers)
+            alignments = monomer_alignments_concatenation_pipeline.concatenate(alignments, is_homomers=is_homomers)
         else:
             print("The multimer alignments have been generated!")
     else:
@@ -478,6 +498,12 @@ def run_multimer_structure_generation_pipeline_v2(params, fasta_path, chain_id_m
                                   monomer_model_dir=monomer_model_dir,
                                   output_dir=output_dir,
                                   notemplates=notemplates)
+        print(f"Start to generate DeepMSA models")
+        result = pipeline.process_deepmsa(fasta_path=fasta_path,
+                                          chain_id_map=chain_id_map,
+                                          aln_dir=aln_dir,
+                                          complex_aln_dir=complex_aln_dir,
+                                          output_dir=output_dir)
     except Exception as e:
         print(e)
         return False

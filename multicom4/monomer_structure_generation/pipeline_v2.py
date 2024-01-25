@@ -7,7 +7,9 @@ import pandas as pd
 from multiprocessing import Pool
 import pathlib
 from multicom4.common.protein import complete_result
-import yaml
+import yaml, json
+import numpy as np
+
 
 class Monomer_structure_prediction_pipeline_v2:
 
@@ -32,10 +34,11 @@ class Monomer_structure_prediction_pipeline_v2:
                                 'dhr',
                                 'paddle-helix', 'esmfold',
                                 'deepfold', 'megafold']
+
             for deepmsa_noimg_tag in self.deepmsa_noimg_tags:
-                self.run_methods += ['deepmsa_noimg_' + deepmsa_noimg_tag]
+                self.run_methods += ['deepmsa_' + deepmsa_noimg_tag]
             for deepmsa_img_tag in self.deepmsa_img_tags:
-                self.run_methods += ['deepmsa_img_' + deepmsa_img_tag]
+                self.run_methods += ['deepmsa_' + deepmsa_img_tag]
 
         else:
             self.run_methods = run_methods
@@ -60,22 +63,22 @@ class Monomer_structure_prediction_pipeline_v2:
                            'esmfold': 'esmfold',
                            'deepfold': 'deepfold',
                            'megafold': 'megafold',
-                           'deepmsa_noimg_dMSA.hhb': 'deepmsa_dMSA_hhb',
-                           'deepmsa_noimg_dMSA.jac': 'deepmsa_dMSA_jac',
-                           'deepmsa_noimg_dMSA.hms': 'deepmsa_dMSA_hms',
-                           'deepmsa_noimg_dMSA': 'deepmsa_dMSA',
-                           'deepmsa_noimg_qMSA': 'deepmsa_qMSA',
-                           'deepmsa_noimg_aMSA': 'deepmsa_aMSA',
-                           'deepmsa_noimg_qMSA.hhb': 'deepmsa_qMSA_hhb',
-                           'deepmsa_noimg_qMSA.jac': 'deepmsa_qMSA_jac',
-                           'deepmsa_noimg_qMSA.hh3': 'deepmsa_qMSA_hh3',
-                           'deepmsa_noimg_qMSA.hms': 'deepmsa_qMSA_hms',
-                           'deepmsa_img_DeepJGI.hms': 'deepmsa_DeepJGI_hms', 
-                           'deepmsa_img_DeepJGI': 'deepmsa_DeepJGI',  
-                           'deepmsa_img_q3JGI': 'deepmsa_q3JGI', 
-                           'deepmsa_img_q4JGI': 'deepmsa_q4JGI', 
-                           'deepmsa_img_q3JGI.hms': 'deepmsa_q3JGI_hms', 
-                           'deepmsa_img_q4JGI.hms': 'deepmsa_q4JGI_hms',
+                           'deepmsa_dMSA.hhb': 'deepmsa_dMSA_hhb',
+                           'deepmsa_dMSA.jac': 'deepmsa_dMSA_jac',
+                           'deepmsa_dMSA.hms': 'deepmsa_dMSA_hms',
+                           'deepmsa_dMSA': 'deepmsa_dMSA',
+                           'deepmsa_qMSA': 'deepmsa_qMSA',
+                           'deepmsa_aMSA': 'deepmsa_aMSA',
+                           'deepmsa_qMSA.hhb': 'deepmsa_qMSA_hhb',
+                           'deepmsa_qMSA.jac': 'deepmsa_qMSA_jac',
+                           'deepmsa_qMSA.hh3': 'deepmsa_qMSA_hh3',
+                           'deepmsa_qMSA.hms': 'deepmsa_qMSA_hms',
+                           'deepmsa_DeepJGI.hms': 'deepmsa_DeepJGI_hms', 
+                           'deepmsa_DeepJGI': 'deepmsa_DeepJGI',  
+                           'deepmsa_q3JGI': 'deepmsa_q3JGI', 
+                           'deepmsa_q4JGI': 'deepmsa_q4JGI', 
+                           'deepmsa_q3JGI.hms': 'deepmsa_q3JGI_hms', 
+                           'deepmsa_q4JGI.hms': 'deepmsa_q4JGI_hms',
         }
 
 
@@ -476,7 +479,7 @@ class Monomer_structure_prediction_pipeline_v2:
                     cmd = f"sh {self.params['megafold_program']} {fastadir} {method_out_dir} {out_data_yaml}"
                     cmds += [cmd]
 
-            elif run_method.find('deepmsa_noimg') >= 0:
+            elif run_method.find('deepmsa_') >= 0:
 
                 os.chdir(self.params['alphafold_program_dir'])
                 errormsg = ""
@@ -484,40 +487,14 @@ class Monomer_structure_prediction_pipeline_v2:
                 if not os.path.exists(uniref90_sto):
                     errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
-                deepmsa_noimg_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'MSA', run_method.replace('deepmsa_noimg_', '') + 'a3m')
-                if not os.path.exists(deepmsa_noimg_a3m):
-                    deepmsa_noimg_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'MSA', run_method.replace('deepmsa_noimg_', '') + '.a3m')
-                    if not os.path.exists(deepmsa_noimg_a3m):
-                        errormsg = errormsg + f"Cannot find img alignment for {targetname}: {deepmsa_noimg_a3m}\n"
+                deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', run_method.replace('deepmsa_', '') + '.a3m')
+                if not os.path.exists(deepmsa_a3m):
+                    errormsg = errormsg + f"Cannot find img alignment for {targetname}: {deepmsa_a3m}\n"
 
                 if len(errormsg) == 0:
                     if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
                         cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={deepmsa_noimg_a3m} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--output_dir={method_out_dir} " + common_parameters 
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-            
-            elif run_method.find('deepmsa_img') >= 0:
-
-                os.chdir(self.params['alphafold_program_dir'])
-                errormsg = ""
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                deepmsa_img_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'JGI', run_method.replace('deepmsa_img_', '') + 'a3m')
-                if not os.path.exists(deepmsa_img_a3m):
-                    deepmsa_img_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'JGI', run_method.replace('deepmsa_img_', '') + '.a3m')
-                    if not os.path.exists(deepmsa_img_a3m):
-                        errormsg = errormsg + f"Cannot find img alignment for {targetname}: {deepmsa_img_a3m}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={deepmsa_img_a3m} " \
+                            f"--custom_msa={deepmsa_a3m} " \
                             f"--uniref90_sto={uniref90_sto} " \
                             f"--output_dir={method_out_dir} " + common_parameters 
                         cmds += [cmd]
@@ -530,6 +507,27 @@ class Monomer_structure_prediction_pipeline_v2:
                     os.system(cmd)
                 except Exception as e:
                     print(e)
+
+        # add ranking for deepmsa2 alignments
+        deepmsa_alns = []
+        deepmsa_plddts = []
+        for method in self.method2dir:
+            if method.find('deepmsa') >= 0:
+                ranking_json_file = os.path.join(outdir, self.method2dir[method], "ranking_debug.json")
+                if not os.path.exists(ranking_json_file):
+                    continue
+
+                ranking_json = json.loads(open(ranking_json_file).read())
+                plddts = []
+                for key in ranking_json['plddts'].keys():
+                    plddts += [float(ranking_json['plddts'][key])]
+                deepmsa_alns += [method.replace('deepmsa_', '')]
+                deepmsa_plddts += [np.max(np.array(plddts))]
+
+        with open(os.path.join(outdir, 'deepmsa.rank'), 'w') as fw:
+            indices = np.argsort(-np.array(deepmsa_plddts))
+            for index in indices:
+                fw.write(f"{deepmsa_alns[index]}\t{deepmsa_plddts[index]}\n")
 
 
     def process(self, monomers, alndir, outdir, templatedir=None):

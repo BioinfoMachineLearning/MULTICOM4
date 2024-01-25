@@ -196,9 +196,10 @@ Before CASP16:
      | -------------| -----| 
      |ESMFold | ESMFold|
      |DeepFold | DeepFold |
-     |MEGAFold | MEGAFold |
-     |DMFold | DMFold|
-     |30 kinds of MSA in DeepMSA2 | DeepMSA2| 
+     |~~MEGAFold~~ | ~~MEGAFold~~ |
+     |~~DMFold~~ | ~~DMFold~~|
+     |? kinds of MSA in DeepMSA2 | DeepMSA2| 
+     |5 variants in AFsample | AFsample| 
 
 6. Quality assessment methods
 
