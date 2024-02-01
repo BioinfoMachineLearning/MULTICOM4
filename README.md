@@ -113,11 +113,11 @@ Before CASP16:
      *   [UniProt](https://www.uniprot.org/uniprot/),
      *   [UniRef90](https://www.uniprot.org/help/uniref).
 
-     b. ~~DeepMSA2 (tianqi)~~
+     b. DeepMSA2
           
-     ~~*   [TaraDB](https://zenodo.org/records/3380712)~~
+     *   [UniRef30 v2023_02](https://gwdu111.gwdg.de/~compbiol/uniclust/2023_02/)
 
-     ~~*   [MetaSourceDB v2023_02](https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/2023_02/)~~
+     *   [MGnify v2023_02]([https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/2023_02/),
    
      c. Inhouse template databases (pdb_sort90, pdb_complex)
 
