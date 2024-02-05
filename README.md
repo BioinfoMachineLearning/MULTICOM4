@@ -79,26 +79,45 @@ b. Multimer
 
 - AlphaFold-Multimer-based predictors
 
-     | Predictor  | Note |
-     | -------------| -----| 
-     |default_multimer | default AlphaFold-Multimer |
-     |default_variants | default_variants|
-     |spec_variants | spec_variants |
-     |str_variants | str_variants |
-     |pdb_variants| pdb_variants | 
-     |unidist_variants | unidist_variants |
-     |Iterative methods | Structural-alignment based methods |
-
-To be added:
-
-| Predictor  | Note |
-| -------------| -----| 
-|ESMFold | ESMFold|
-|~~DeepFold~~ | ~~DeepFold~~ |
-|~~MEGAFold~~ | ~~MEGAFold~~ |
-|~~DMFold~~ | ~~DMFold~~|
-|? kinds of MSA in DeepMSA2 | DeepMSA2| 
-|5 variants in AFsample | AFsample| 
+     | Predictor  | $MSA_{paired}$ | $MSA_{unpaired}$ | Template | dropout | dropout in structure module | Description |
+     | -------------| -----| -----| -----| -----| -----| -----| 
+     | default_multimer | default | default | pdb_seqres | false | true (0.1) | default AlphaFold-Multimer |
+     | default_struct | -----| -----| -----| -----| -----| -----| 
+     | default_pdb70 |-----| -----| -----| -----| -----| -----| 
+     | default_pdb |-----| -----| -----| -----| -----| -----| 
+     | default_comp |-----| -----| -----| -----| -----| -----| 
+     | default_af |-----| -----| -----| -----| -----| -----| 
+     | uniclust_oxmatch_a3m |-----| -----| -----| -----| -----| -----| 
+     | pdb_iter_uniref_a3m |-----| -----| -----| -----| -----| -----| 
+     | spec_iter_uniref_a3m |-----| -----| -----| -----| -----| -----| 
+     | spec_struct |-----| -----| -----| -----| -----| -----| 
+     | spec_pdb70 |-----| -----| -----| -----| -----| -----| 
+     | spec_pdb |-----| -----| -----| -----| -----| -----| 
+     | spec_comp |-----| -----| -----| -----| -----| -----| 
+     | spec_af |-----| -----| -----| -----| -----| -----| 
+     | unidist_uniref_a3m |-----| -----| -----| -----| -----| -----| 
+     | str_iter_uniref_a3m |-----| -----| -----| -----| -----| -----| 
+     | spec_iter_uniref_sto |-----| -----| -----| -----| -----| -----| 
+     | unidist_uniref_sto |-----| -----| -----| -----| -----| -----| 
+     | str_iter_uniref_sto |-----| -----| -----| -----| -----| -----| 
+     | str_struct |-----| -----| -----| -----| -----| -----| 
+     | str_pdb70 |-----| -----| -----| -----| -----| -----| 
+     | str_pdb |-----| -----| -----| -----| -----| -----| 
+     | str_comp |-----| -----| -----| -----| -----| -----| 
+     | str_af |-----| -----| -----| -----| -----| -----| 
+     | spec_iter_uniprot_sto |-----| -----| -----| -----| -----| -----| 
+     | unidist_uniprot_sto |-----| -----| -----| -----| -----| -----| 
+     | str_iter_uniprot_sto |-----| -----| -----| -----| -----| -----| 
+     | pdb_iter_uniref_sto |-----| -----| -----| -----| -----| -----| 
+     | pdb_iter_uniprot_sto |-----| -----| -----| -----| -----| -----| 
+     |Iterative methods | Structural-alignment based methods | -----| -----| -----| -----| -----|
+     | def_drop_s | default | default | pdb_seqres (default) | true | true (0.1) | AFSample | 
+     | def_drop_nos | default | default | pdb_seqres (default) | true | false | AFSample | 
+     | def_notemp | default | default | no templates | false | true (0.1) | AFSample |
+     | def_notemp_drop_s | default | default | no templates | true | true (0.1) | AFSample |
+     | def_notemp_drop_nos | default | default | no templates | true | false | AFSample |
+      
+     |? kinds of MSA in DeepMSA2 | DeepMSA2| 
 
 To be added: 
 | Predictor  | Note |
@@ -113,3 +132,9 @@ Number of models to generate:
 About 500 models per AlphaFold-Multimer-based variant (MSA, template, dropout), select the top 100 models for relaxation and further ranking.
 
 For hard targets, use AFsample to generate 1000 models per variant (total 5000) in AFsample, select the top 200 for relaxation per variant and further ranking. For other predictors, increase to 1000 models per AlphaFold2-based variants, and select the top 200 models for relaxation.
+
+- Non-AlphaFold-Multimer-based predictors
+
+| Predictor  | Note |
+| -------------| -----| 
+|ESMFold | ESMFold|
