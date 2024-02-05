@@ -47,6 +47,12 @@ class Multimer_structure_prediction_pipeline_v2:
                                 'default+sequence_based_template_pdb',
                                 'default+sequence_based_template_complex_pdb',
                                 'default+alphafold_model_templates',
+                                'default+default_template+dropout+struct_dropout',
+                                'default+default_template+dropout+no_struct_dropout',
+                                'default+notemplate+nodropout+struct_dropout',
+                                'default+notemplate+dropout+struct_dropout',
+                                'default+notemplate+dropout+no_struct_dropout',
+
                                 'uniclust_oxmatch_a3m',
                                 'pdb_interact_uniref_a3m',
                                 'species_interact_uniref_a3m',
@@ -83,6 +89,14 @@ class Multimer_structure_prediction_pipeline_v2:
                            'default+sequence_based_template_pdb': 'default_pdb',
                            'default+sequence_based_template_complex_pdb': 'default_comp',
                            'default+alphafold_model_templates': 'default_af',
+
+                           'default+default_template+dropout+struct_dropout': 'def_mul_drop_s',
+                           'default+default_template+dropout+no_struct_dropout': 'def_mul_drop_nos',
+                           'default+notemplate+nodropout+struct_dropout': 'def_mul_notemp',
+                           'default+notemplate+dropout+struct_dropout': 'def_mul_notemp_drop_s',
+                           'default+notemplate+dropout+no_struct_dropout': 'def_mul_notemp_drop_nos',
+
+
                            'uniclust_oxmatch_a3m': 'uniclust_oxmatch_a3m',
                            'pdb_interact_uniref_a3m': 'pdb_iter_uniref_a3m',
 
@@ -111,6 +125,8 @@ class Multimer_structure_prediction_pipeline_v2:
                            
                            'pdb_interact_uniref_sto': 'pdb_iter_uniref_sto',
                            'pdb_interact_uniprot_sto': 'pdb_iter_uniprot_sto',
+
+                           'esmfold': 'esmfold'
                            }
 
     def process(self,
@@ -120,8 +136,7 @@ class Multimer_structure_prediction_pipeline_v2:
                 complex_aln_dir,
                 template_dir,
                 monomer_model_dir,
-                output_dir,
-                notemplates=False):
+                output_dir):
 
         makedir_if_not_exists(output_dir)
 
@@ -140,6 +155,17 @@ class Multimer_structure_prediction_pipeline_v2:
                               f"--max_template_date={self.params['max_template_date']} "
 
         while True:
+            # run esmfold
+            method_out_dir = os.path.join(output_dir, "esmfold")
+            os.makedirs(method_out_dir, exist_ok=True)
+            for num_recycle in [4, 10, 50]:
+                outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
+                if not os.path.exists(outpdb):
+                    cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
+                    print(cmd)
+                    os.system(cmd)
+
+
             # run alphafold default pipeline:
             outdir = os.path.join(output_dir, "default_multimer")
             monomers = [chain_id for chain_id in chain_id_map]
@@ -178,9 +204,6 @@ class Multimer_structure_prediction_pipeline_v2:
                       f"--uniprot_stos={','.join(uniprot_stos)} " \
                       f"--output_dir={outdir} " + common_parameters
 
-                if notemplates:
-                    cmd += "--notemplates=true"
-
                 print(cmd)
                 os.system(cmd)
             result_dirs += [outdir]
@@ -212,13 +235,24 @@ class Multimer_structure_prediction_pipeline_v2:
 
                 os.chdir(self.params['alphafold_program_dir'])
 
-                if method == "default":
+                if method == "default" or method == "esmfold":
                     continue
 
                 concatenate_method = ""
                 template_method = ""
+                dropout = False
+                dropout_structure_module = True
+                
                 if method.find('+') > 0:
-                    concatenate_method, template_method = method.split('+')
+                    settings = method.split('+')
+                    if len(settings) == 2:
+                        concatenate_method, template_method = method.split('+')
+                    else:
+                        concatenate_method, template_method, dropout_setting, struct_dropout_setting = method.split('+')
+                        if dropout_setting == "dropout":
+                            dropout=True
+                        if struct_dropout_setting == "no_struct_dropout":
+                            dropout_structure_module = False
                 else:
                     concatenate_method = method
 
@@ -259,7 +293,7 @@ class Multimer_structure_prediction_pipeline_v2:
                            f"--multimer_a3ms={','.join(a3m_paths)} " \
                            f"--msa_pair_file={msa_pair_file} " \
 
-                if template_method == "":
+                if template_method == "" or template_method == "default_template":
                     base_cmd += f"--template_stos {','.join(template_stos)} "
 
                 elif template_method == "structure_based_template":
@@ -324,8 +358,11 @@ class Multimer_structure_prediction_pipeline_v2:
                     
                 base_cmd += f"--output_dir={outdir} " + common_parameters
 
-                if notemplates:
-                    base_cmd += "--notemplates=true"  
+                if template_method == "notemplate":
+                    base_cmd += "--notemplate=true "  
+
+                base_cmd += f"--dropout={dropout} "
+                base_cmd += f"--dropout_structure_module={dropout_structure_module} " \
 
                 if complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
                     continue
@@ -380,6 +417,9 @@ class Multimer_structure_prediction_pipeline_v2:
 
             for concatenate_method in os.listdir(deepmsa_complex_aln_dir):
                 
+                if concatenate_method.find('.csv') > 0:
+                    continue
+
                 method_outdir = os.path.join(output_dir, concatenate_method)
 
                 os.chdir(self.params['alphafold_program_dir'])

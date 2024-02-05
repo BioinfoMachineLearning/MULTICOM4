@@ -487,7 +487,7 @@ def run_monomer_templates_concatenation_pipeline(multimers, monomer_aln_dir, mon
 
 def run_multimer_structure_generation_pipeline_v2(params, fasta_path, chain_id_map, aln_dir, complex_aln_dir,
                                                     template_dir,
-                                                    monomer_model_dir, output_dir, run_methods=None, notemplates=False):
+                                                    monomer_model_dir, output_dir, run_methods=None):
     try:
         pipeline = Multimer_structure_prediction_pipeline_v2(params, run_methods)
         result = pipeline.process(fasta_path=fasta_path,
@@ -496,8 +496,7 @@ def run_multimer_structure_generation_pipeline_v2(params, fasta_path, chain_id_m
                                   complex_aln_dir=complex_aln_dir,
                                   template_dir=template_dir,
                                   monomer_model_dir=monomer_model_dir,
-                                  output_dir=output_dir,
-                                  notemplates=notemplates)
+                                  output_dir=output_dir)
         print(f"Start to generate DeepMSA models")
         result = pipeline.process_deepmsa(fasta_path=fasta_path,
                                           chain_id_map=chain_id_map,

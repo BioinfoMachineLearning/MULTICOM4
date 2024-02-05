@@ -12,8 +12,16 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    sequence = open(args.fasta).readlines()[1].rstrip('\n')
-
+    sequences = []
+    for line in open(args.fasta):
+        if line[0] == ">":
+            continue
+        sequences += [line.rstrip('\n')]
+    
+    sequence = sequences[0]
+    if len(sequences) > 1:
+        sequence = ':'.join(sequences)
+        
     try:
         model = esm.pretrained.esmfold_v1()
         model = model.eval().cuda()
