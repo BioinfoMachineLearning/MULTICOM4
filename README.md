@@ -125,6 +125,7 @@ To be added:
 | default_multimer | default_multimer no msa pairing | 
 | Iterative methods | Iterative methods no msa pairing | 
 | Iterative methods | Iterative methods no templates |
+| TM-search based template search | TM-search | 
 
 Number of models to generate:
 
