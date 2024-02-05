@@ -116,8 +116,7 @@ b. Multimer
      | def_notemp | default | default | no templates | false | true (0.1) | AFSample |
      | def_notemp_drop_s | default | default | no templates | true | true (0.1) | AFSample |
      | def_notemp_drop_nos | default | default | no templates | true | false | AFSample |
-      
-     |? kinds of MSA in DeepMSA2 | DeepMSA2| 
+     |? kinds of MSA in DeepMSA2 | deepmsa | deepmsa | pdb_seqres | true | false | DeepMSA2| 
 
 To be added: 
 | Predictor  | Note |
