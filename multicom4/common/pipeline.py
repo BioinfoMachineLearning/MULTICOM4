@@ -24,7 +24,7 @@ import pandas as pd
 import numpy as np
 from multicom4.monomer_structure_refinement.util import cal_tmscore
 from multicom4.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
-
+from multicom4.common import config
 
 def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     uniref30 = params['uniref_db']
@@ -334,14 +334,14 @@ def rerun_monomer_evaluation_pipeline(params, targetname, fasta_file, outputdir)
     return result
 
 
-def run_monomer_refinement_pipeline(params, refinement_inputs, outdir, finaldir, prefix):
-    pipeline = iterative_refine_pipeline.Monomer_iterative_refinement_pipeline_server(params=params)
-    pipeline.search(refinement_inputs=refinement_inputs, outdir=outdir)
+# def run_monomer_refinement_pipeline(params, refinement_inputs, outdir, finaldir, prefix):
+#     pipeline = iterative_refine_pipeline.Monomer_iterative_refinement_pipeline_server(params=params)
+#     pipeline.search(refinement_inputs=refinement_inputs, outdir=outdir)
 
-    makedir_if_not_exists(finaldir)
+#     makedir_if_not_exists(finaldir)
 
-    pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(params)
-    pipeline.select_v1(indir=outdir, outdir=finaldir, prefix=prefix)
+#     pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(params)
+#     pipeline.select_v1(indir=outdir, outdir=finaldir, prefix=prefix)
 
 
 def getTopN(maxP, chainN, is_homomers):
@@ -356,7 +356,12 @@ def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_d
                                             outputdir, params, is_homomers=False):
     chains = multimer.split(',')
     alignment = {'outdir': outputdir}
-    topN = getTopN(20, len(chains), is_homomers)
+
+    config_deepmsa2 = config.HETEROMULTIMER_CONFIG.predictors.deepmsa2
+    if is_homomers:
+        config_deepmsa2 = config.HOMOMULTIMER_CONFIG.predictors.deepmsa2
+
+    topN = getTopN(config_deepmsa2.max_pairs, len(chains), is_homomers)
 
     for i in range(len(chains)):
         chain = chains[i]

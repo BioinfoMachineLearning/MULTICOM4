@@ -78,24 +78,10 @@ alphafold_multimer_program = run_alphafold_multimer_custom.py
 # alphafold tertiary structure prediction script
 alphafold_default_program = run_alphafold_pre.py
 
-# AlphaFold2 parameters
-monomer_num_ensemble = 1
-monomer_num_recycle = 3
-num_monomer_predictions_per_model = 1
-monomer_model_preset = monomer
-
-# AlphaFold-Multimer parameters
-multimer_num_ensemble = 1
-multimer_num_recycle = 20
-num_multimer_predictions_per_model = 5
-multimer_model_preset = multimer
-
 # Common parameters
 alphafold_benchmark = True
-use_gpu_relax = True
 
-# ALL, BEST, NONE
-models_to_relax = ALL
+use_gpu_relax = True
 
 max_template_date = 9999-06-01
 
@@ -117,6 +103,12 @@ deepfold_program_dir = /bmlfast/bml_casp16/tools/deepfold/
 deepfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/run_deepfold.py
 
 ######################Monomer template search option#################################
+
+tmsearch_binary = /bmlfast/bml_casp16/MULTICOM4/tools/TM-search1.0/TMsearch
+
+tmsearch_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/TM-search1.0
+
+tmsearch_database = /bmlfast/bml_casp16/MULTICOM4/tools/TM-search1.0/PDB/
 
 foldseek_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 

@@ -7,7 +7,7 @@ from multicom4.common.protein import read_qa_txt_as_df, parse_fasta, complete_re
 from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer
 from multicom4.monomer_structure_refinement import iterative_refine_pipeline
 from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
-    run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, run_monomer_refinement_pipeline, \
+    run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_v2, \
     run_multimer_structure_generation_pipeline_foldseek, run_multimer_refinement_pipeline, \
@@ -68,6 +68,17 @@ def main(argv):
                                                        descriptions=input_descs)
 
     processed_seuqences = {}
+    monomer_run_methods = ['default', 'default_seq_temp','def_drop_s','def_drop_nos',
+                                'def_notemp', 'def_notemp_drop_s', 'def_notemp_drop_nos',
+                                'original', 'ori_seq_temp', 'colabfold', 'colab_seq_temp',
+                                'img', 'img_seq_temp', 'dhr', 
+                                'deepmsa_dMSA_hhb', 'deepmsa_dMSA_jac', 'deepmsa_dMSA_hms',
+                                'deepmsa_dMSA', 'deepmsa_qMSA', 'deepmsa_aMSA', 'deepmsa_qMSA_hhb',
+                                'deepmsa_qMSA_jac', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hms',
+                                'deepmsa_DeepJGI_hms', 'deepmsa_DeepJGI', 'deepmsa_q3JGI', 
+                                'deepmsa_q4JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI_hms',
+                                'paddle-helix', 'esmfold', 'deepfold', 'megafold']
+
     for chain_id in chain_id_map:
         monomer_id = chain_id
         monomer_sequence = chain_id_map[chain_id].sequence
@@ -103,7 +114,8 @@ def main(argv):
                                                                 fasta_path=monomer_fasta,
                                                                 alndir=N1_monomer_outdir,
                                                                 templatedir=N2_monomer_outdir,
-                                                                outdir=N3_monomer_outdir):
+                                                                outdir=N3_monomer_outdir,
+                                                                run_methods=monomer_run_methods):
                 print(f"Program failed in step 3: monomer {monomer_id} structure generation")
 
             processed_seuqences[monomer_sequence] = monomer_id
@@ -141,7 +153,7 @@ def main(argv):
     try:
         concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
                            'string_interact', 'uniprot_distance']
-        #concat_methods = ['species_interact']
+
         run_monomer_msas_concatenation_pipeline(
             multimer=','.join([chain_id for chain_id in chain_id_map]),
             run_methods=concat_methods,
@@ -171,36 +183,6 @@ def main(argv):
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
     makedir_if_not_exists(N6_outdir)
-
-    # run_methods = ['default',
-    #                 'default+sequence_based_template_pdb70',
-    #                 'default+structure_based_template',
-    #                 'default+sequence_based_template_pdb',
-    #                 'default+sequence_based_template_complex_pdb',
-    #                 'default+alphafold_model_templates',
-    #                 'uniclust_oxmatch_a3m',
-    #                 'pdb_interact_uniref_a3m',
-    #                 'species_interact_uniref_a3m',
-    #                 'species_interact_uniref_a3m+sequence_based_template_pdb70',
-    #                 'species_interact_uniref_a3m+structure_based_template',
-    #                 'species_interact_uniref_a3m+sequence_based_template_pdb',
-    #                 'species_interact_uniref_a3m+sequence_based_template_complex_pdb',
-    #                 'species_interact_uniref_a3m+alphafold_model_templates',
-    #                 'uniprot_distance_uniref_a3m',
-    #                 'string_interact_uniref_a3m',
-    #                 'pdb_interact_uniref_sto',
-    #                 'species_interact_uniref_sto',
-    #                 'uniprot_distance_uniref_sto',
-    #                 'string_interact_uniref_sto',
-    #                 'string_interact_uniref_sto+sequence_based_template_pdb70',
-    #                 'string_interact_uniref_sto+structure_based_template',
-    #                 'string_interact_uniref_sto+sequence_based_template_pdb',
-    #                 'string_interact_uniref_sto+sequence_based_template_complex_pdb',
-    #                 'string_interact_uniref_sto+alphafold_model_templates',
-    #                 'pdb_interact_uniprot_sto',
-    #                 'species_interact_uniprot_sto',
-    #                 'uniprot_distance_uniprot_sto',
-    #                 'string_interact_uniprot_sto']
 
     if not run_multimer_structure_generation_pipeline_v2(params=params,
                                                            fasta_path=FLAGS.fasta_path,

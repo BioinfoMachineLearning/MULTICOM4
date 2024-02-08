@@ -6,7 +6,7 @@ from multicom4.monomer_structure_refinement import iterative_refine_pipeline
 from multicom4.common.protein import read_qa_txt_as_df, complete_result
 from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
-    run_monomer_refinement_pipeline, run_monomer_msa_pipeline_img
+    run_monomer_msa_pipeline_img
 import pandas as pd
 from absl import flags
 from absl import app
@@ -84,6 +84,7 @@ def main(argv):
     print("3. Start to generate tertiary structure for monomers using alphafold")
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
     makedir_if_not_exists(N3_outdir)
+    run_methods = []
     if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                         fasta_path=FLAGS.fasta_path,
                                                         alndir=N1_outdir, templatedir=N2_outdir, outdir=N3_outdir):
@@ -130,34 +131,34 @@ def main(argv):
 
     print("#################################################################################################")
 
-    print("5. Start to refine monomer models based on the qa rankings")
+    # print("5. Start to refine monomer models based on the qa rankings")
 
-    N5_outdir_avg = os.path.join(outdir, 'N5_monomer_structure_refinement_avg')
+    # N5_outdir_avg = os.path.join(outdir, 'N5_monomer_structure_refinement_avg')
 
-    makedir_if_not_exists(N5_outdir_avg)
+    # makedir_if_not_exists(N5_outdir_avg)
 
-    os.system(f"cp {result['pairwise_af_avg']} {N5_outdir_avg}")
+    # os.system(f"cp {result['pairwise_af_avg']} {N5_outdir_avg}")
 
-    ref_ranking_avg = pd.read_csv(result['pairwise_af_avg'])  # apollo or average ranking or the three qas
+    # ref_ranking_avg = pd.read_csv(result['pairwise_af_avg'])  # apollo or average ranking or the three qas
 
-    refine_inputs = []
-    for i in range(5):
-        pdb_name = ref_ranking_avg.loc[i, 'model']
-        refine_input = iterative_refine_pipeline.refinement_input(fasta_path=FLAGS.fasta_path,
-                                                                  pdb_path=os.path.join(N4_outdir, 'pdb', pdb_name),
-                                                                  pkl_path=os.path.join(N4_outdir, 'pkl', pdb_name.replace('.pdb', '.pkl')),
-                                                                  msa_path=os.path.join(N4_outdir, 'msa', pdb_name.replace('.pdb', '.a3m')))
-        refine_inputs += [refine_input]
+    # refine_inputs = []
+    # for i in range(5):
+    #     pdb_name = ref_ranking_avg.loc[i, 'model']
+    #     refine_input = iterative_refine_pipeline.refinement_input(fasta_path=FLAGS.fasta_path,
+    #                                                               pdb_path=os.path.join(N4_outdir, 'pdb', pdb_name),
+    #                                                               pkl_path=os.path.join(N4_outdir, 'pkl', pdb_name.replace('.pdb', '.pkl')),
+    #                                                               msa_path=os.path.join(N4_outdir, 'msa', pdb_name.replace('.pdb', '.a3m')))
+    #     refine_inputs += [refine_input]
 
-    final_dir = N5_outdir_avg + '_final'
-    run_monomer_refinement_pipeline(params=params, refinement_inputs=refine_inputs, outdir=N5_outdir_avg,
-                                    finaldir=final_dir, prefix="refine")
+    # final_dir = N5_outdir_avg + '_final'
+    # run_monomer_refinement_pipeline(params=params, refinement_inputs=refine_inputs, outdir=N5_outdir_avg,
+    #                                 finaldir=final_dir, prefix="refine")
 
-    print("The refinement for the top-ranked monomer models has been finished!")
+    # print("The refinement for the top-ranked monomer models has been finished!")
 
-    print("#################################################################################################")
+    # print("#################################################################################################")
 
-    print("#################################################################################################")
+    # print("#################################################################################################")
 
 
 if __name__ == '__main__':

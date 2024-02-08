@@ -12,7 +12,7 @@ import numpy as np
 from multicom4.monomer_templates_concatenation import parsers
 from multicom4.monomer_structure_refinement.util import *
 from multicom4.common.protein import complete_result
-
+from multicom4.common import config
 
 # Prefilter exceptions.
 class PrefilterError(Exception):
@@ -62,15 +62,15 @@ def assess_foldseek_hit(
 
     return True
 
-class Monomer_iterative_refinement_pipeline:
+class Monomer_iterative_refinement_pipeline(config.pipeline):
 
-    def __init__(self, params, max_template_count=50):
+    def __init__(self, params):
+
+        super().__init__()
 
         self.params = params
 
-        self.max_iteration = 5
-
-        self.max_template_count = max_template_count
+        self.predictor_config = self.monomer_config.predictors.foldseek_refine
 
         release_date_df = pd.read_csv(params['pdb_release_date_file'])
         self._release_dates = dict(zip(release_date_df['pdbcode'], release_date_df['release_date']))
@@ -166,7 +166,7 @@ class Monomer_iterative_refinement_pipeline:
                         tmscore_af_indices += [i]
 
             if len(evalue_af_indices) + len(evalue_pdb_indices) \
-                    + len(tmscore_af_indices) + len(tmscore_pdb_indices) >= self.max_template_count:
+                    + len(tmscore_af_indices) + len(tmscore_pdb_indices) >= self.predictor_config.max_template_count:
                 break
 
         templates_sorted = copy.deepcopy(template_result['local_alignment'].iloc[evalue_pdb_indices])
@@ -262,7 +262,28 @@ class Monomer_iterative_refinement_pipeline:
 
         print(f"Start to refine {pdb_path}")
 
-        for num_iteration in range(self.max_iteration):
+        monomer_num_ensemble = self.get_monomer_config(self.predictor_config, 'num_ensemble')
+        monomer_num_recycle = self.get_monomer_config(self.predictor_config, 'num_recycle')
+        num_monomer_predictions_per_model = self.get_monomer_config(self.predictor_config, 'predictions_per_model')
+        model_preset = self.get_monomer_config(self.predictor_config, 'model_preset')
+        relax_topn_predictions = self.get_monomer_config(self.predictor_config, 'relax_topn_predictions')
+        dropout = self.get_monomer_config(self.predictor_config, 'dropout')
+        dropout_structure_module = self.get_monomer_config(self.predictor_config, 'dropout_structure_module')
+
+        common_parameters = f"--fasta_path={fasta_path} " \
+                            f"--env_dir={self.params['alphafold_env_dir']} " \
+                            f"--database_dir={self.params['alphafold_database_dir']} " \
+                            f"--benchmark={self.params['alphafold_benchmark']} " \
+                            f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                            f"--max_template_date={self.params['max_template_date']} " \
+                            f"--monomer_num_ensemble={monomer_num_ensemble} " \
+                            f"--monomer_num_recycle={monomer_num_recycle} " \
+                            f"--num_monomer_predictions_per_model {num_monomer_predictions_per_model} " \
+                            f"--model_preset={model_preset} " \
+                            f"--relax_topn_predictions={relax_topn_predictions} " \
+                            f"--models_to_relax=TOPN "
+
+        for num_iteration in range(self.predictor_config.max_iteration):
             os.chdir(cwd)
             current_work_dir = os.path.join(outdir, f"iteration{num_iteration + 1}")
             makedir_if_not_exists(current_work_dir)
@@ -281,7 +302,7 @@ class Monomer_iterative_refinement_pipeline:
             model_iteration_scores += [ref_avg_lddt]
 
             out_model_dir = os.path.join(current_work_dir, "alphafold")
-            if not complete_result(out_model_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
+            if not complete_result(out_model_dir, 5 * num_monomer_predictions_per_model):
 
                 foldseek_res = self.search_templates(inpdb=start_pdb, outdir=os.path.join(current_work_dir, 'foldseek'))
 
@@ -303,22 +324,12 @@ class Monomer_iterative_refinement_pipeline:
                 makedir_if_not_exists(out_model_dir)
                 custom_msa = os.path.join(current_work_dir, f"iteration{num_iteration + 1}.a3m")
                 temp_struct_csv = os.path.join(current_work_dir, "structure_templates.csv")
+
                 cmd = f"python {self.params['alphafold_program']} " \
-                      f"--fasta_path={fasta_path} " \
-                      f"--env_dir={self.params['alphafold_env_dir']} " \
-                      f"--database_dir={self.params['alphafold_database_dir']} " \
-                      f"--monomer_num_ensemble={self.params['monomer_num_ensemble']} " \
-                      f"--monomer_num_recycle={self.params['monomer_num_recycle']} " \
-                      f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
-                      f"--model_preset={self.params['monomer_model_preset']} " \
-                      f"--benchmark={self.params['alphafold_benchmark']} " \
-                      f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                      f"--models_to_relax={self.params['models_to_relax']} " \
-                      f"--max_template_date={self.params['max_template_date']} " \
                       f"--custom_msa={custom_msa} " \
                       f"--temp_struct_csv={temp_struct_csv} " \
                       f"--struct_atom_dir={out_template_dir} " \
-                      f"--output_dir={out_model_dir}"
+                      f"--output_dir={out_model_dir} " + common_parameters
 
                 try:
                     os.chdir(self.params['alphafold_program_dir'])
@@ -340,7 +351,7 @@ class Monomer_iterative_refinement_pipeline:
                 ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
                 ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
                 print('##################################################')
-                if num_iteration + 1 >= self.max_iteration:
+                if num_iteration + 1 >= self.predictor_config.max_iteration:
                     print("Reach maximum iteration")
                     model_iteration_scores += [max_lddt_score]
             else:
@@ -353,7 +364,7 @@ class Monomer_iterative_refinement_pipeline:
                     model_iteration_scores += [max_lddt_score]
                 break
 
-        while len(model_iteration_scores) <= self.max_iteration:
+        while len(model_iteration_scores) <= self.predictor_config.max_iteration:
             model_iteration_scores += [0]
 
         print(model_iteration_scores)

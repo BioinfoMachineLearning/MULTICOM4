@@ -290,13 +290,11 @@ class Complex_sequence_based_template_search_pipeline:
 
         concatenated_pd = self.concatenate_templates(monomer_inputs, monomer_template_results, outdir)
         concatenated_pd = self.filter_same_pdbcodes(concatenated_pd, len(monomer_template_results))
-        concatenated_pd_v2 = copy.deepcopy(concatenated_pd)
 
         if len(concatenated_pd) < 50:
 
             print(f"template count is smaller than 50, add monomer templates")
             prev_pd = None
-            prev_pd_v2 = None
             for i in range(len(monomer_template_results)):
                 seen_templates_sequences = [
                     f"{concatenated_pd.loc[j, f'template{i + 1}']}_{concatenated_pd.loc[j, f'aln_temp{i + 1}']}" for j
@@ -320,18 +318,13 @@ class Complex_sequence_based_template_search_pipeline:
                 curr_pd = curr_pd.drop([f'index{i + 1}'], axis=1)
                 if prev_pd is None:
                     prev_pd = curr_pd
-                    prev_pd_v2 = curr_pd
                 else:
-                    prev_pd = prev_pd.merge(curr_pd, how="inner", on='index')
-                    prev_pd_v2 = prev_pd_v2.merge(curr_pd, how="outer", on='index')
+                    prev_pd = prev_pd.merge(curr_pd, how="outer", on='index')
 
             concatenated_pd = concatenated_pd.append(prev_pd, ignore_index=True)
-            concatenated_pd_v2 = concatenated_pd_v2.append(prev_pd_v2)
 
         concatenated_pd.reset_index(inplace=True, drop=True)
         concatenated_pd.to_csv(os.path.join(outdir, 'sequence_templates.csv'))
-        concatenated_pd_v2.reset_index(inplace=True, drop=True)
-        concatenated_pd_v2.to_csv(os.path.join(outdir, 'sequence_templates_v2.csv'))
 
         cwd = os.getcwd()
         template_dir = os.path.join(outdir, 'templates')
@@ -343,12 +336,3 @@ class Complex_sequence_based_template_search_pipeline:
                 template_path = os.path.join(self.atom_dir, template_pdb + '.atom.gz')
                 os.system(f"cp {template_path} .")
                 os.system(f"gunzip -f {template_pdb}.atom.gz")
-
-        for i in range(len(concatenated_pd_v2)):
-            for j in range(len(monomer_inputs)):
-                template_name = concatenated_pd_v2.loc[i, f'template{j + 1}']
-                if not pd.isna(template_name):
-                    template_pdb = template_name.split()[0]
-                    template_path = os.path.join(self.atom_dir, template_pdb + '.atom.gz')
-                    os.system(f"cp {template_path} .")
-                    os.system(f"gunzip -f {template_pdb}.atom.gz")

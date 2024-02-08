@@ -9,78 +9,38 @@ import pathlib
 from multicom4.common.protein import complete_result
 import yaml, json
 import numpy as np
+from multicom4.common import config
+from multicom4.monomer_structure_refinement import iterative_refine_pipeline
+from multicom4.monomer_templates_search.structure_tmsearch_pipeline import monomer_tmsearch_based_template_search_pipeline
 
-
-class Monomer_structure_prediction_pipeline_v2:
+class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
     def __init__(self, params, run_methods=None):
+        
+        super().__init__()
 
         self.params = params
-        self.deepmsa_noimg_tags = ['dMSA.hhb', 'dMSA.jac', 'dMSA.hms', 'dMSA', 'qMSA', 'aMSA', 'qMSA.hhb', 'qMSA.jac', 'qMSA.hh3', 'qMSA.hms']
-        self.deepmsa_img_tags = ['DeepJGI.hms', 'DeepJGI', 'q3JGI', 'q4JGI', 'q3JGI.hms', 'q4JGI.hms']
+
+        self.non_af2_methods = ['paddle-helix', 'esmfold', 'deepfold', 'megafold']
+
+        self.post_af2_methods = ['foldseek_refine']
 
         if run_methods is None:
-            #template/no_template, nodropout/dropout dropout->struct_dropout/no
-            # default: default_template_nodropout_struct_dropout
-            self.run_methods = ['default', 'default+seq_template', 
-                                'default+template+dropout+struct_dropout',
-                                'default+template+dropout+no_struct_dropout',
-                                'default+notemplate+nodropout+struct_dropout',
-                                'default+notemplate+dropout+struct_dropout',
-                                'default+notemplate+dropout+no_struct_dropout',
-
-                                'original', 'original+seq_template',
-                                'colabfold', 'colabfold+seq_template',
-                                'dhr',
-                                'paddle-helix', 'esmfold',
-                                'deepfold', 'megafold']
-
-            for deepmsa_noimg_tag in self.deepmsa_noimg_tags:
-                self.run_methods += ['deepmsa_' + deepmsa_noimg_tag]
-            for deepmsa_img_tag in self.deepmsa_img_tags:
-                self.run_methods += ['deepmsa_' + deepmsa_img_tag]
-
+            self.run_methods = ['default', 'default_seq_temp','def_drop_s','def_drop_nos',
+                                'def_notemp', 'def_notemp_drop_s', 'def_notemp_drop_nos',
+                                'original', 'ori_seq_temp', 'colabfold', 'colab_seq_temp',
+                                'img', 'img_seq_temp', 'dhr', 
+                                'deepmsa_dMSA_hhb', 'deepmsa_dMSA_jac', 'deepmsa_dMSA_hms',
+                                'deepmsa_dMSA', 'deepmsa_qMSA', 'deepmsa_aMSA', 'deepmsa_qMSA_hhb',
+                                'deepmsa_qMSA_jac', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hms',
+                                'deepmsa_DeepJGI_hms', 'deepmsa_DeepJGI', 'deepmsa_q3JGI', 
+                                'deepmsa_q4JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI_hms',
+                                'paddle-helix', 'esmfold', 'deepfold', 'megafold',
+                                'default_tmsearch',
+                                'foldseek_refine']
+        
         else:
             self.run_methods = run_methods
-
-        self.method2dir = {'default': 'default',
-                           'default+seq_template': 'default_seq_temp',
-
-                           'default+template+dropout+struct_dropout': 'def_drop_s',
-                           'default+template+dropout+no_struct_dropout': 'def_drop_nos',
-                           'default+notemplate+nodropout+struct_dropout': 'def_notemp',
-                           'default+notemplate+dropout+struct_dropout': 'def_notemp_drop_s',
-                           'default+notemplate+dropout+no_struct_dropout': 'def_notemp_drop_nos',
-
-                           'original': 'original',
-                           'original+seq_template': 'ori_seq_temp',
-                           'colabfold': 'colabfold',
-                           'colabfold+seq_template': 'colab_seq_temp',
-                           'img': 'img',
-                           'img_seq_template': 'img_seq_temp',
-                           'dhr': 'dhr',
-                           'paddle-helix': 'paddle-helix',
-                           'esmfold': 'esmfold',
-                           'deepfold': 'deepfold',
-                           'megafold': 'megafold',
-                           'deepmsa_dMSA.hhb': 'deepmsa_dMSA_hhb',
-                           'deepmsa_dMSA.jac': 'deepmsa_dMSA_jac',
-                           'deepmsa_dMSA.hms': 'deepmsa_dMSA_hms',
-                           'deepmsa_dMSA': 'deepmsa_dMSA',
-                           'deepmsa_qMSA': 'deepmsa_qMSA',
-                           'deepmsa_aMSA': 'deepmsa_aMSA',
-                           'deepmsa_qMSA.hhb': 'deepmsa_qMSA_hhb',
-                           'deepmsa_qMSA.jac': 'deepmsa_qMSA_jac',
-                           'deepmsa_qMSA.hh3': 'deepmsa_qMSA_hh3',
-                           'deepmsa_qMSA.hms': 'deepmsa_qMSA_hms',
-                           'deepmsa_DeepJGI.hms': 'deepmsa_DeepJGI_hms', 
-                           'deepmsa_DeepJGI': 'deepmsa_DeepJGI',  
-                           'deepmsa_q3JGI': 'deepmsa_q3JGI', 
-                           'deepmsa_q4JGI': 'deepmsa_q4JGI', 
-                           'deepmsa_q3JGI.hms': 'deepmsa_q3JGI_hms', 
-                           'deepmsa_q4JGI.hms': 'deepmsa_q4JGI_hms',
-        }
-
 
     def process_single(self, fasta_path, alndir, outdir, template_dir=None):
         
@@ -90,331 +50,169 @@ class Monomer_structure_prediction_pipeline_v2:
 
         makedir_if_not_exists(outdir)
 
-        common_parameters =   f"--fasta_path={fasta_path} " \
-                              f"--env_dir={self.params['alphafold_env_dir']} " \
-                              f"--database_dir={self.params['alphafold_database_dir']} " \
-                              f"--monomer_num_ensemble={self.params['monomer_num_ensemble']} " \
-                              f"--monomer_num_recycle={self.params['monomer_num_recycle']} " \
-                              f"--num_monomer_predictions_per_model {self.params['num_monomer_predictions_per_model']} " \
-                              f"--model_preset={self.params['monomer_model_preset']} " \
-                              f"--benchmark={self.params['alphafold_benchmark']} " \
-                              f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                              f"--models_to_relax={self.params['models_to_relax']} " \
-                              f"--max_template_date={self.params['max_template_date']} "
-
+        # run non-alphafold2 predictors
         for run_method in self.run_methods:
             
             cmds = []
 
-            method_out_dir = os.path.join(outdir, self.method2dir[run_method]) 
+            method_out_dir = os.path.join(outdir, run_method) 
 
-            if run_method == "default":
+            if run_method not in self.non_af2_methods and run_method not in self.post_af2_methods:
                 
                 os.chdir(self.params['alphafold_program_dir'])
 
-                errormsg = ""
+                predictor_config = self.monomer_config.predictors[run_method]
+    
+                monomer_num_ensemble = self.get_monomer_config(predictor_config, 'num_ensemble')
+                monomer_num_recycle = self.get_monomer_config(predictor_config, 'num_recycle')
+                num_monomer_predictions_per_model = self.get_monomer_config(predictor_config, 'predictions_per_model')
+                model_preset = self.get_monomer_config(predictor_config, 'model_preset')
+                relax_topn_predictions = self.get_monomer_config(predictor_config, 'relax_topn_predictions')
+                dropout = self.get_monomer_config(predictor_config, 'dropout')
+                dropout_structure_module = self.get_monomer_config(predictor_config, 'dropout_structure_module')
 
-                if not os.path.exists(alndir):
-                    errormsg = errormsg + f"Cannot find alignment directory for {targetname}: {alndir}\n"
+                common_parameters =  f"--fasta_path={fasta_path} " \
+                                     f"--env_dir={self.params['alphafold_env_dir']} " \
+                                     f"--database_dir={self.params['alphafold_database_dir']} " \
+                                     f"--benchmark={self.params['alphafold_benchmark']} " \
+                                     f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                                     f"--max_template_date={self.params['max_template_date']} " \
+                                     f"--monomer_num_ensemble={monomer_num_ensemble} " \
+                                     f"--monomer_num_recycle={monomer_num_recycle} " \
+                                     f"--num_monomer_predictions_per_model {num_monomer_predictions_per_model} " \
+                                     f"--model_preset={model_preset} " \
+                                     f"--relax_topn_predictions={relax_topn_predictions} " \
+                                     f"--models_to_relax=TOPN "
 
-                bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
-                if not os.path.exists(bfd_uniref30_a3m):
-                    errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
-
-                mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
-                if not os.path.exists(mgnify_sto):
-                    errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_default_program']} " \
-                            f"--bfd_uniref_a3ms={bfd_uniref30_a3m} " \
-                            f"--mgnify_stos={mgnify_sto} " \
-                            f"--uniref90_stos={uniref90_sto} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-
-            elif run_method == "default+seq_template":
+                msa_source = self.get_monomer_config(predictor_config, 'msa_source')
+                template_source = self.get_monomer_config(predictor_config, 'template_source')
                 
-                os.chdir(self.params['alphafold_program_dir'])
+                if msa_source == "default" and template_source == "pdb70":
+                    errormsg = ""
+                    bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
+                    if not os.path.exists(bfd_uniref30_a3m):
+                        errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
+                    mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                    if not os.path.exists(mgnify_sto):
+                        errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
+                    uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                    if not os.path.exists(uniref90_sto):
+                        errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
 
-                errormsg = ""
+                    if not complete_result(method_out_dir, 5 * num_monomer_predictions_per_model): 
+                        if len(errormsg) > 0:
+                            print(errormsg)
+                        else:
+                            cmd = f"python {self.params['alphafold_default_program']} " \
+                                    f"--bfd_uniref_a3ms={bfd_uniref30_a3m} " \
+                                    f"--mgnify_stos={mgnify_sto} " \
+                                    f"--uniref90_stos={uniref90_sto} " \
+                                    f"--output_dir={method_out_dir} " + common_parameters
+                            cmds += [cmd]
+                
+                else:
 
-                if not os.path.exists(alndir):
-                    errormsg = errormsg + f"Cannot find alignment directory for {targetname}: {alndir}\n"
+                    common_parameters += f"--dropout={dropout} " \
+                                         f"--dropout_structure_module={dropout_structure_module} " \
 
-                bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
-                if not os.path.exists(bfd_uniref30_a3m):
-                    errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
+                    errormsg = ""
+                    if msa_source == "default":
+                        bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
+                        if not os.path.exists(bfd_uniref30_a3m):
+                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
+                        mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                        if not os.path.exists(mgnify_sto):
+                            errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
+                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                        if not os.path.exists(uniref90_sto):
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                        common_parameters += f"--bfd_uniref_a3m={bfd_uniref30_a3m} " \
+                                             f"--mgnify_sto={mgnify_sto} " \
+                                             f"--uniref90_sto={uniref90_sto} " \
 
-                mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
-                if not os.path.exists(mgnify_sto):
-                    errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
+                    elif msa_source == "original":
+                        uniref30_a3m = os.path.join(alndir, targetname + '_uniref30.a3m')
+                        if not os.path.exists(uniref30_a3m):
+                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {uniref30_a3m}\n"
+                        bfd_a3m = os.path.join(alndir, targetname + '_bfd.a3m')
+                        if not os.path.exists(bfd_a3m):
+                            errormsg = errormsg + f"Cannot find bfd alignment for {targetname}: {bfd_a3m}\n"
+                        mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                        if not os.path.exists(mgnify_sto):
+                            errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
+                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                        if not os.path.exists(uniref90_sto):
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                        common_parameters += f"--bfd_uniref_a3m={uniref30_a3m} " \
+                                             f"--bfd_a3m={bfd_a3m} " \
+                                             f"--mgnify_sto={mgnify_sto} " \
+                                             f"--uniref90_sto={uniref90_sto} " \
 
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                    elif msa_source == "colabfold":
+                        colabfold_a3m = os.path.join(alndir, targetname + '_colabfold.a3m')
+                        if not os.path.exists(colabfold_a3m):
+                            errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {colabfold_a3m}\n"
+                        common_parameters += f"--custom_msa={colabfold_a3m} "
 
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
+                    elif msa_source == "img":
+                        img_a3m = os.path.join(alndir, targetname + '.a3m')
+                        if not os.path.exists(img_a3m):
+                            errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
+                        common_parameters += f"--custom_msa={img_a3m} "
+
+                    elif msa_source == "dhr":
+                        dhr_af_a3m = os.path.join(alndir, targetname + '_dhr_af.a3m')
+                        if not os.path.exists(dhr_af_a3m):
+                            errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {dhr_af_a3m}\n"
+                        common_parameters += f"--custom_msa={dhr_af_a3m} "
+
+                    elif run_method.find('deepmsa_') >= 0:
+                        deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', msa_source + '.a3m')
+                        if not os.path.exists(deepmsa_a3m):
+                            errormsg = errormsg + f"Cannot find img alignment for {targetname}: {deepmsa_a3m}\n"
+                        common_parameters += f"--custom_msa={deepmsa_a3m} "
+
+                    if template_source == "pdb70":
+                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                        if not os.path.exists(uniref90_sto):
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                        if common_parameters.find('--uniref90_sto') < 0:
+                            common_parameters += f"--uniref90_sto={uniref90_sto} "
+
+                    elif template_source == "pdb_sort90":
                         temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
+                        if not os.path.exists(temp_struct_csv):
+                            errormsg = errormsg + f"Cannot find template csv for {targetname}: {temp_struct_csv}\n"
+
                         struct_atom_dir = os.path.join(template_dir, "templates")
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--bfd_uniref_a3m={bfd_uniref30_a3m} " \
-                            f"--mgnify_sto={mgnify_sto} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--temp_struct_csv={temp_struct_csv} " \
-                            f"--struct_atom_dir={struct_atom_dir} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
+                        if not os.path.exists(struct_atom_dir):
+                            errormsg = errormsg + f"Cannot find template directory for {targetname}: {struct_atom_dir}\n"
+                        common_parameters += f"--temp_struct_csv={temp_struct_csv} " \
+                                             f"--struct_atom_dir={struct_atom_dir} " \
 
-            elif run_method in ["default+template+dropout+struct_dropout",
-                                "default+template+dropout+no_struct_dropout",
-                                'default+notemplate+nodropout+struct_dropout',
-                                'default+notemplate+dropout+struct_dropout',
-                                'default+notemplate+dropout+no_struct_dropout']:
+                    elif template_source == "notemplate":
+                        common_parameters += f"--notemplate=true "
 
-                os.chdir(self.params['alphafold_program_dir'])
+                    elif template_source == "tmsearch":
+                        default_ranked_0_pdb = os.path.join(outdir, 'default', 'ranked_0.pdb')
 
-                errormsg = ""
+                        workdir = os.path.join(method_out_dir, 'tmsearch')
+                        makedir_if_not_exists(workdir)
+                        
+                        pipeline = monomer_tmsearch_based_template_search_pipeline(self.params)
+                        template_file, template_dir = pipeline.search(fasta_path=fasta_path, inpdb=default_ranked_0_pdb, outdir=workdir)
+                        print(template_file)
+                        common_parameters += f"--temp_struct_csv={template_file} " \
+                                             f"--struct_atom_dir={template_dir} " \
 
-                if not os.path.exists(alndir):
-                    errormsg = errormsg + f"Cannot find alignment directory for {targetname}: {alndir}\n"
-
-                bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
-                if not os.path.exists(bfd_uniref30_a3m):
-                    errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
-
-                mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
-                if not os.path.exists(mgnify_sto):
-                    errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                if len(errormsg) == 0:
-                    configs = run_method.split('+')
-                    notemplate=False
-                    dropout=False
-                    dropout_structure_module=True
-                    if configs[1] == "notemplate":
-                        notemplate = True
-                    if configs[2] == "dropout":
-                        dropout=True
-                    if configs[3] == "no_struct_dropout":
-                        dropout_structure_module = False
-
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--bfd_uniref_a3m={bfd_uniref30_a3m} " \
-                            f"--mgnify_sto={mgnify_sto} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--notemplate={notemplate} " \
-                            f"--dropout={dropout} " \
-                            f"--dropout_structure_module={dropout_structure_module} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-                    
-            elif run_method == "original":
-
-                os.chdir(self.params['alphafold_program_dir'])
-
-                errormsg = ""
-
-                if not os.path.exists(alndir):
-                    errormsg = errormsg + f"Cannot find alignment directory for {targetname}: {alndir}\n"
-
-                uniref30_a3m = os.path.join(alndir, targetname + '_uniref30.a3m')
-                if not os.path.exists(uniref30_a3m):
-                    errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {uniref30_a3m}\n"
-
-                bfd_a3m = os.path.join(alndir, targetname + '_bfd.a3m')
-                if not os.path.exists(bfd_a3m):
-                    errormsg = errormsg + f"Cannot find bfd alignment for {targetname}: {bfd_a3m}\n"
-
-                mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
-                if not os.path.exists(mgnify_sto):
-                    errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--bfd_uniref_a3m={uniref30_a3m} " \
-                            f"--bfd_a3m={bfd_a3m} " \
-                            f"--mgnify_sto={mgnify_sto} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-
-            elif run_method ==  "original+seq_template":
-
-                os.chdir(self.params['alphafold_program_dir'])
-
-                errormsg = ""
-
-                if not os.path.exists(alndir):
-                    errormsg = errormsg + f"Cannot find alignment directory for {targetname}: {alndir}\n"
-
-                uniref30_a3m = os.path.join(alndir, targetname + '_uniref30.a3m')
-                if not os.path.exists(uniref30_a3m):
-                    errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {uniref30_a3m}\n"
-
-                bfd_a3m = os.path.join(alndir, targetname + '_bfd.a3m')
-                if not os.path.exists(bfd_a3m):
-                    errormsg = errormsg + f"Cannot find bfd alignment for {targetname}: {bfd_a3m}\n"
-
-                mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
-                if not os.path.exists(mgnify_sto):
-                    errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
-                        struct_atom_dir = os.path.join(template_dir, "templates")
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--bfd_uniref_a3m={uniref30_a3m} " \
-                            f"--bfd_a3m={bfd_a3m} " \
-                            f"--mgnify_sto={mgnify_sto} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--temp_struct_csv={temp_struct_csv} " \
-                            f"--struct_atom_dir={struct_atom_dir} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-
-            elif run_method ==  "colabfold":
-                os.chdir(self.params['alphafold_program_dir'])
-                errormsg = ""
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                colabfold_a3m = os.path.join(alndir, targetname + '_colabfold.a3m')
-                if not os.path.exists(colabfold_a3m):
-                    errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {colabfold_a3m}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={colabfold_a3m} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-
-            elif run_method ==  "colabfold+seq_template":
-                os.chdir(self.params['alphafold_program_dir'])
-                errormsg = ""
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                colabfold_a3m = os.path.join(alndir, targetname + '_colabfold.a3m')
-                if not os.path.exists(colabfold_a3m):
-                    errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {colabfold_a3m}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
-                        struct_atom_dir = os.path.join(template_dir, "templates")
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={colabfold_a3m} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--temp_struct_csv={temp_struct_csv} " \
-                            f"--struct_atom_dir={struct_atom_dir} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-        
-            elif run_method ==  "img":
-                os.chdir(self.params['alphafold_program_dir'])
-                errormsg = ""
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                img_a3m = os.path.join(alndir, targetname + '.a3m')
-                if not os.path.exists(img_a3m):
-                    errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={img_a3m} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--output_dir={method_out_dir} " + common_parameters 
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-
-            elif run_method ==  "img+seq_template":
-                os.chdir(self.params['alphafold_program_dir'])
-                errormsg = ""
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                img_a3m = os.path.join(alndir, targetname + '.a3m')
-                if not os.path.exists(img_a3m):
-                    errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
-                        struct_atom_dir = os.path.join(template_dir, "templates")
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={img_a3m} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--temp_struct_csv={temp_struct_csv} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-            
-            elif run_method ==  "dhr":
-                os.chdir(self.params['alphafold_program_dir'])
-                errormsg = ""
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
-
-                dhr_af_a3m = os.path.join(alndir, targetname + '_dhr_af.a3m')
-                if not os.path.exists(dhr_af_a3m):
-                    errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {dhr_af_a3m}\n"
-
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={dhr_af_a3m} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--output_dir={method_out_dir} " + common_parameters
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
+                    if not complete_result(method_out_dir, 5 * num_monomer_predictions_per_model): 
+                        if len(errormsg) > 0:
+                            print(errormsg)
+                        else:
+                            cmd = f"python {self.params['alphafold_program']} " \
+                                f"--output_dir={method_out_dir} " + common_parameters
+                            print(cmd)
+                            cmds += [cmd]
 
             elif run_method ==  "paddle-helix":
                 os.makedirs(method_out_dir, exist_ok=True)
@@ -433,7 +231,7 @@ class Monomer_structure_prediction_pipeline_v2:
             elif run_method == "deepfold":
                 os.chdir(self.params['deepfold_program_dir'])
                 os.makedirs(method_out_dir, exist_ok=True)
-                pickle_path = os.path.join(outdir, self.method2dir['default'], 'features.pkl')
+                pickle_path = os.path.join(outdir, 'default', 'features.pkl')
                 # if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
                 if not complete_result(method_out_dir, 5):
                     cmd = f"python {self.params['deepfold_program']} " \
@@ -478,29 +276,41 @@ class Monomer_structure_prediction_pipeline_v2:
                     os.system(f"rm {out_a3m_path}/seq/final.a3m {out_a3m_path}/seq/0.a3m")
                     cmd = f"sh {self.params['megafold_program']} {fastadir} {method_out_dir} {out_data_yaml}"
                     cmds += [cmd]
+            
+            elif run_method == "foldseek_refine":
+                
+                # refine default top-ranked models
+                refinement_inputs = []
+                default_workdir = os.path.join(outdir, 'default')
+                ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
+                if not os.path.exists(ranking_json_file):
+                    continue
+                ranking_json = json.loads(open(ranking_json_file).read())
+                
+                for i in range(self.monomer_config.predictors.foldseek_refine.number_of_input_models):
+                    pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
+                    model_name = list(ranking_json["order"])[i]
+                    pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
+                    msa_path = os.path.join(default_workdir, 'msas', "monomer_final.a3m")
+                    refine_input = iterative_refine_pipeline.refinement_input(fasta_path=fasta_path,
+                                                                              pdb_path=pdb_path,
+                                                                              pkl_path=pkl_path,
+                                                                              msa_path=msa_path)
+                    refinement_inputs += [refine_input]
 
-            elif run_method.find('deepmsa_') >= 0:
+                refine_dir = os.path.join(method_out_dir, 'workdir')
+                makedir_if_not_exists(refine_dir)
+                pipeline = iterative_refine_pipeline.Monomer_iterative_refinement_pipeline_server(params=self.params)
+                pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir)
 
-                os.chdir(self.params['alphafold_program_dir'])
-                errormsg = ""
-                uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
-                if not os.path.exists(uniref90_sto):
-                    errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                final_dir = os.path.join(method_out_dir, 'finaldir')
+                makedir_if_not_exists(final_dir)
 
-                deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', run_method.replace('deepmsa_', '') + '.a3m')
-                if not os.path.exists(deepmsa_a3m):
-                    errormsg = errormsg + f"Cannot find img alignment for {targetname}: {deepmsa_a3m}\n"
+                pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(self.params)
+                pipeline.select_v1(indir=refine_dir, outdir=final_dir, prefix="avg_refine")
+                pipeline.make_predictor_results(final_dir, method_out_dir)
 
-                if len(errormsg) == 0:
-                    if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
-                        cmd = f"python {self.params['alphafold_program']} " \
-                            f"--custom_msa={deepmsa_a3m} " \
-                            f"--uniref90_sto={uniref90_sto} " \
-                            f"--output_dir={method_out_dir} " + common_parameters 
-                        cmds += [cmd]
-                else:
-                    print(errormsg)
-
+    
             for cmd in cmds:
                 try:
                     print(cmd)
@@ -511,9 +321,9 @@ class Monomer_structure_prediction_pipeline_v2:
         # add ranking for deepmsa2 alignments
         deepmsa_alns = []
         deepmsa_plddts = []
-        for method in self.method2dir:
+        for method in self.run_methods:
             if method.find('deepmsa') >= 0:
-                ranking_json_file = os.path.join(outdir, self.method2dir[method], "ranking_debug.json")
+                ranking_json_file = os.path.join(outdir, method, "ranking_debug.json")
                 if not os.path.exists(ranking_json_file):
                     continue
 

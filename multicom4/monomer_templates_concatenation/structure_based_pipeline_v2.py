@@ -226,13 +226,11 @@ class Complex_structure_based_template_search_pipeline:
                 curr_pd = curr_pd.drop([f'index{i + 1}'], axis=1)
                 if prev_pd is None:
                     prev_pd = curr_pd
-                    prev_pd_v2 = curr_pd
                 else:
-                    prev_pd = prev_pd.merge(curr_pd, how="inner", on='index')
-                    prev_pd_v2 = prev_pd_v2.merge(curr_pd, how="outer", on='index')
+                    prev_pd = prev_pd.merge(curr_pd, how="outer", on='index')
 
             prev_pd.to_csv(os.path.join(outdir, "structure_templates.csv"), index=False)
-            prev_pd_v2.to_csv(os.path.join(outdir, "structure_templates_v2.csv"), index=False)
+
         else:
             prev_df_sorted_filtered.head(100).to_csv(os.path.join(outdir, "structure_templates.csv"), index=False)
 
@@ -250,14 +248,3 @@ class Complex_structure_based_template_search_pipeline:
                 template_pdb = prev_df_sorted_filtered.loc[i, f'template{j + 1}'].split()[0]
                 os.system(f"cp {self.params['foldseek_pdb_database_dir']}/{template_pdb}.atom.gz .")
                 os.system(f"gunzip -f {template_pdb}.atom.gz")
-
-        if os.path.exists(os.path.join(outdir, "structure_templates_v2.csv")):
-            prev_df_sorted_filtered = pd.read_csv(os.path.join(outdir, "structure_templates_v2.csv"))
-            for i in range(len(prev_df_sorted_filtered)):
-                for j in range(len(monomers_pdbs)):
-                    template_name = prev_df_sorted_filtered.loc[i, f'template{j + 1}']
-                    if not pd.isna(template_name):
-                        template_pdb = template_name.split()[0]
-                        template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb + '.atom.gz')
-                        os.system(f"cp {template_path} .")
-                        os.system(f"gunzip -f {template_pdb}.atom.gz")
