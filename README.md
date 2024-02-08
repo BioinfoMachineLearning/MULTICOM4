@@ -12,7 +12,7 @@ Monomer
      | Adjustable inputs  | Description | Choices | default value |
      | -------------| ---------------| ------ | ------ |
      | MSA inputs| MSA sampling | default, original, colabfold, img, deepmsa | default | 
-     | Template inputs | Template sampling | pdb70 (default), pdb_sort90 (inhouse template database), no templates | pdb70 (default) |
+     | Template inputs | Template sampling | pdb70 (default), pdb_sort90 (inhouse template database), tmsearch, foldseek, no templates | pdb70 (default) |
      | monomer_num_ensemble | number of ensemble | 8 (casp15) |  3 |
      | monomer_num_recycle | number of recycle | 8 (casp15) | 1 |
      | monomer preset | deep learning models for monomer | monomer, monomer_ptm | monomer |
