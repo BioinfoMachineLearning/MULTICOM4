@@ -201,7 +201,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         
                         pipeline = monomer_tmsearch_based_template_search_pipeline(self.params)
                         template_file, template_dir = pipeline.search(fasta_path=fasta_path, inpdb=default_ranked_0_pdb, outdir=workdir)
-                        print(template_file)
+
                         common_parameters += f"--temp_struct_csv={template_file} " \
                                              f"--struct_atom_dir={template_dir} " \
 
@@ -211,7 +211,6 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         else:
                             cmd = f"python {self.params['alphafold_program']} " \
                                 f"--output_dir={method_out_dir} " + common_parameters
-                            print(cmd)
                             cmds += [cmd]
 
             elif run_method ==  "paddle-helix":

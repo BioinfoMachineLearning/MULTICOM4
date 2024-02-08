@@ -3,14 +3,7 @@ import os
 import sys
 import time, json
 from multicom4.common.util import makedir_if_not_exists, check_dirs
-import pandas as pd
-from multiprocessing import Pool
 import dataclasses
-from multicom4.tool.foldseek import *
-import pickle
-import numpy as np
-from multicom4.monomer_templates_concatenation.sequence_based_pipeline import assess_hhsearch_hit, PrefilterError
-from multicom4.monomer_templates_concatenation.parsers import TemplateHit
 
 
 def combine_a3ms(infiles, outfile):
