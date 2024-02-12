@@ -62,6 +62,10 @@ RUN pip3 install --upgrade pip --no-cache-dir \
       jaxlib==0.3.25+cuda11.cudnn805 \
       -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
+# AFProfile
+RUN pip3 install chex==0.1.5
+RUN pip3 install optax==0.1.4
+
 # Apply OpenMM patch.
 WORKDIR /opt/conda/lib/python3.8/site-packages
 RUN patch -p0 < /app/MULTICOM3/tools/alphafold-v2.3.2/docker/openmm.patch
