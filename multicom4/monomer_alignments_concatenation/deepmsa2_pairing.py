@@ -7,26 +7,34 @@ from multicom4.monomer_alignment_generation.alignment import *
 from multicom4.monomer_alignments_concatenation.species_interact_v3 import Species_interact_v3
 import itertools
 
-def combineMSAs(MSA_Tags):  # dict
+def combineMSAs(MSA_Tags, is_homomers=False):  # dict
 
     combined_MSA_Tags = []
-    x = []
-    for chain in MSA_Tags:
-        x.append(MSA_Tags[chain])
-    combined_MSA_Tags = list(itertools.product(*x))
+
+    if is_homomers:
+        num_examples = len(list(MSA_Tags.keys()))
+        for chain in MSA_Tags:
+            for msa_name in MSA_Tags[chain]:
+                combined_MSA_Tags += [[msa_name] * num_examples]
+            break
+    else:
+        x = []
+        for chain in MSA_Tags:
+            x.append(MSA_Tags[chain])
+        combined_MSA_Tags = list(itertools.product(*x))
 
     return combined_MSA_Tags
 
 
 class DeepMSA2_pairing:
 
-    def get_pairs(deepmsa_chain_alignments):
+    def get_pairs(deepmsa_chain_alignments, is_homomers=False):
         num_examples = len(list(deepmsa_chain_alignments.keys()))
         MSA_Tags = {}
         for chain in deepmsa_chain_alignments:
             MSA_Tags[chain] = list(deepmsa_chain_alignments[chain].keys())
 
-        combined_MSA_Tags = combineMSAs(MSA_Tags)
+        combined_MSA_Tags = combineMSAs(MSA_Tags, is_homomers)
 
         combined_MSA_alignments = {}
         for combined_MSA_Tag in combined_MSA_Tags:  # c(qMSA,DeepMSA.hhb,DeepJGI3)
@@ -49,6 +57,7 @@ class DeepMSA2_pairing:
             for index, line in enumerate(contents):
                 line = line.rstrip('\n')
                 msa_name, plddt = line.split()
+                msa_name = msa_name.replace('_', '.')
                 deepmsa_ranking[msa_name] = float(plddt)
             deepmsa_ranking_info += [deepmsa_ranking]
 

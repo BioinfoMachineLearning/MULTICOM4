@@ -319,7 +319,7 @@ class Complex_sequence_based_template_search_pipeline:
                 if prev_pd is None:
                     prev_pd = curr_pd
                 else:
-                    prev_pd = prev_pd.merge(curr_pd, how="outer", on='index')
+                    prev_pd = prev_pd.merge(curr_pd, how="inner", on='index')
 
             concatenated_pd = concatenated_pd.append(prev_pd, ignore_index=True)
 
@@ -332,7 +332,10 @@ class Complex_sequence_based_template_search_pipeline:
         os.chdir(template_dir)
         for i in range(len(concatenated_pd)):
             for j in range(len(monomer_inputs)):
-                template_pdb = concatenated_pd.loc[i, f'template{j + 1}'].split()[0]
+                template_name = concatenated_pd.loc[i, f'template{j + 1}']
+                if pd.isna(template_name):
+                    continue
+                template_pdb = template_name.split()[0]
                 template_path = os.path.join(self.atom_dir, template_pdb + '.atom.gz')
                 os.system(f"cp {template_path} .")
                 os.system(f"gunzip -f {template_pdb}.atom.gz")

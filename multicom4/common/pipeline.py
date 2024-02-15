@@ -11,7 +11,9 @@ from multicom4.monomer_structure_refinement import iterative_refine_pipeline
 from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer
 from multicom4.monomer_alignments_concatenation.pipeline_v3 import *
 from multicom4.monomer_templates_concatenation import sequence_based_pipeline_complex_pdb, \
-    sequence_based_pipeline_pdb, sequence_based_pipeline, structure_based_pipeline_v2
+    sequence_based_pipeline_pdb, sequence_based_pipeline, structure_based_pipeline_v2, \
+    structure_tmsearch_pipeline_v2
+    
 # from multicom4.multimer_structure_generation.pipeline import *
 from multicom4.multimer_structure_generation.pipeline_v2 import *
 from multicom4.multimer_structure_generation.pipeline_default import *
@@ -85,10 +87,11 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
 
 
 
-def copy_same_sequence_msas(srcdir, trgdir, srcname, trgname):
+def copy_same_sequence_msas(srcdir, trgdir, srcname, trgname, rename_prefix=True):
     for msa in os.listdir(srcdir):
-        if msa[0] != srcname:
+        if rename_prefix and msa[0] != srcname:
             continue
+
         if msa.find('.a3m') > 0 or msa.find('.fasta') > 0:
             contents = open(os.path.join(srcdir, msa))
             new_contents = []
@@ -97,10 +100,15 @@ def copy_same_sequence_msas(srcdir, trgdir, srcname, trgname):
                     new_contents += [f">{trgname}\n"]
                 else:
                     new_contents += [line]
-            fw = open(os.path.join(trgdir, f"{trgname}{msa[1:]}"), 'w')
+            
+            outfile = os.path.join(trgdir, f"{trgname}{msa[1:]}")
+            if not rename_prefix:
+                outfile = os.path.join(trgdir, msa)
+            fw = open(outfile, 'w')
             fw.writelines(new_contents)
+
         elif msa.find('.sto') > 0:
-            contents = []
+            new_contents = []
             for line in open(os.path.join(srcdir, msa)):
                 if line[:7] == "#=GF ID":
                     line = line.replace(srcname, trgname)
@@ -108,14 +116,13 @@ def copy_same_sequence_msas(srcdir, trgdir, srcname, trgname):
                 tmp = line.split()
                 if len(tmp) > 0 and tmp[0] == srcname:
                     line = line[0].replace(srcname, trgname) + line[1:]
-                contents += [line]
-            fw = open(os.path.join(trgdir, f"{trgname}{msa[1:]}"), 'w')
-            fw.writelines(contents)
-    # cwd = os.getcwd()
-    # os.chdir(trgdir)
-    # print(f"rename {srcname} {trgname} *")
-    # os.system(f"rename {srcname} {trgname} *")
-    # os.chdir(cwd)
+                new_contents += [line]
+            
+            outfile = os.path.join(trgdir, f"{trgname}{msa[1:]}")
+            if not rename_prefix:
+                outfile = os.path.join(trgdir, msa)
+            fw = open(outfile, 'w')
+            fw.writelines(new_contents)
 
 
 def run_monomer_msa_pipeline_img(fasta, outdir, params):
@@ -381,6 +388,7 @@ def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_d
                     break
                 line = line.rstrip('\n')
                 msa_name, plddt = line.split()
+                msa_name = msa_name.replace('_', '.')
                 chain_a3ms['deepmsa_' + msa_name] = os.path.join(chain_aln_dir, 'DeepMSA2_a3m', 'finalMSAs', msa_name + '.a3m')
             chain_a3ms['deepmsa_ranking_file'] = deepmsa_ranking_file
         else:
@@ -470,6 +478,27 @@ def run_monomer_templates_concatenation_pipeline(multimers, monomer_aln_dir, mon
             monomer_pdbs += [monomer_trg_pdb]
         pipeline = structure_based_pipeline_v2.Complex_structure_based_template_search_pipeline(params)
         pipeline.search(monomer_sequences, monomer_pdbs, struct_temp_dir)
+
+    print("searching complex structure based tmsearch pipeline")
+    struct_temp_dir = os.path.join(outdir, 'tmsearch')
+    makedir_if_not_exists(struct_temp_dir)
+    if not os.path.exists(os.path.join(struct_temp_dir, 'structure_templates.csv')):
+        monomer_pdbs = []
+        monomer_tmsearch_result_dirs = []
+        for chain in multimers:
+            monomer_pdb = os.path.join(monomer_model_dir, chain, 'default', 'ranked_0.pdb')
+            if not os.path.exists(monomer_pdb):
+                print(f"Cannot find teritary structure for {chain}: {monomer_pdb}")
+                continue
+            monomer_trg_pdb = os.path.join(struct_temp_dir, f"{chain}.pdb")
+            os.system(f"cp {monomer_pdb} {monomer_trg_pdb}")
+            monomer_pdbs += [monomer_trg_pdb]
+
+            monomer_tmsearch_result_dir = os.path.join(monomer_model_dir, chain, 'default_tmsearch', 'tmsearch')
+            monomer_tmsearch_result_dirs += [monomer_tmsearch_result_dir]
+
+        pipeline = structure_tmsearch_pipeline_v2.Complex_structure_tmsearch_based_template_search_pipeline(params)
+        pipeline.search(monomer_sequences, monomer_pdbs, monomer_tmsearch_result_dirs, struct_temp_dir)
 
 
 # def run_multimer_structure_generation_pipeline(params, fasta_path, chain_id_map, aln_dir, complex_aln_dir,
@@ -582,9 +611,9 @@ class foldseek_iterative_monomer_input:
         self.monomer_alphafold_a3ms = monomer_alphafold_a3ms
 
 
-def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chain_id_map, pipeline_inputs, outdir,
-                                                          start=0, is_homomers=False):
-    pipeline = Multimer_iterative_generation_pipeline_monomer(params)
+def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chain_id_map, pipeline_inputs, 
+                                                        outdir, config_name, start=0, is_homomers=False):
+    pipeline = Multimer_iterative_generation_pipeline_monomer(params=params, config_name=config_name)
     try:
         for i, pipeline_input in enumerate(pipeline_inputs):
             if is_homomers:
@@ -592,13 +621,13 @@ def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chai
                                             chain_id_map=chain_id_map,
                                             monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                             monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                            outdir=os.path.join(outdir, f"iter_{i + 1 + start}"))
+                                            outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
             else:
                 pipeline.search_single(fasta_file=fasta_path,
                                        chain_id_map=chain_id_map,
                                        monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                        monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                       outdir=os.path.join(outdir, f"iter_{i + 1 + start}"))
+                                       outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
     except Exception as e:
         print(e)
         return False
@@ -606,8 +635,8 @@ def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chai
 
 
 def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, chain_id_map, pipeline_inputs, outdir,
-                                                              start=0, is_homomers=False):
-    pipeline = Multimer_iterative_generation_pipeline_monomer_old(params)
+                                                            config_name, start=0, is_homomers=False):
+    pipeline = Multimer_iterative_generation_pipeline_monomer_old(params=params, config_name=config_name)
     try:
         for i, pipeline_input in enumerate(pipeline_inputs):
             if is_homomers:
@@ -615,13 +644,13 @@ def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, 
                                             chain_id_map=chain_id_map,
                                             monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                             monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                            outdir=os.path.join(outdir, f"iter_{i + 1 + start}_old"))
+                                            outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
             else:
                 pipeline.search_single(fasta_file=fasta_path,
                                        chain_id_map=chain_id_map,
                                        monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                        monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                       outdir=os.path.join(outdir, f"iter_{i + 1 + start}_old"))
+                                       outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
     except Exception as e:
         print(e)
         return False

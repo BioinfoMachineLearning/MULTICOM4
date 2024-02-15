@@ -296,7 +296,7 @@ class Complex_sequence_based_template_search_pipeline:
                 if prev_pd is None:
                     prev_pd = curr_pd
                 else:
-                    prev_pd = prev_pd.merge(curr_pd, how="outer", on='index')
+                    prev_pd = prev_pd.merge(curr_pd, how="inner", on='index')
 
             concatenated_pd = concatenated_pd.append(prev_pd)
 

@@ -16,16 +16,22 @@ from multicom4.multimer_structure_refinement.util import convert_taln_seq_to_a3m
         combine_a3ms, assess_complex_templates_homo, assess_complex_templates
 from multicom4.monomer_alignment_generation.alignment import read_a3m
 from multicom4.common.protein import complete_result
+from multicom4.common import config
 
-class Multimer_iterative_generation_pipeline_monomer_old:
+class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
 
-    def __init__(self, params, max_template_count=50):
-
+    def __init__(self, params, max_template_count=50, multimer_type="heteromer", config_name=""):
+        
+        super().__init__()
+        
         self.params = params
 
-        self.max_iteration = 5
-
         self.max_template_count = max_template_count
+
+        if multimer_type == "heteromer":
+            self.predictor_config = self.heteromer_config.predictors[config_name]
+        else:
+            self.predictor_config = self.homomer_config.predictors[config_name]
 
         release_date_df = pd.read_csv(params['pdb_release_date_file'])
         self._release_dates = dict(zip(release_date_df['pdbcode'], release_date_df['release_date']))
@@ -214,7 +220,30 @@ class Multimer_iterative_generation_pipeline_monomer_old:
 
         makedir_if_not_exists(prepare_dir)
 
-        if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+        common_parameters =   f"--fasta_path={fasta_file} " \
+                              f"--env_dir={self.params['alphafold_env_dir']} " \
+                              f"--database_dir={self.params['alphafold_database_dir']} " \
+                              f"--benchmark={self.params['alphafold_benchmark']} " \
+                              f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                              f"--max_template_date={self.params['max_template_date']} "
+
+        multimer_num_ensemble = self.get_heteromer_config(self.predictor_config, 'num_ensemble')
+        multimer_num_recycle = self.get_heteromer_config(self.predictor_config, 'num_recycle')
+        num_multimer_predictions_per_model = self.get_heteromer_config(self.predictor_config, 'predictions_per_model')
+        model_preset = self.get_heteromer_config(self.predictor_config, 'model_preset')
+        relax_topn_predictions = self.get_heteromer_config(self.predictor_config, 'relax_topn_predictions')
+        dropout = self.get_heteromer_config(self.predictor_config, 'dropout')
+        dropout_structure_module = self.get_heteromer_config(self.predictor_config, 'dropout_structure_module')     
+
+        common_parameters +=  f"--multimer_num_ensemble={multimer_num_ensemble} " \
+                                f"--multimer_num_recycle={multimer_num_recycle} " \
+                                f"--num_multimer_predictions_per_model={num_multimer_predictions_per_model} " \
+                                f"--model_preset={model_preset} " \
+                                f"--relax_topn_predictions={relax_topn_predictions} " \
+                                f"--models_to_relax=TOPN "
+
+
+        if not complete_result(out_model_dir, 5 * num_multimer_predictions_per_model):
 
             out_template_dir = os.path.join(outdir, 'templates')
 
@@ -262,44 +291,20 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                                                    alphafold_monomer_a3ms=alphafold_monomer_a3ms,
                                                    outpath=outdir)
 
-            if len(template_files) == 1:
-                cmd = f"python {self.params['alphafold_multimer_program']} " \
-                      f"--fasta_path={fasta_file} " \
-                      f"--env_dir={self.params['alphafold_env_dir']} " \
-                      f"--database_dir={self.params['alphafold_database_dir']} " \
-                      f"--multimer_num_ensemble={self.params['multimer_num_ensemble']} " \
-                      f"--multimer_num_recycle={self.params['multimer_num_recycle']} " \
-                      f"--num_multimer_predictions_per_model={self.params['num_multimer_predictions_per_model']} " \
-                      f"--model_preset={self.params['multimer_model_preset']} " \
-                      f"--benchmark={self.params['alphafold_benchmark']} " \
-                      f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                      f"--models_to_relax={self.params['models_to_relax']} " \
-                      f"--max_template_date={self.params['max_template_date']} " \
-                      f"--multimer_a3ms={','.join(multimer_msa_files)} " \
-                      f"--monomer_a3ms={','.join(monomer_msa_files)} " \
-                      f"--msa_pair_file={msa_pair_file} " \
-                      f"--temp_struct_csv={template_files[0]} " \
-                      f"--struct_atom_dir={out_template_dir} " \
-                      f"--output_dir={out_model_dir}"
+            cmd = f"python {self.params['alphafold_multimer_program']} " + common_parameters + f"--output_dir={out_model_dir} "
+
+            cmd += f"--monomer_a3ms={','.join(monomer_msa_files)} "
+            if self.predictor_config.msa_paired_source == "None":
+                cmd += "--msa_pairing_hetero=false "
             else:
-                cmd = f"python {self.params['alphafold_multimer_program']} " \
-                      f"--fasta_path={fasta_file} " \
-                      f"--env_dir={self.params['alphafold_env_dir']} " \
-                      f"--database_dir={self.params['alphafold_database_dir']} " \
-                      f"--multimer_num_ensemble={self.params['multimer_num_ensemble']} " \
-                      f"--multimer_num_recycle={self.params['multimer_num_recycle']} " \
-                      f"--num_multimer_predictions_per_model={self.params['num_multimer_predictions_per_model']} " \
-                      f"--model_preset={self.params['multimer_model_preset']} " \
-                      f"--benchmark={self.params['alphafold_benchmark']} " \
-                      f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                      f"--models_to_relax={self.params['models_to_relax']} " \
-                      f"--max_template_date={self.params['max_template_date']} " \
-                      f"--multimer_a3ms={','.join(multimer_msa_files)} " \
-                      f"--monomer_a3ms={','.join(monomer_msa_files)} " \
-                      f"--msa_pair_file={msa_pair_file} " \
-                      f"--monomer_temp_csvs={','.join(template_files)} " \
-                      f"--struct_atom_dir={out_template_dir} " \
-                      f"--output_dir={out_model_dir}"
+                cmd += f"--multimer_a3ms={','.join(multimer_msa_files)} " \
+                       f"--msa_pair_file={msa_pair_file} " \
+
+            if self.predictor_config.template_source == "notemplate":
+                cmd += "--notemplate=true "
+            else:
+                cmd +=  f"--monomer_temp_csvs={','.join(template_files)} " \
+                        f"--struct_atom_dir={out_template_dir} "
 
             try:
                 os.chdir(self.params['alphafold_program_dir'])
@@ -454,7 +459,29 @@ class Multimer_iterative_generation_pipeline_monomer_old:
 
         makedir_if_not_exists(prepare_dir)
 
-        if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+        common_parameters =   f"--fasta_path={fasta_file} " \
+                              f"--env_dir={self.params['alphafold_env_dir']} " \
+                              f"--database_dir={self.params['alphafold_database_dir']} " \
+                              f"--benchmark={self.params['alphafold_benchmark']} " \
+                              f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                              f"--max_template_date={self.params['max_template_date']} "
+
+        multimer_num_ensemble = self.get_homomer_config(self.predictor_config, 'num_ensemble')
+        multimer_num_recycle = self.get_homomer_config(self.predictor_config, 'num_recycle')
+        num_multimer_predictions_per_model = self.get_homomer_config(self.predictor_config, 'predictions_per_model')
+        model_preset = self.get_homomer_config(self.predictor_config, 'model_preset')
+        relax_topn_predictions = self.get_homomer_config(self.predictor_config, 'relax_topn_predictions')
+        dropout = self.get_homomer_config(self.predictor_config, 'dropout')
+        dropout_structure_module = self.get_homomer_config(self.predictor_config, 'dropout_structure_module')     
+
+        common_parameters +=  f"--multimer_num_ensemble={multimer_num_ensemble} " \
+                                f"--multimer_num_recycle={multimer_num_recycle} " \
+                                f"--num_multimer_predictions_per_model={num_multimer_predictions_per_model} " \
+                                f"--model_preset={model_preset} " \
+                                f"--relax_topn_predictions={relax_topn_predictions} " \
+                                f"--models_to_relax=TOPN "
+
+        if not complete_result(out_model_dir, 5 * num_multimer_predictions_per_model):
 
             out_template_dir = os.path.join(prepare_dir, 'templates')
 
@@ -501,42 +528,15 @@ class Multimer_iterative_generation_pipeline_monomer_old:
                                                         alphafold_monomer_a3ms=alphafold_monomer_a3ms,
                                                         outpath=outdir)
 
-            if len(template_files) == 1:
-                cmd = f"python {self.params['alphafold_multimer_program']} " \
-                      f"--fasta_path={fasta_file} " \
-                      f"--env_dir={self.params['alphafold_env_dir']} " \
-                      f"--database_dir={self.params['alphafold_database_dir']} " \
-                      f"--multimer_num_ensemble={self.params['multimer_num_ensemble']} " \
-                      f"--multimer_num_recycle={self.params['multimer_num_recycle']} " \
-                      f"--num_multimer_predictions_per_model={self.params['num_multimer_predictions_per_model']} " \
-                      f"--model_preset={self.params['multimer_model_preset']} " \
-                      f"--benchmark={self.params['alphafold_benchmark']} " \
-                      f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                      f"--models_to_relax={self.params['models_to_relax']} " \
-                      f"--max_template_date={self.params['max_template_date']} " \
-                      f"--multimer_a3ms={','.join(monomer_msa_files)} " \
-                      f"--monomer_a3ms={','.join(monomer_msa_files)} " \
-                      f"--temp_struct_csv={template_files[0]} " \
-                      f"--struct_atom_dir={out_template_dir} " \
-                      f"--output_dir={out_model_dir}"
+            cmd = f"python {self.params['alphafold_multimer_program']} " + common_parameters + f"--output_dir={out_model_dir} "
+
+            cmd += f"--monomer_a3ms={','.join(monomer_msa_files)} "
+
+            if self.predictor_config.template_source == "notemplate":
+                cmd += "--notemplate=true "
             else:
-                cmd = f"python {self.params['alphafold_multimer_program']} " \
-                      f"--fasta_path={fasta_file} " \
-                      f"--env_dir={self.params['alphafold_env_dir']} " \
-                      f"--database_dir={self.params['alphafold_database_dir']} " \
-                      f"--multimer_num_ensemble={self.params['multimer_num_ensemble']} " \
-                      f"--multimer_num_recycle={self.params['multimer_num_recycle']} " \
-                      f"--num_multimer_predictions_per_model={self.params['num_multimer_predictions_per_model']} " \
-                      f"--model_preset={self.params['multimer_model_preset']} " \
-                      f"--benchmark={self.params['alphafold_benchmark']} " \
-                      f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                      f"--models_to_relax={self.params['models_to_relax']} " \
-                      f"--max_template_date={self.params['max_template_date']} " \
-                      f"--multimer_a3ms={','.join(monomer_msa_files)} " \
-                      f"--monomer_a3ms={','.join(monomer_msa_files)} " \
-                      f"--monomer_temp_csvs={','.join(template_files)} " \
-                      f"--struct_atom_dir={out_template_dir} " \
-                      f"--output_dir={out_model_dir}"
+                cmd +=  f"--temp_struct_csv={template_files[0]} " \
+                        f"--struct_atom_dir={out_template_dir} "
 
             try:
                 os.chdir(self.params['alphafold_program_dir'])

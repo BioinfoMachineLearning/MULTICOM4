@@ -11,6 +11,8 @@ class pipeline():
 
         self.heteromer_config = HETEROMULTIMER_CONFIG
 
+        self.homomer_config = HOMOMULTIMER_CONFIG
+
     def get_monomer_config(self, predictor_config, config_name):
         if config_name in predictor_config:
             return predictor_config[config_name]
@@ -23,6 +25,11 @@ class pipeline():
         else:
             return self.heteromer_config.common_config[config_name]
 
+    def get_homomer_config(self, predictor_config, config_name):
+        if config_name in predictor_config:
+            return predictor_config[config_name]
+        else:
+            return self.homomer_config.common_config[config_name]
 
 MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
@@ -165,19 +172,22 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'predictors':{
         'default_multimer': {
         },
-        'default_struct': {
+        'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
         },
-        'default_pdb70': {
+        'def_mul_tmsearch': {
+            'template_source': 'tmsearch_structure_based_template'
+        },
+        'def_mul_pdb70': {
             'template_source': 'sequence_based_template_pdb70'
         },
-        'default_pdb': {
+        'def_mul_pdb': {
             'template_source': 'sequence_based_template_pdb_sort90'
         },
-        'default_comp': {
+        'def_mul_comp': {
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'default_af': {
+        'def_mul_af': {
             'template_source': 'alphafold_model_templates'
         },
         'def_mul_drop_s': {
@@ -191,38 +201,41 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'def_mul_notemp': {
             'template_source': 'notemplate',
         },
-        'def_mul_notemp_drop_s': {
+        'def_mul_not_drop_s': {
             'template_source': 'notemplate',
             'dropout': True,
             'dropout_structure_module': True,
         },
-        'def_mul_notemp_drop_nos': {
+        'def_mul_not_drop_nos': {
             'template_source': 'notemplate',
             'dropout': True,
             'dropout_structure_module': False,
         },
-        'uniclust_oxmatch_a3m': {
+        'def_mul_nopair': {
+            'msa_paired_source': 'None',
+        },
+        'uniclust_ox_a3m': {
             'msa_paired_source': 'uniclust_oxmatch_a3m',
         },
-        'pdb_interact_uniref_a3m': {
+        'pdb_inter_ref_a3m': {
             'msa_paired_source': 'pdb_interact_uniref_a3m',
         },
-        'pdb_interact_uniref_sto': {
+        'pdb_inter_ref_sto': {
             'msa_paired_source': 'pdb_interact_uniref_sto',
         },
-        'pdb_interact_uniprot_sto': {
+        'pdb_inter_prot_sto': {
             'msa_paired_source': 'pdb_interact_uniprot_sto',
         },
-        'uniprot_distance_uniref_a3m': {
+        'unidist_ref_a3m': {
             'msa_paired_source': 'uniprot_distance_uniref_a3m',
         },
-        'uniprot_distance_uniref_sto': {
+        'unidist_ref_sto': {
             'msa_paired_source': 'uniprot_distance_uniref_sto',
         },
-        'uniprot_distance_uniprot_sto': {
+        'unidist_prot_sto': {
             'msa_paired_source': 'uniprot_distance_uniprot_sto',
         },
-        'species_interact_uniref_a3m': {
+        'spec_inter_ref_a3m': {
             'msa_paired_source': 'species_interact_uniref_a3m',
         },
         'spec_struct': {
@@ -245,16 +258,16 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'species_interact_uniref_a3m',
             'template_source': 'alphafold_model_templates'
         },
-        'species_interact_uniref_sto': {
+        'spec_inter_ref_sto': {
             'msa_paired_source': 'species_interact_uniref_sto',
         },
-        'species_interact_uniprot_sto': {
+        'spec_inter_prot_sto': {
             'msa_paired_source': 'species_interact_uniprot_sto',
         },
-        'string_interact_uniref_a3m': {
+        'str_inter_ref_a3m': {
             'msa_paired_source': 'string_interact_uniref_a3m',
         },
-        'string_interact_uniref_sto': {
+        'str_inter_ref_sto': {
             'msa_paired_source': 'string_interact_uniref_sto',
         },
         'str_struct': {
@@ -277,11 +290,194 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'string_interact_uniref_sto',
             'template_source': 'alphafold_model_templates',
         },
-        'string_interact_uniprot_sto': {
+        'str_inter_prot_sto': {
             'msa_paired_source': 'string_interact_uniprot_sto',
         },
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
             'max_pairs': 20,
+        },
+        'foldseek_iter': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'foldseek',
+            'number_of_input': 2,
+        },
+        'foldseek_iter_nop': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'None',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'foldseek',
+            'number_of_input': 2,
+        },
+        'foldseek_iter_not': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'number_of_input': 2,
+        },
+        'AFProfile': 
+        {
+            'confidence_threshold': 0.95,
+            'max_iteration': 5 * 5,
+            'learning_rate': 0.0001,
         }
+    }
+})
+
+HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
+    'common_config': {
+        'num_ensemble': 1,
+        'num_recycle': 20,
+        'predictions_per_model': 5,
+        'model_preset': 'multimer',
+        'relax_topn_predictions': 5,
+        'dropout': False,
+        'dropout_structure_module': True,
+        'msa_paired_source': 'default',
+        'template_source': 'pdb_seqres',
+    },
+    'predictors':{
+        'default_multimer': {
+        },
+        'def_mul_struct': {
+            'template_source': 'foldseek_structure_based_template'
+        },
+        'def_mul_tmsearch': {
+            'template_source': 'tmsearch_structure_based_template'
+        },
+        'def_mul_pdb70': {
+            'template_source': 'sequence_based_template_pdb70'
+        },
+        'def_mul_pdb': {
+            'template_source': 'sequence_based_template_pdb_sort90'
+        },
+        'def_mul_comp': {
+            'template_source': 'sequence_based_template_pdb_complex'
+        },
+        'def_mul_af': {
+            'template_source': 'alphafold_model_templates'
+        },
+        'def_mul_drop_s': {
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_mul_drop_nos': {
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+        'def_mul_notemp': {
+            'template_source': 'notemplate',
+        },
+        'def_mul_not_drop_s': {
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_mul_not_drop_nos': {
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+        'uniclust_ox_a3m': {
+            'msa_paired_source': 'uniclust_oxmatch_a3m',
+        },
+        'pdb_inter_ref_a3m': {
+            'msa_paired_source': 'pdb_interact_uniref_a3m',
+        },
+        'pdb_inter_ref_sto': {
+            'msa_paired_source': 'pdb_interact_uniref_sto',
+        },
+        'pdb_inter_prot_sto': {
+            'msa_paired_source': 'pdb_interact_uniprot_sto',
+        },
+        # 'uniprot_distance_uniref_a3m': {
+        #     'msa_paired_source': 'uniprot_distance_uniref_a3m',
+        # },
+        # 'uniprot_distance_uniref_sto': {
+        #     'msa_paired_source': 'uniprot_distance_uniref_sto',
+        # },
+        # 'uniprot_distance_uniprot_sto': {
+        #     'msa_paired_source': 'uniprot_distance_uniprot_sto',
+        # },
+        'spec_inter_ref_a3m': {
+            'msa_paired_source': 'species_interact_uniref_a3m',
+        },
+        'spec_struct': {
+            'msa_paired_source': 'species_interact_uniref_a3m',
+            'template_source': 'foldseek_structure_based_template'
+        },
+        'spec_pdb70': {
+            'msa_paired_source': 'species_interact_uniref_a3m',
+            'template_source': 'sequence_based_template_pdb70'
+        },
+        'spec_pdb': {
+            'msa_paired_source': 'species_interact_uniref_a3m',
+            'template_source': 'sequence_based_template_pdb_sort90'
+        },
+        'spec_comp': {
+            'msa_paired_source': 'species_interact_uniref_a3m',
+            'template_source': 'sequence_based_template_pdb_complex'
+        },
+        'spec_af': {
+            'msa_paired_source': 'species_interact_uniref_a3m',
+            'template_source': 'alphafold_model_templates'
+        },
+        'spec_inter_ref_sto': {
+            'msa_paired_source': 'species_interact_uniref_sto',
+        },
+        'spec_inter_prot_sto': {
+            'msa_paired_source': 'species_interact_uniprot_sto',
+        },
+        # 'string_interact_uniref_a3m': {
+        #     'msa_paired_source': 'string_interact_uniref_a3m',
+        # },
+        # 'string_interact_uniref_sto': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        # },
+        # 'str_struct': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        #     'template_source': 'foldseek_structure_based_template'
+        # },
+        # 'str_pdb70': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        #     'template_source': 'sequence_based_template_pdb70'
+        # },
+        # 'str_pdb': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        #     'template_source': 'sequence_based_template_pdb_sort90'
+        # },
+        # 'str_comp': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        #     'template_source': 'sequence_based_template_pdb_complex',
+        # },
+        # 'str_af': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        #     'template_source': 'alphafold_model_templates',
+        # },
+        # 'string_interact_uniprot_sto': {
+        #     'msa_paired_source': 'string_interact_uniprot_sto',
+        # },
+        'deepmsa2': {   # common parameters for all deepmsa2 predictors
+            'max_pairs': 20,
+        },
+        'foldseek_iter': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'foldseek',
+            'number_of_input': 2,
+        },
+        'foldseek_iter_not': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'number_of_input': 2,
+        },
+        'foldseek_iter_o': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'foldseek',
+            'number_of_input': 2,
+        },
+        'foldseek_iter_o_not': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'number_of_input': 2,
+        },
     }
 })

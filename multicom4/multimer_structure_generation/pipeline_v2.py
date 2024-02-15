@@ -35,26 +35,33 @@ def get_complex_alignments_by_method(monomers, concatenate_method, aln_dir):
     return a3ms_path
 
 
-class Multimer_structure_prediction_pipeline_v2:
+class Multimer_structure_prediction_pipeline_v2(config.pipeline):
 
     def __init__(self, params, run_methods=None):
 
+        super().__init__()
+
         self.params = params
-        self.configs = config.HETEROMULTIMER_CONFIG
+
         self.non_af2_methods = ['esmfold']
 
         if run_methods is None:
             # non-alphafold2 predictors
-            self.run_methods = list(self.configs.predictors.keys())
+            self.run_methods = ['default_multimer', 'def_mul_struct', 'def_mul_tmsearch', 'def_mul_pdb70',
+                                'def_mul_pdb', 'def_mul_comp', 'def_mul_af', 'def_mul_drop_s',
+                                'def_mul_drop_nos', 'def_mul_notemp', 'def_mul_not_drop_s', 
+                                'def_mul_not_drop_nos', 'def_mul_nopair', 'uniclust_ox_a3m',
+                                'pdb_inter_ref_a3m', 'pdb_inter_ref_sto', 'pdb_inter_prot_sto', 
+                                'unidist_ref_a3m', 'unidist_ref_sto', 'unidist_prot_sto', 'spec_inter_ref_a3m', 'spec_struct',
+                                'spec_pdb70', 'spec_pdb', 'spec_comp', 'spec_af',
+                                'spec_inter_ref_sto', 'spec_inter_prot_sto', 
+                                'str_inter_ref_a3m', 'str_inter_ref_sto', 'str_struct',
+                                'str_pdb70', 'str_pdb', 'str_comp', 'str_af', 'str_inter_prot_sto',
+                                'AFProfile']
+
             self.run_methods += ['esmfold']
         else:
             self.run_methods = run_methods
-
-    def get_config(self, predictor_config, config_name):
-        if config_name in predictor_config:
-            return predictor_config[config_name]
-        else:
-            return self.configs.common_config[config_name]
             
     def process(self,
                 fasta_path,
@@ -67,55 +74,58 @@ class Multimer_structure_prediction_pipeline_v2:
 
         makedir_if_not_exists(output_dir)
 
-        result_dirs, check_num_prediction_per_model = [], []
-
-        common_parameters =   f"--fasta_path={fasta_path} " \
-                              f"--env_dir={self.params['alphafold_env_dir']} " \
-                              f"--database_dir={self.params['alphafold_database_dir']} " \
-                              f"--benchmark={self.params['alphafold_benchmark']} " \
-                              f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                              f"--max_template_date={self.params['max_template_date']} "
+        result_dirs, check_num_predictions = [], []
 
         while True:
-            # run esmfold
-            method_out_dir = os.path.join(output_dir, "esmfold")
-            os.makedirs(method_out_dir, exist_ok=True)
-            for num_recycle in [4, 10, 50]:
-                outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
-                if not os.path.exists(outpdb):
-                    cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
-                    print(cmd)
-                    os.system(cmd)
 
             for method in self.run_methods:
                 
+                common_parameters = f"--fasta_path={fasta_path} " \
+                                    f"--env_dir={self.params['alphafold_env_dir']} " \
+                                    f"--database_dir={self.params['alphafold_database_dir']} " \
+                                    f"--benchmark={self.params['alphafold_benchmark']} " \
+                                    f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                                    f"--max_template_date={self.params['max_template_date']} "
+
+                if method == "esmfold":
+                    # run esmfold
+                    method_out_dir = os.path.join(output_dir, "esmfold")
+                    os.makedirs(method_out_dir, exist_ok=True)
+                    for num_recycle in [4, 10, 50]:
+                        outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
+                        if not os.path.exists(outpdb):
+                            cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
+                            print(cmd)
+                            os.system(cmd)
+                    continue
+            
                 outdir = os.path.join(output_dir, method)
 
-                predictor_config = self.configs.predictors[run_method]
+                predictor_config = self.heteromer_config.predictors[method]
     
-                multimer_num_ensemble = self.get_config(predictor_config, 'num_ensemble')
-                multimer_num_recycle = self.get_config(predictor_config, 'num_recycle')
-                num_multimer_predictions_per_model = self.get_config(predictor_config, 'predictions_per_model')
-                model_preset = self.get_config(predictor_config, 'model_preset')
-                relax_topn_predictions = self.get_config(predictor_config, 'relax_topn_predictions')
-                dropout = self.get_config(predictor_config, 'dropout')
-                dropout_structure_module = self.get_config(predictor_config, 'dropout_structure_module')     
+                multimer_num_ensemble = self.get_heteromer_config(predictor_config, 'num_ensemble')
+                multimer_num_recycle = self.get_heteromer_config(predictor_config, 'num_recycle')
+                num_multimer_predictions_per_model = self.get_heteromer_config(predictor_config, 'predictions_per_model')
+                model_preset = self.get_heteromer_config(predictor_config, 'model_preset')
+                relax_topn_predictions = self.get_heteromer_config(predictor_config, 'relax_topn_predictions')
+                dropout = self.get_heteromer_config(predictor_config, 'dropout')
+                dropout_structure_module = self.get_heteromer_config(predictor_config, 'dropout_structure_module')     
 
                 common_parameters +=  f"--multimer_num_ensemble={multimer_num_ensemble} " \
                                       f"--multimer_num_recycle={multimer_num_recycle} " \
-                                      f"--num_multimer_predictions_per_model {num_multimer_predictions_per_model} " \
+                                      f"--num_multimer_predictions_per_model={num_multimer_predictions_per_model} " \
                                       f"--model_preset={model_preset} " \
                                       f"--relax_topn_predictions={relax_topn_predictions} " \
                                       f"--models_to_relax=TOPN "
 
-                msa_unpaired_source = self.get_config(predictor_config, 'msa_unpaired_source')
-                msa_paired_source = self.get_config(predictor_config, 'msa_paired_source')
-                template_source = self.get_config(predictor_config, 'template_source')
+                msa_unpaired_source = self.get_heteromer_config(predictor_config, 'msa_unpaired_source')
+                msa_paired_source = self.get_heteromer_config(predictor_config, 'msa_paired_source')
+                template_source = self.get_heteromer_config(predictor_config, 'template_source')
 
-                if run_method == "default_multimer":
+                if method == "default_multimer":
                     # run alphafold default pipeline:
                     monomers = [chain_id for chain_id in chain_id_map]
-                    if not complete_result(outdir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+                    if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
                         os.chdir(self.params['alphafold_program_dir'])
                         bfd_uniref_a3ms = []
                         mgnify_stos = []
@@ -155,14 +165,52 @@ class Multimer_structure_prediction_pipeline_v2:
                             os.system(cmd)
 
                     result_dirs += [outdir]
-                    check_num_prediction_per_model += [num_multimer_predictions_per_model]
+                    check_num_predictions += [num_multimer_predictions_per_model * 5]
+
+                elif method == "AFProfile": 
+                    
+                    os.makedirs(outdir, exist_ok=True)
+
+                    os.chdir(self.params['alphafold_program_dir'])
+
+                    default_feature_pkl = os.path.join(output_dir, 'default_multimer', 'features.pkl')
+                    os.system(f"cp {default_feature_pkl} {outdir}")
+                    
+                    predictor_config = self.heteromer_config.predictors[method]
+
+                    confidence_threshold = self.get_heteromer_config(predictor_config, 'confidence_threshold')
+                    max_iteration = self.get_heteromer_config(predictor_config, 'max_iteration')
+                    learning_rate = self.get_heteromer_config(predictor_config, 'learning_rate')
+
+                    cmd = f"python {self.params['afprofile_program']} " \
+                          f"--fasta_path={fasta_path} " \
+                          f"--data_dir={self.params['alphafold_database_dir']} " \
+                          f"--model_preset={model_preset} " \
+                          f"--num_recycles={multimer_num_recycle} " \
+                          f"--confidence_threshold={confidence_threshold} " \
+                          f"--max_iter={max_iteration} " \
+                          f"--learning_rate={learning_rate} " \
+                          f"--output_dir={outdir} " \
+                          f"--models_to_relax=TOPN " \
+                          f"--relax_topn_predictions={relax_topn_predictions} "
+
+                    if not complete_result(outdir, max_iteration):
+                        print(cmd)
+                        os.system(cmd)
+
+                    result_dirs += [outdir]
+                    check_num_predictions += [max_iteration]
 
                 else:
+                    
+                    os.chdir(self.params['alphafold_program_dir'])
 
                     common_parameters += f"--dropout={dropout} " \
                                          f"--dropout_structure_module={dropout_structure_module} " \
 
                     monomer_a3ms, multimer_a3ms = [], []
+
+                    base_cmd = f"python {self.params['alphafold_multimer_program']} "
 
                     # msa_unpaired_source
                     if msa_unpaired_source == "default":
@@ -173,41 +221,43 @@ class Multimer_structure_prediction_pipeline_v2:
                                 raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_monomer_a3m}")
                             monomer_a3ms += [default_alphafold_monomer_a3m]
 
+                    base_cmd += f"--monomer_a3ms={','.join(monomer_a3ms)} "
+
                     # msa_paired_source
-                    if msa_paired_source == "default":
-                        for chain_id in chain_id_map:
-                            monomer = chain_id
-                            default_alphafold_multimer_a3m = os.path.join(output_dir, 'default_multimer', 'msas', monomer + '.paired.a3m')
-                            if not os.path.exists(default_alphafold_multimer_a3m):
-                                raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_multimer_a3m}")
-                            multimer_a3ms += [default_alphafold_multimer_a3m]
-
-                        msa_pair_file = os.path.join(output_dir, "default_multimer/msas/interact.csv")
-                        interact_dict = {}
-                        msa_len = -1
-                        for i in range(len(default_alphafold_multimer_a3ms)):
-                            with open(default_alphafold_multimer_a3ms[i]) as f:
-                                input_fasta_str = f.read()
-                            msa_sequences, msa_descriptions = parse_fasta(input_fasta_str)
-                            current_len = len(msa_descriptions)
-                            if msa_len == -1:
-                                msa_len = current_len
-                            elif current_len != msa_len:
-                                raise Exception(f"The length of each msas are not equal! {default_alphafold_multimer_a3ms}")
-                            interact_dict[f'index_{i + 1}'] = [j for j in range(msa_len)]
-                        interact_df = pd.DataFrame(interact_dict)
-                        interact_df.to_csv(msa_pair_file)
-
+                    if msa_paired_source == "None":
+                        base_cmd += "--msa_pairing_hetero=false "
                     else:
-                        msa_pair_file = os.path.join(complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
-                        if len(pd.read_csv(msa_pair_file)) <= 1:
-                            continue
-                        multimer_a3ms = [os.path.join(complex_aln_dir, concatenate_method, monomer + "_con.a3m") for monomer in monomers]
+                        if msa_paired_source == "default":
+                            for chain_id in chain_id_map:
+                                monomer = chain_id
+                                default_alphafold_multimer_a3m = os.path.join(output_dir, 'default_multimer', 'msas', monomer + '.paired.a3m')
+                                if not os.path.exists(default_alphafold_multimer_a3m):
+                                    raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_multimer_a3m}")
+                                multimer_a3ms += [default_alphafold_multimer_a3m]
 
-                    base_cmd = f"python {self.params['alphafold_multimer_program']} " \
-                               f"--monomer_a3ms={','.join(monomer_a3ms)} " \
-                               f"--multimer_a3ms={','.join(multimer_a3ms)} " \
-                               f"--msa_pair_file={msa_pair_file} " \
+                            msa_pair_file = os.path.join(output_dir, "default_multimer/msas/interact.csv")
+                            interact_dict = {}
+                            msa_len = -1
+                            for i in range(len(multimer_a3ms)):
+                                with open(multimer_a3ms[i]) as f:
+                                    input_fasta_str = f.read()
+                                msa_sequences, msa_descriptions = parse_fasta(input_fasta_str)
+                                current_len = len(msa_descriptions)
+                                if msa_len == -1:
+                                    msa_len = current_len
+                                elif current_len != msa_len:
+                                    raise Exception(f"The length of each msas are not equal! {multimer_a3ms}")
+                                interact_dict[f'index_{i + 1}'] = [j for j in range(msa_len)]
+                            interact_df = pd.DataFrame(interact_dict)
+                            interact_df.to_csv(msa_pair_file)
+                        else:
+                            msa_pair_file = os.path.join(complex_aln_dir, msa_paired_source, msa_paired_source + "_interact.csv")
+                            if len(pd.read_csv(msa_pair_file)) <= 1:
+                                continue
+                            multimer_a3ms = [os.path.join(complex_aln_dir, msa_paired_source, monomer + "_con.a3m") for monomer in monomers]
+
+                        base_cmd += f"--multimer_a3ms={','.join(multimer_a3ms)} " \
+                                    f"--msa_pair_file={msa_pair_file} " \
 
                     # template_source
                     if template_source == "pdb_seqres":
@@ -226,13 +276,19 @@ class Multimer_structure_prediction_pipeline_v2:
                         base_cmd += f"--temp_struct_csv={template_file} " \
                                     f"--struct_atom_dir={struct_atom_dir} "
 
-                    elif template_source == "sequence_based_template_pdb":
+                    elif template_source == "tmsearch_structure_based_template":
+                        template_file = os.path.join(template_dir, "tmsearch", "structure_templates.csv")
+                        struct_atom_dir = os.path.join(template_dir, "tmsearch", "templates")
+                        base_cmd += f"--temp_struct_csv={template_file} " \
+                                    f"--struct_atom_dir={struct_atom_dir} "
+
+                    elif template_source == "sequence_based_template_pdb_sort90":
                         template_file = os.path.join(template_dir, "pdb_seq", "sequence_templates.csv")
                         struct_atom_dir = os.path.join(template_dir, "pdb_seq", "templates")
                         base_cmd += f"--temp_struct_csv={template_file} " \
                                     f"--struct_atom_dir={struct_atom_dir} "
 
-                    elif template_source == "sequence_based_template_complex_pdb":
+                    elif template_source == "sequence_based_template_pdb_complex":
                         template_file = os.path.join(template_dir, "complex_pdb_seq", "sequence_templates.csv")
                         struct_atom_dir = os.path.join(template_dir, "complex_pdb_seq", "templates")
                         base_cmd += f"--temp_struct_csv={template_file} " \
@@ -272,11 +328,11 @@ class Multimer_structure_prediction_pipeline_v2:
                     os.system(base_cmd)
 
                     result_dirs += [outdir]
-                    check_num_prediction_per_model += [num_multimer_predictions_per_model]
+                    check_num_predictions += [num_multimer_predictions_per_model * 5]
 
             rerun = False
-            for result_dir, num_prediction_per_model in zip(result_dirs, check_num_prediction_per_model):
-                if not complete_result(result_dir, 5 * num_prediction_per_model):
+            for result_dir, check_num_prediction in zip(result_dirs, check_num_predictions):
+                if not complete_result(result_dir, check_num_prediction):
                     rerun = True
 
             if not rerun:
@@ -304,15 +360,15 @@ class Multimer_structure_prediction_pipeline_v2:
                               f"--use_gpu_relax={self.params['use_gpu_relax']} " \
                               f"--max_template_date={self.params['max_template_date']} "
 
-        predictor_config = self.configs.predictors.deepmsa2
+        predictor_config = self.heteromer_config.predictors.deepmsa2
     
-        multimer_num_ensemble = self.get_config(predictor_config, 'num_ensemble')
-        multimer_num_recycle = self.get_config(predictor_config, 'num_recycle')
-        num_multimer_predictions_per_model = self.get_config(predictor_config, 'predictions_per_model')
-        model_preset = self.get_config(predictor_config, 'model_preset')
-        relax_topn_predictions = self.get_config(predictor_config, 'relax_topn_predictions')
-        dropout = self.get_config(predictor_config, 'dropout')
-        dropout_structure_module = self.get_config(predictor_config, 'dropout_structure_module')  
+        multimer_num_ensemble = self.get_heteromer_config(predictor_config, 'num_ensemble')
+        multimer_num_recycle = self.get_heteromer_config(predictor_config, 'num_recycle')
+        num_multimer_predictions_per_model = self.get_heteromer_config(predictor_config, 'predictions_per_model')
+        model_preset = self.get_heteromer_config(predictor_config, 'model_preset')
+        relax_topn_predictions = self.get_heteromer_config(predictor_config, 'relax_topn_predictions')
+        dropout = self.get_heteromer_config(predictor_config, 'dropout')
+        dropout_structure_module = self.get_heteromer_config(predictor_config, 'dropout_structure_module')  
                 
         common_parameters +=  f"--multimer_num_ensemble={multimer_num_ensemble} " \
                               f"--multimer_num_recycle={multimer_num_recycle} " \
@@ -325,14 +381,18 @@ class Multimer_structure_prediction_pipeline_v2:
 
         while True:
             
-            deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa_species')
+            deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa2')
 
-            for concatenate_method in os.listdir(deepmsa_complex_aln_dir):
+            ranking_file = os.path.join(deepmsa_complex_aln_dir, 'deepmsa_paired_ranking.csv')
+            
+            ranking_df = pd.read_csv(ranking_file)
+
+            for index, concatenate_method in enumerate(ranking_df.name):
                 
                 if concatenate_method.find('.csv') > 0:
                     continue
 
-                method_outdir = os.path.join(output_dir, concatenate_method)
+                method_outdir = os.path.join(output_dir, f"deepmsa2_{index}")
 
                 os.chdir(self.params['alphafold_program_dir'])
 
@@ -345,6 +405,7 @@ class Multimer_structure_prediction_pipeline_v2:
                 template_stos = []
 
                 monomer_a3m_names = concatenate_method.split('_')
+
                 for chain_idx, chain_id in enumerate(chain_id_map):
 
                     monomer = chain_id

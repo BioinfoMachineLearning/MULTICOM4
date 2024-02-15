@@ -295,26 +295,6 @@ def concatenate_alignments(inparams):
                                                                                     is_homomers)
                     print(f"species_interact_uniprot_sto: {len(pair_ids)} pairs")
 
-                if len(list(deepmsa_chain_alignments.keys())) > 0:
-
-                    comb_pairs = DeepMSA2_pairing.get_pairs(deepmsa_chain_alignments)
-                    #print(comb_pairs)
-
-                    method_outdir = os.path.join(outdir, 'deepmsa_species')
-                    for comb_msa_name in comb_pairs:
-                        print(comb_msa_name)
-                        pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
-                        alignment[comb_msa_name] = write_multimer_a3ms(pair_ids,
-                                                                       comb_pairs[comb_msa_name],
-                                                                       method_outdir,
-                                                                       comb_msa_name,
-                                                                       is_homomers)
-                        print(f"{comb_msa_name}: {len(pair_ids)} pairs")
-
-                    print("Start to generate deepmsa ranking")
-                    ranking_file = os.path.join(method_outdir, 'deepmsa_paired_ranking.csv')
-                    DeepMSA2_pairing.rank_msas(method_outdir, deepmsa_ranking_files, ranking_file, calNf)
-
             elif method == "string_interact":
                 if len(uniref_a3m_alignments) > 0:
                     pair_ids = runners['string_interact'].get_interactions_v2(uniref_a3m_alignments)
@@ -369,6 +349,41 @@ def concatenate_alignments(inparams):
                                                                                     'uniprot_distance_uniprot_sto',
                                                                                     is_homomers)
                     print(f"uniprot_distance_uniprot_sto: {len(pair_ids)} pairs")
+                    
+            elif method == "deepmsa2":
+
+                if len(list(deepmsa_chain_alignments.keys())) > 0:
+
+                    comb_pairs = DeepMSA2_pairing.get_pairs(deepmsa_chain_alignments, is_homomers)
+                    #print(comb_pairs)
+                    method_outdir = os.path.join(outdir, 'deepmsa2')
+                    for comb_msa_name in comb_pairs:
+                        print(comb_msa_name)
+                        if is_homomers:
+                            for i in range(len(comb_pairs[comb_msa_name])):
+                                with open(comb_pairs[comb_msa_name][i]) as f:
+                                    input_fasta_str = f.read()
+                                msa_sequences, msa_descriptions = parse_fasta(input_fasta_str)
+                                current_len = len(msa_descriptions)
+                                if msa_len == -1:
+                                    msa_len = current_len
+                                elif current_len != msa_len:
+                                    raise Exception(f"The length of each msas are not equal! {multimer_a3ms}")
+                                interact_dict[f'index_{i + 1}'] = [j for j in range(msa_len)]
+                            pair_ids = pd.DataFrame(interact_dict)
+                        else:
+                            pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
+
+                        alignment[comb_msa_name] = write_multimer_a3ms(pair_ids,
+                                                                       comb_pairs[comb_msa_name],
+                                                                       method_outdir,
+                                                                       comb_msa_name,
+                                                                       is_homomers)
+                        print(f"{comb_msa_name}: {len(pair_ids)} pairs")
+
+                    print("Start to generate deepmsa ranking")
+                    ranking_file = os.path.join(method_outdir, 'deepmsa_paired_ranking.csv')
+                    DeepMSA2_pairing.rank_msas(method_outdir, deepmsa_ranking_files, ranking_file, calNf)
 
         os.system("touch " + os.path.join(outdir, "DONE"))
 

@@ -12,8 +12,9 @@ from multicom4.monomer_structure_refinement.iterative_refine_pipeline_v4_50 impo
 from multicom4.monomer_templates_concatenation.parsers import TemplateHit
 from multicom4.monomer_structure_refinement.util import build_alignment_indices
 import datetime
+from multicom4.tool import tmsearch
 
-class Complex_structure_based_template_search_pipeline:
+class Complex_structure_tmsearch_based_template_search_pipeline:
 
     def __init__(self, params):
 
@@ -21,6 +22,14 @@ class Complex_structure_based_template_search_pipeline:
         release_date_df = pd.read_csv(params['pdb_release_date_file'])
         self._release_dates = dict(zip(release_date_df['pdbcode'], release_date_df['release_date']))
         self._max_template_date = datetime.datetime.strptime(params['max_template_date'], '%Y-%m-%d')
+
+        self.tmsearch_database = params['tmsearch_database']
+
+        self.template_searcher = tmsearch.TMSearch(
+            binary_path=params['tmsearch_binary'],
+            program_path=params['tmsearch_program_dir'],
+            tmsearch_database=self.tmsearch_database)
+
 
     def search_templates_foldseek(self, inpdb, outdir):
         makedir_if_not_exists(outdir)
@@ -42,10 +51,7 @@ class Complex_structure_based_template_search_pipeline:
             tend = templates.loc[i, 'tend']
             evalue = float(templates.loc[i, 'evalue'])
             aln_len = int(templates.loc[i, 'alnlen'])
-
-            if target.find('.atom.gz') > 0:
-                target = target.replace('.atom.gz', '')
-                pdbcode = target[0:4]
+            pdbcode = target[0:4]
 
             hit = TemplateHit(index=i,
                             name=templates.loc[i, 'target'].split('.')[0],
@@ -82,7 +88,7 @@ class Complex_structure_based_template_search_pipeline:
                                         'aln_query', 'qstart', 'qend', 'evalue', 'aligned_length'])
         return pd.DataFrame(row_list)
 
-    def search(self, monomer_sequences, monomers_pdbs, outdir, is_homodimer=False):
+    def search(self, monomer_sequences, monomers_pdbs, monomer_tmsearch_result_dirs, outdir, is_homodimer=False):
 
         outdir = os.path.abspath(outdir)
 
@@ -93,8 +99,22 @@ class Complex_structure_based_template_search_pipeline:
         for i, monomer in enumerate(monomers_pdbs):
             monomer_work_dir = os.path.join(outdir, pathlib.Path(monomer).stem)
             makedir_if_not_exists(monomer_work_dir)
-            foldseek_df = self.search_templates_foldseek(inpdb=monomer, outdir=os.path.join(monomer_work_dir, 'foldseek'))
-            curr_df = self.create_template_df(foldseek_df, monomer_sequences[i])
+
+            template_file = os.path.join(monomer_tmsearch_result_dirs[i], 'tmsearch_templates.csv')
+            template_dir = os.path.join(monomer_tmsearch_result_dirs[i], 'templates')
+
+            if os.path.exists(template_file) and os.path.exists(template_dir):
+                os.system(f"cp {template_file} {monomer_work_dir}")
+                os.system(f"cp -r {template_dir} {monomer_work_dir}")
+            else:
+                pipeline = monomer_tmsearch_based_template_search_pipeline(self.params)
+                template_file, template_dir = pipeline.search(fasta_path=fasta_path, inpdb=monomers_pdbs[i], outdir=monomer_work_dir)
+
+            template_file = os.path.join(monomer_work_dir, 'tmsearch_templates.csv')
+            template_df = pd.read_csv(template_file, sep='\t')
+            print(template_df)
+
+            curr_df = self.create_template_df(template_df, monomer_sequences[i])
             monomer_template_results += [curr_df]
 
             curr_df = curr_df.add_suffix(f"{i + 1}")
@@ -245,9 +265,8 @@ class Complex_structure_based_template_search_pipeline:
         os.chdir(template_dir)
         for i in range(len(prev_df_sorted_filtered)):
             for j in range(len(monomers_pdbs)):
-                template_pdb = prev_df_sorted_filtered.loc[i, f'template{j + 1}']
-                if pd.isna(template_pdb):
+                template = prev_df_sorted_filtered.loc[i, f'template{j + 1}']
+                if pd.isna(template):
                     continue
-                template_pdb = template_pdb.split()[0]
-                os.system(f"cp {self.params['foldseek_pdb_database_dir']}/{template_pdb}.atom.gz .")
-                os.system(f"gunzip -f {template_pdb}.atom.gz")
+                template = template.split()[0]
+                os.system(f"cp {self.tmsearch_database}/{template}.pdb {template_dir}/{template}.atom")
