@@ -272,33 +272,34 @@ class Monomer_alignment_generation_pipeline:
                 if os.path.exists(msa_out_path):
                     result_dict[msa_key] = msa_out_path
 
-        # Need to combine dhr a3m with other default a3ms
-        dhr_af_a3m = os.path.join(msa_output_dir, f'{targetname}_dhr_af.a3m')
-        if not os.path.exists(dhr_af_a3m):
-            with open(result_dict['uniref90_sto']) as f:
-                uniref90_msa = parsers.parse_stockholm(f.read())
-                uniref90_msa = uniref90_msa.truncate(max_seqs=self.uniref_max_hits)
+        if self.dhr_runner is not None:
+            # Need to combine dhr a3m with other default a3ms
+            dhr_af_a3m = os.path.join(msa_output_dir, f'{targetname}_dhr_af.a3m')
+            if not os.path.exists(dhr_af_a3m):
+                with open(result_dict['uniref90_sto']) as f:
+                    uniref90_msa = parsers.parse_stockholm(f.read())
+                    uniref90_msa = uniref90_msa.truncate(max_seqs=self.uniref_max_hits)
 
-            with open(result_dict['mgnify_sto']) as f:
-                mgnify_msa = parsers.parse_stockholm(f.read())
-                mgnify_msa = mgnify_msa.truncate(max_seqs=self.mgnify_max_hits)
+                with open(result_dict['mgnify_sto']) as f:
+                    mgnify_msa = parsers.parse_stockholm(f.read())
+                    mgnify_msa = mgnify_msa.truncate(max_seqs=self.mgnify_max_hits)
 
-            with open(result_dict['uniref30_bfd_a3m']) as f:
-                bfd_msa = parsers.parse_a3m(f.read())
+                with open(result_dict['uniref30_bfd_a3m']) as f:
+                    bfd_msa = parsers.parse_a3m(f.read())
 
-            with open(result_dict['dhr_a3m']) as f:
-                dhr_msa = parsers.parse_a3m(f.read())
-
-            if len(dhr_msa.sequences) > 100000:
-                cmd = f"{self.hhfilter_binary_path} -diff 50000 -i {result_dict['dhr_a3m']} -o {result_dict['dhr_a3m']}.filt -id 90"
-                print(cmd)
-                os.system(cmd)
-                with open(result_dict['dhr_a3m'] + '.filt') as f:
+                with open(result_dict['dhr_a3m']) as f:
                     dhr_msa = parsers.parse_a3m(f.read())
 
-            combine_a3ms([dhr_msa, uniref90_msa, bfd_msa, mgnify_msa], dhr_af_a3m)
+                if len(dhr_msa.sequences) > 100000:
+                    cmd = f"{self.hhfilter_binary_path} -diff 50000 -i {result_dict['dhr_a3m']} -o {result_dict['dhr_a3m']}.filt -id 90"
+                    print(cmd)
+                    os.system(cmd)
+                    with open(result_dict['dhr_a3m'] + '.filt') as f:
+                        dhr_msa = parsers.parse_a3m(f.read())
 
-        result_dict['dhr_af_a3m'] = dhr_af_a3m
+                combine_a3ms([dhr_msa, uniref90_msa, bfd_msa, mgnify_msa], dhr_af_a3m)
+
+            result_dict['dhr_af_a3m'] = dhr_af_a3m
 
         return result_dict
 

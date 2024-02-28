@@ -613,7 +613,7 @@ class foldseek_iterative_monomer_input:
 
 def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chain_id_map, pipeline_inputs, 
                                                         outdir, config_name, start=0, is_homomers=False):
-    pipeline = Multimer_iterative_generation_pipeline_monomer(params=params, config_name=config_name)
+    pipeline = Multimer_iterative_generation_pipeline_monomer(params=params, config_name=config_name, is_homomers=is_homomers)
     try:
         for i, pipeline_input in enumerate(pipeline_inputs):
             if is_homomers:
@@ -636,7 +636,7 @@ def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chai
 
 def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, chain_id_map, pipeline_inputs, outdir,
                                                             config_name, start=0, is_homomers=False):
-    pipeline = Multimer_iterative_generation_pipeline_monomer_old(params=params, config_name=config_name)
+    pipeline = Multimer_iterative_generation_pipeline_monomer_old(params=params, config_name=config_name, is_homomers=is_homomers)
     try:
         for i, pipeline_input in enumerate(pipeline_inputs):
             if is_homomers:

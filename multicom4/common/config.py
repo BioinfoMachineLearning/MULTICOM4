@@ -459,6 +459,12 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
             'max_pairs': 20,
         },
+        'AFProfile': 
+        {
+            'confidence_threshold': 0.95,
+            'max_iteration': 5 * 5,
+            'learning_rate': 0.0001,
+        },
         'foldseek_iter': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'foldseek',

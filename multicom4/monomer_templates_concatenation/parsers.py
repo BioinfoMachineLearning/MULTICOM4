@@ -120,17 +120,25 @@ def parse_stockholm(stockholm_string: str) -> Msa:
 
     msa = []
     deletion_matrix = []
+    name_to_sequence_list = []
 
     query = ''
     keep_columns = []
-    for seq_index, sequence in enumerate(name_to_sequence.values()):
+    for seq_index, name in enumerate(name_to_sequence.keys()):
+        sequence = name_to_sequence[name]
         if seq_index == 0:
             # Gather the columns with gaps from the query
             query = sequence
             keep_columns = [i for i, res in enumerate(query) if res != '-']
 
-        # Remove the columns with gaps in the query from all sequences.
-        aligned_sequence = ''.join([sequence[c] for c in keep_columns])
+        try:
+            # Remove the columns with gaps in the query from all sequences.
+            aligned_sequence = ''.join([sequence[c] for c in keep_columns])
+        except Exception as e:
+            print(e)
+            continue
+
+        name_to_sequence_list.append(name)
 
         msa.append(aligned_sequence)
 
@@ -148,7 +156,7 @@ def parse_stockholm(stockholm_string: str) -> Msa:
 
     return Msa(sequences=msa,
                deletion_matrix=deletion_matrix,
-               descriptions=list(name_to_sequence.keys()))
+               descriptions=name_to_sequence_list)
 
 
 def parse_a3m(a3m_string: str) -> Msa:

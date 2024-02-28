@@ -64,7 +64,7 @@ DHR_database_path = /bmlfast/DHR/DHR_DATABASE/
 alphafold_env_dir = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/
 
 # alphafold database directory
-alphafold_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3
+alphafold_database_dir = /home/bml_casp15/tools/alphafold_databases_multicom3
 
 # alphafold program path
 alphafold_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/alphafold-v2.3.2
@@ -125,9 +125,9 @@ foldseek_af_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/af_pdbs
 
 ################################databases option#####################################
 
-bfd_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
+bfd_database = /home/bml_casp15/tools/alphafold_databases_multicom3/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
 
-mgnify_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
+mgnify_database = /home/bml_casp15/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
 
 metaclust_database = /bmlfast/bml_casp16/tools/multicom3_db/Metaclust_2018_06/metaclust_50
 
@@ -143,11 +143,11 @@ JGIclust_database = /bmlfast/bml_casp16/tools/DeepMSA2/database/JGIclust
 uniclust_db = /bmlfast/bml_casp16/tools/multicom3_db/uniclust30_2018_08/uniclust30_2018_08
 
 # uniref database
-uniref_db = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/uniref30/UniRef30_2023_02
+uniref_db = /home/bml_casp15/tools/alphafold_databases_multicom3/uniref30/UniRef30_2023_02
 
-uniref90_fasta = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/uniref90/uniref90.fasta
+uniref90_fasta = /home/bml_casp15/tools/alphafold_databases_multicom3/uniref90/uniref90.fasta
 
-uniprot_fasta = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/uniprot/uniprot.fasta
+uniprot_fasta = /home/bml_casp15/tools/alphafold_databases_multicom3/uniprot/uniprot.fasta
 
 ###########################UNIPROT TO PDB database option############################
 
@@ -166,11 +166,11 @@ string2uniprot_map = /bmlfast/bml_casp16/tools/multicom3_db/string/string2unipro
 
 ###########################Sequence and structure based template search option####################
 
-pdb70_hhsuite_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/pdb70/pdb70
+pdb70_hhsuite_database = /home/bml_casp15/tools/alphafold_databases_multicom3/pdb70/pdb70
 
-pdb70_hhsuite_cluster_tsv = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/pdb70/pdb70_clu.tsv
+pdb70_hhsuite_cluster_tsv = /home/bml_casp15/tools/alphafold_databases_multicom3/pdb70/pdb70_clu.tsv
 
-pdb_seqs_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/pdb_seqres/pdb_seqs
+pdb_seqs_dir = /home/bml_casp15/tools/alphafold_databases_multicom3/pdb_seqres/pdb_seqs
 
 pdb_sort90_hhsuite_database = /bmlfast/bml_casp16/tools/multicom3_db/pdb_sort90/hhsuitedb3
 

@@ -170,6 +170,8 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                 elif method == "AFProfile": 
 
+                    makedir_if_not_exists(outdir)
+                    
                     os.chdir(self.params['alphafold_program_dir'])
 
                     default_feature_pkl = os.path.join(output_dir, 'default_multimer', 'features.pkl')

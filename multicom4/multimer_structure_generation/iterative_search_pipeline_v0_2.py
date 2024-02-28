@@ -20,7 +20,7 @@ from multicom4.common import config
 
 class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
-    def __init__(self, params, max_template_count=50, multimer_type="heteromer", config_name=""):
+    def __init__(self, params, max_template_count=50, is_homomers=False, config_name=""):
         
         super().__init__()
 
@@ -28,10 +28,10 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
         self.max_template_count = max_template_count
 
-        if multimer_type == "heteromer":
-            self.predictor_config = self.heteromer_config.predictors[config_name]
-        else:
+        if is_homomers:
             self.predictor_config = self.homomer_config.predictors[config_name]
+        else:
+            self.predictor_config = self.heteromer_config.predictors[config_name]
 
         release_date_df = pd.read_csv(params['pdb_release_date_file'])
         self._release_dates = dict(zip(release_date_df['pdbcode'], release_date_df['release_date']))
@@ -581,7 +581,7 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
             if self.predictor_config.template_source == "notemplate":
                 cmd += "--notemplate=true "
             else:
-                cmd +=  f"--temp_struct_csv={template_files[0]} " \
+                cmd +=  f"--monomer_temp_csvs={','.join(template_files)} " \
                         f"--struct_atom_dir={out_template_dir} "
 
             try:
