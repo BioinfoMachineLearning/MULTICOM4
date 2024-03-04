@@ -152,7 +152,36 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
             'relax_topn_predictions': 1,
-        }
+            'foldseek_database': 'pdb+afdb',
+            'msa_source': 'foldseek',
+            'template_source': 'foldseek',
+        },
+        'foldseek_refine_esm': {
+            'number_of_input_models': 5,
+            'max_iteration': 5,
+            'max_template_count': 50,
+            'progressive_threshold': 2000,
+            'number_of_output_models': 5,
+            'relax_topn_predictions': 1,
+            'foldseek_database': 'esm_atlas',
+            'plddt_threshold': 0.0,
+            'ptm_threshold': 0.0,
+            'msa_source': 'foldseek',
+            'template_source': 'default',
+        },
+        'foldseek_refine_esm_high': {
+            'number_of_input_models': 5,
+            'max_iteration': 5,
+            'max_template_count': 50,
+            'progressive_threshold': 2000,
+            'number_of_output_models': 5,
+            'relax_topn_predictions': 1,
+            'foldseek_database': 'esm_atlas',
+            'msa_source': 'foldseek',
+            'template_source': 'default',
+            'plddt_threshold': 0.7,
+            'ptm_threshold': 0.7,
+        },
     }
 })
 
@@ -296,22 +325,46 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
             'max_pairs': 20,
         },
-        'foldseek_iter': {   # common parameters for all deepmsa2 predictors
+        'folds_iter': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'msa_unpaired_source': 'foldseek',
             'template_source': 'foldseek',
+            'foldseek_database': "pdb+afdb",
             'number_of_input': 2,
         },
-        'foldseek_iter_nop': {   # common parameters for all deepmsa2 predictors
+        'folds_iter_nop': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'None',
             'msa_unpaired_source': 'foldseek',
             'template_source': 'foldseek',
+            'foldseek_database': "pdb+afdb",
             'number_of_input': 2,
         },
-        'foldseek_iter_not': {   # common parameters for all deepmsa2 predictors
+        'folds_iter_not': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'msa_unpaired_source': 'foldseek',
             'template_source': 'notemplate',
+            'foldseek_database': "pdb+afdb",
+            'number_of_input': 2,
+        },
+        'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'pdb_seqres',
+            'foldseek_database': "esm_atlas",
+            'number_of_input': 2,
+        },
+        'folds_iter_esm_nop': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'None',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'pdb_seqres',
+            'foldseek_database': "esm_atlas",
+            'number_of_input': 2,
+        },
+        'folds_iter_esm_not': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
         'AFProfile': 
@@ -465,24 +518,52 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'max_iteration': 5 * 5,
             'learning_rate': 0.0001,
         },
-        'foldseek_iter': {   # common parameters for all deepmsa2 predictors
+        'folds_iter': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'foldseek',
+            'foldseek_database': "pdb+afdb",
             'number_of_input': 2,
         },
-        'foldseek_iter_not': {   # common parameters for all deepmsa2 predictors
+        'folds_iter_not': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'notemplate',
+            'foldseek_database': "pdb+afdb",
             'number_of_input': 2,
         },
-        'foldseek_iter_o': {   # common parameters for all deepmsa2 predictors
+        'folds_iter_o': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'foldseek',
+            'foldseek_database': "pdb+afdb",
             'number_of_input': 2,
         },
-        'foldseek_iter_o_not': {   # common parameters for all deepmsa2 predictors
+        'folds_iter_o_not': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'notemplate',
+            'foldseek_database': "pdb+afdb",
+            'number_of_input': 2,
+        },
+        'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'pdb_seqres',
+            'foldseek_database': "esm_atlas",
+            'number_of_input': 2,
+        },
+        'folds_iter_esm_not': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'foldseek_database': "esm_atlas",
+            'number_of_input': 2,
+        },
+        'folds_iter_esm_o': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'pdb_seqres',
+            'foldseek_database': "esm_atlas",
+            'number_of_input': 2,
+        },
+        'folds_iter_esm_o_not': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
     }

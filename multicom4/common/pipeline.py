@@ -612,7 +612,7 @@ class foldseek_iterative_monomer_input:
 
 
 def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chain_id_map, pipeline_inputs, 
-                                                        outdir, config_name, start=0, is_homomers=False):
+                                                        outdir, config_name, monomer_template_stos=[], start=0, is_homomers=False):
     pipeline = Multimer_iterative_generation_pipeline_monomer(params=params, config_name=config_name, is_homomers=is_homomers)
     try:
         for i, pipeline_input in enumerate(pipeline_inputs):
@@ -621,12 +621,14 @@ def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chai
                                             chain_id_map=chain_id_map,
                                             monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                             monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                            monomer_template_stos=monomer_template_stos,
                                             outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
             else:
                 pipeline.search_single(fasta_file=fasta_path,
                                        chain_id_map=chain_id_map,
                                        monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                        monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                       monomer_template_stos=monomer_template_stos,
                                        outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
     except Exception as e:
         print(e)
@@ -635,7 +637,7 @@ def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chai
 
 
 def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, chain_id_map, pipeline_inputs, outdir,
-                                                            config_name, start=0, is_homomers=False):
+                                                            config_name, monomer_template_stos=[], start=0, is_homomers=False):
     pipeline = Multimer_iterative_generation_pipeline_monomer_old(params=params, config_name=config_name, is_homomers=is_homomers)
     try:
         for i, pipeline_input in enumerate(pipeline_inputs):
@@ -644,12 +646,14 @@ def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, 
                                             chain_id_map=chain_id_map,
                                             monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                             monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                            monomer_template_stos=monomer_template_stos,
                                             outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
             else:
                 pipeline.search_single(fasta_file=fasta_path,
                                        chain_id_map=chain_id_map,
                                        monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
                                        monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                       monomer_template_stos=monomer_template_stos,
                                        outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
     except Exception as e:
         print(e)

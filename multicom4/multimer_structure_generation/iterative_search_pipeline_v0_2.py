@@ -40,11 +40,22 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
     def search_templates_foldseek(self, inpdb, outdir):
         makedir_if_not_exists(outdir)
         foldseek_program = self.params['foldseek_program']
-        foldseek_pdb_database = self.params['foldseek_pdb_database']
-        foldseek_af_database = self.params['foldseek_af_database']
+        foldseek_pdb_database = ""
+
+        other_databases = []
+        if self.predictor_config.foldseek_database == "esm_atlas":
+            other_databases = [os.path.join(self.params['foldseek_esm_atlas_database'], database) 
+                                for database in sorted(os.listdir(self.params['foldseek_esm_atlas_database'])) 
+                                if database.endswith('DB')]
+            print(f"Total {len(other_databases)} to be searched!")
+        else:
+            foldseek_pdb_database = self.params['foldseek_pdb_database']
+            other_databases += [self.params['foldseek_af_database']]
+
         foldseek_runner = Foldseek(binary_path=foldseek_program, pdb_database=foldseek_pdb_database,
                                    max_template_date=self._max_template_date, release_dates=self._release_dates,
-                                   other_databases=[foldseek_af_database])
+                                   other_databases=other_databases)
+
         return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000)
 
     def concatenate_msa_and_templates(self,
@@ -199,7 +210,8 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
                 os.system(f"cp {template_path} {outdir}")
             os.system(f"gunzip -f {template_pdb}")
 
-    def search_single(self, fasta_file, chain_id_map, monomer_pdb_dirs, monomer_alphafold_a3ms, outdir):
+    def search_single(self, fasta_file, chain_id_map, monomer_pdb_dirs, monomer_alphafold_a3ms, 
+                      outdir, monomer_template_stos=[]):
 
         fasta_file = os.path.abspath(fasta_file)
 
@@ -247,8 +259,6 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
             out_template_dir = os.path.join(prepare_dir, 'templates')
 
-            makedir_if_not_exists(out_template_dir)
-
             template_results = []
             alphafold_monomer_a3ms = []
 
@@ -279,8 +289,10 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
                 template_results += [foldseek_res]
 
-                self.copy_atoms_and_unzip(templates=foldseek_res['all_alignment'],
-                                          outdir=out_template_dir)
+                if self.predictor_config.template_source == "foldseek":
+                    makedir_if_not_exists(out_template_dir)
+                    self.copy_atoms_and_unzip(templates=foldseek_res['all_alignment'],
+                                            outdir=out_template_dir)
 
             if len(template_results) != len(chain_id_map):
                 return None
@@ -302,7 +314,9 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
             if self.predictor_config.template_source == "notemplate":
                 cmd += "--notemplate=true "
-            else:
+            elif self.predictor_config.template_source == "pdb_seqres":
+                cmd += f"--template_stos {','.join(monomer_template_stos)} "
+            elif self.predictor_config.template_source == "foldseek":
                 cmd +=  f"--monomer_temp_csvs={','.join(template_files)} " \
                         f"--struct_atom_dir={out_template_dir} "
 
@@ -481,7 +495,8 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
         return top_template_files, out_monomer_msas
 
-    def search_single_homo(self, fasta_file, chain_id_map, monomer_pdb_dirs, monomer_alphafold_a3ms, outdir):
+    def search_single_homo(self, fasta_file, chain_id_map, monomer_pdb_dirs, 
+                           monomer_alphafold_a3ms, outdir, monomer_template_stos = []):
 
         fasta_file = os.path.abspath(fasta_file)
 
@@ -529,8 +544,6 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
             out_template_dir = os.path.join(prepare_dir, 'templates')
 
-            makedir_if_not_exists(out_template_dir)
-
             template_results = []
             alphafold_monomer_a3ms = []
 
@@ -555,14 +568,15 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
                 foldseek_res = self.search_templates_foldseek(inpdb=chain_pdb, outdir=os.path.join(monomer_work_dir, 'foldseek'))
 
                 if len(foldseek_res['all_alignment']) == 0:
-                    print(
-                        f"Cannot find any templates for {chain_id}")
+                    print(f"Cannot find any templates for {chain_id}")
                     break
 
                 template_results += [foldseek_res]
 
-                self.copy_atoms_and_unzip(templates=foldseek_res['all_alignment'],
-                                          outdir=out_template_dir)
+                if self.predictor_config.template_source == "foldseek":
+                    makedir_if_not_exists(out_template_dir)
+                    self.copy_atoms_and_unzip(templates=foldseek_res['all_alignment'],
+                                            outdir=out_template_dir)
 
             if len(template_results) != len(chain_id_map):
                 return None
@@ -580,7 +594,9 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
             if self.predictor_config.template_source == "notemplate":
                 cmd += "--notemplate=true "
-            else:
+            elif self.predictor_config.template_source == "pdb_seqres":
+                cmd += f"--template_stos {','.join(template_stos)} "
+            elif self.predictor_config.template_source == "foldseek":
                 cmd +=  f"--monomer_temp_csvs={','.join(template_files)} " \
                         f"--struct_atom_dir={out_template_dir} "
 

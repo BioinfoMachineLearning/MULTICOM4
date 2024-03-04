@@ -58,11 +58,11 @@ class Foldseek:
 
         for database_path in self.other_databases:
             if not glob.glob(database_path + '_*'):
-                logging.error('Could not find HHsearch database %s', database_path)
-                raise ValueError(f'Could not find HHsearch database {database_path}')
+                logging.error('Could not find Foldseek database %s', database_path)
+                raise ValueError(f'Could not find Foldseek database {database_path}')
 
     def query(self, pdb: str, outdir: str, progressive_threshold=1, tmscore_threshold=0.3, maxseq=2000) -> str:
-        """Queries the database using HHsearch using a given a3m."""
+        """Queries the database using Foldseek."""
         input_path = os.path.join(outdir, 'query.pdb')
         os.system(f"cp {pdb} {input_path}")
 
@@ -73,7 +73,11 @@ class Foldseek:
         tmscore_df = pd.DataFrame(
             columns=['query', 'target', 'qaln', 'taln', 'qstart', 'qend', 'tstart', 'tend', 'evalue', 'alnlen'])
 
-        databases = [self.pdb_database] + self.other_databases
+        if self.pdb_database == "":
+            databases = self.other_databases
+        else:
+            databases = [self.pdb_database] + self.other_databases
+
         for database in databases:
             database_name = pathlib.Path(database).stem
             outfile = os.path.join(outdir, f'aln.m8_{database_name}')

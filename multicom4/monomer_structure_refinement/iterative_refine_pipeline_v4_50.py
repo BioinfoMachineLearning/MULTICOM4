@@ -13,6 +13,7 @@ from multicom4.monomer_templates_concatenation import parsers
 from multicom4.monomer_structure_refinement.util import *
 from multicom4.common.protein import complete_result
 from multicom4.common import config
+import re 
 
 # Prefilter exceptions.
 class PrefilterError(Exception):
@@ -64,13 +65,13 @@ def assess_foldseek_hit(
 
 class Monomer_iterative_refinement_pipeline(config.pipeline):
 
-    def __init__(self, params):
+    def __init__(self, params, config_name):
 
         super().__init__()
 
         self.params = params
 
-        self.predictor_config = self.monomer_config.predictors.foldseek_refine
+        self.predictor_config = self.monomer_config.predictors[config_name]
 
         release_date_df = pd.read_csv(params['pdb_release_date_file'])
         self._release_dates = dict(zip(release_date_df['pdbcode'], release_date_df['release_date']))
@@ -79,11 +80,31 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
     def search_templates(self, inpdb, outdir):
         makedir_if_not_exists(outdir)
         foldseek_program = self.params['foldseek_program']
-        foldseek_pdb_database = self.params['foldseek_pdb_database']
-        foldseek_af_database = self.params['foldseek_af_database']
+        foldseek_pdb_database = ""
+
+        other_databases = []
+        if self.predictor_config.foldseek_database == "esm_atlas":
+            esm_atlas_databases = [os.path.join(self.params['foldseek_esm_atlas_database'], database) 
+                                for database in sorted(os.listdir(self.params['foldseek_esm_atlas_database'])) 
+                                if database.endswith('DB')]
+            # e.g, tm_.80_.90_plddt_.80_.90_14.DB
+            pattern = r'tm_([\d.]+)_[\d.]+_plddt_([\d.]+)_[\d.]+'
+            for esm_atlas_database in esm_atlas_databases:
+                match = re.search(pattern, esm_atlas_database)
+                ptm = float(match.group(1))
+                plddt = float(match.group(2))
+                if ptm >= self.predictor_config.ptm_threshold and plddt >= self.predictor_config.plddt_threshold:
+                    other_databases += [esm_atlas_database]
+
+            print(f"Total {len(other_databases)} to be searched!")
+        else:
+            foldseek_pdb_database = self.params['foldseek_pdb_database']
+            other_databases += [self.params['foldseek_af_database']]
+
         foldseek_runner = Foldseek(binary_path=foldseek_program, pdb_database=foldseek_pdb_database,
                                    max_template_date=self._max_template_date, release_dates=self._release_dates,
-                                   other_databases=[foldseek_af_database])
+                                   other_databases=other_databases)
+
         return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000)
 
     def check_and_rank_templates(self, template_result, outfile, query_sequence):
@@ -240,7 +261,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                 os.system(f"cp {template_path} {outdir}")
             os.system(f"gunzip -f {template_pdb}")
 
-    def search_single(self, fasta_path, pdb_path, pkl_path, msa_path, outdir):
+    def search_single(self, fasta_path, pdb_path, pkl_path, msa_path, outdir, uniref90_sto=""):
 
         query_sequence = ""
         for line in open(fasta_path):
@@ -316,20 +337,26 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                                                  start_msa=start_msa,
                                                  outfile=os.path.join(current_work_dir, f"iteration{num_iteration + 1}.a3m"))
 
-                out_template_dir = os.path.join(current_work_dir, "template_pdbs")
-                makedir_if_not_exists(out_template_dir)
-                self.copy_atoms_and_unzip(template_csv=os.path.join(current_work_dir, "structure_templates.csv"),
-                                          outdir=out_template_dir)
 
                 makedir_if_not_exists(out_model_dir)
                 custom_msa = os.path.join(current_work_dir, f"iteration{num_iteration + 1}.a3m")
-                temp_struct_csv = os.path.join(current_work_dir, "structure_templates.csv")
 
                 cmd = f"python {self.params['alphafold_program']} " \
                       f"--custom_msa={custom_msa} " \
-                      f"--temp_struct_csv={temp_struct_csv} " \
-                      f"--struct_atom_dir={out_template_dir} " \
                       f"--output_dir={out_model_dir} " + common_parameters
+
+                if self.predictor_config.template_source == "foldseek":
+                    out_template_dir = os.path.join(current_work_dir, "template_pdbs")
+                    makedir_if_not_exists(out_template_dir)
+                    self.copy_atoms_and_unzip(template_csv=os.path.join(current_work_dir, "structure_templates.csv"),
+                                            outdir=out_template_dir)
+                    temp_struct_csv = os.path.join(current_work_dir, "structure_templates.csv")
+                    cmd += f"--temp_struct_csv={temp_struct_csv} " \
+                           f"--struct_atom_dir={out_template_dir} "
+                elif self.predictor_config.template_source == "default":
+                    if len(uniref90_sto) == 0:
+                        raise Exception(f"Cannot find any the uniref90 alignment!")
+                    cmd += f"--uniref90_sto={uniref90_sto} "
 
                 try:
                     os.chdir(self.params['alphafold_program_dir'])

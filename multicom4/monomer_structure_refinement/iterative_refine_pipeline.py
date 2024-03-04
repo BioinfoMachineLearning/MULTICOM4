@@ -19,18 +19,20 @@ class refinement_input:
 
 class Monomer_iterative_refinement_pipeline_server:
 
-    def __init__(self, params):
+    def __init__(self, params, config_name):
         self.params = params
+        self.config_name = config_name
 
-    def search(self, refinement_inputs, outdir):
+    def search(self, refinement_inputs, outdir, uniref90_sto=""):
         result_dirs = []
 
-        pipeline = Monomer_iterative_refinement_pipeline(self.params)
+        pipeline = Monomer_iterative_refinement_pipeline(self.params, self.config_name)
 
         for refine_param in refinement_inputs:
             result_dir = pipeline.search_single(fasta_path=refine_param.fasta_path, pdb_path=refine_param.pdb_path,
                                                 pkl_path=refine_param.pkl_path, msa_path=refine_param.msa_path,
-                                                outdir=os.path.join(outdir, pathlib.Path(refine_param.pdb_path).stem))
+                                                outdir=os.path.join(outdir, pathlib.Path(refine_param.pdb_path).stem),
+                                                uniref90_sto=uniref90_sto)
             result_dirs += [result_dir]
 
         return result_dirs
@@ -38,7 +40,7 @@ class Monomer_iterative_refinement_pipeline_server:
 
 class Monomer_refinement_model_selection(config.pipeline):
 
-    def __init__(self, params):
+    def __init__(self, params, config_name):
 
         super().__init__()
 
