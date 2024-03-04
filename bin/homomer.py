@@ -332,31 +332,67 @@ def main(argv):
         pipeline_inputs += [foldseek_iterative_monomer_input(monomer_pdb_dirs=monomer_pdb_dirs,
                                                              monomer_alphafold_a3ms=monomer_alphafold_a3ms)]
 
+    monomer_template_stos = []
+    for chain_id in chain_id_map:
+        monomer = chain_id
+        monomer_template_sto = os.path.join(N1_outdir, monomer, f"{monomer}_uniref90.sto")
+        if not os.path.exists(monomer_template_sto):
+            raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
+        monomer_template_stos += [monomer_template_sto]
+
     if not run_multimer_structure_generation_pipeline_foldseek_old(params=params, fasta_path=FLAGS.fasta_path,
-                                                                     chain_id_map=chain_id_map, config_name="foldseek_iter_o",
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter_o",
                                                                      pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
-                                                                     is_homomers=True):
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
         print("Program failed in step 6 foldseek_iter_o")
 
     if not run_multimer_structure_generation_pipeline_foldseek_old(params=params, fasta_path=FLAGS.fasta_path,
-                                                                     chain_id_map=chain_id_map, config_name="foldseek_iter_o_not",
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter_o_not",
                                                                      pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
-                                                                     is_homomers=True):
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
         print("Program failed in step 6 foldseek_iter_o_not")
 
     if len(chain_id_map) <= 6:
         if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
-                                                                     chain_id_map=chain_id_map, config_name="foldseek_iter",
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter",
                                                                      pipeline_inputs=[pipeline_inputs[0]],
                                                                      outdir=N6_outdir,
-                                                                     is_homomers=True):
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
             print("Program failed in step 6 foldseek_iter")
         
         if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
-                                                                     chain_id_map=chain_id_map, config_name="foldseek_iter_not",
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter_not",
                                                                      pipeline_inputs=[pipeline_inputs[0]],
                                                                      outdir=N6_outdir,
-                                                                     is_homomers=True):
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
+            print("Program failed in step 6 foldseek_iter_not")
+
+
+    if not run_multimer_structure_generation_pipeline_foldseek_old(params=params, fasta_path=FLAGS.fasta_path,
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter_esm_o",
+                                                                     pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
+        print("Program failed in step 6 foldseek_iter_o")
+
+    if not run_multimer_structure_generation_pipeline_foldseek_old(params=params, fasta_path=FLAGS.fasta_path,
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter_esm_o_not",
+                                                                     pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
+        print("Program failed in step 6 foldseek_iter_o_not")
+
+    if len(chain_id_map) <= 6:
+        if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter_esm",
+                                                                     pipeline_inputs=[pipeline_inputs[0]],
+                                                                     outdir=N6_outdir,
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
+            print("Program failed in step 6 foldseek_iter")
+        
+        if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
+                                                                     chain_id_map=chain_id_map, config_name="folds_iter_esm_not",
+                                                                     pipeline_inputs=[pipeline_inputs[0]],
+                                                                     outdir=N6_outdir,
+                                                                     is_homomers=True, monomer_template_stos=monomer_template_stos):
             print("Program failed in step 6 foldseek_iter_not")
 
     print("Multimer structure generation has been finished!")

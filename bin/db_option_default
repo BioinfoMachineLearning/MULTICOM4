@@ -123,6 +123,8 @@ foldseek_af_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/af
 
 foldseek_af_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/af_pdbs
 
+foldseek_esm_atlas_database = /bmlfast/bml_casp16/tools/multicom3_db/esm_atlas/foldseekdb
+
 ################################databases option#####################################
 
 bfd_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt

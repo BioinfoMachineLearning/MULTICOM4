@@ -89,4 +89,38 @@ This is the installation note for the tools
      patch -p0 < /bmlfast/bml_casp16/tools/DeepMSA2/bin/alphafold/docker/openmm.patch
      ```
 
-    
+- CombFold (https://github.com/dina-lab3D/CombFold)
+
+     ```
+     cd /bmlfast/bml_casp16/tools/
+     git clone https://github.com/dina-lab3D/CombFold.git
+     cd CombFold
+
+     # download boost library
+     wget https://boostorg.jfrog.io/artifactory/main/release/1.84.0/source/boost_1_84_0.tar.gz
+     tar -zxvf boost_1_84_0.tar.gz
+     cd /bmlfast/bml_casp16/tools/CombFold/boost_1_84_0
+
+     ./bootstrap.sh  --prefix=/bmlfast/bml_casp16/tools/CombFold/boost_1_84_0
+
+     ./b2
+
+     ./b2 install
+
+     # install software in CombFold
+     cd /bmlfast/bml_casp16/tools/CombFold/CombinatorialAssembler
+     
+     # change the path of BOOST_INCLUDE and BOOST_LIB in Makefile:
+     # vi Makefile
+     # BOOST_INCLUDE = /bmlfast/bml_casp16/tools/CombFold/boost_1_84_0/include
+     # BOOST_LIB = /bmlfast/bml_casp16/tools/CombFold/boost_1_84_0/lib/
+
+     make
+
+     # test running CombFold
+     ./AF2trans.out
+
+     # if return error: ./AF2trans.out: error while loading shared libraries: libboost_program_options.so.1.84.0: cannot open shared object file: No such file or directory, run:
+     # export LD_LIBRARY_PATH=/bmlfast/bml_casp16/tools/CombFold/boost_1_84_0/lib
+     
+     ```
