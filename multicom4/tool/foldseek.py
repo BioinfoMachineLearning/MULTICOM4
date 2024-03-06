@@ -24,9 +24,65 @@ from multicom4.tool import utils
 import pandas as pd
 import pathlib
 import datetime
+from multiprocessing import Pool
 
 # Internal import (7716).
 
+def query_local_single(inparams):
+    binary_path, input_path, database, outfile, tmpdir, maxseq = inparams
+    os.makedirs(tmpdir, exist_ok=True)
+    cmd = [binary_path,
+            'easy-search',
+            input_path,
+            database,
+            outfile,
+            tmpdir,
+            '--format-output', 'query,target,qaln,taln,qstart,qend,tstart,tend,evalue,alnlen',
+            '--format-mode', '4',
+            '--max-seqs', str(maxseq),
+            '-e', '0.001',
+            '-c', '0.5',
+            '--cov-mode', '2']
+    logging.info('Launching subprocess "%s"', ' '.join(cmd))
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    with utils.timing('Foldseek query'):
+        stdout, stderr = process.communicate()
+        retcode = process.wait()
+    if retcode:
+        # Stderr is truncated to prevent proto size errors in Beam.
+        raise RuntimeError(
+            'Foldseek failed:\nstdout:\n%s\n\nstderr:\n%s\n' % (
+                stdout.decode('utf-8'), stderr[:100_000].decode('utf-8')))
+    return database, outfile
+
+def query_global_single(inparams):
+    binary_path, input_path, database, outfile, tmpdir, tmscore_threshold, maxseq = inparams
+    os.makedirs(tmpdir, exist_ok=True)
+    cmd = [binary_path,
+            'easy-search',
+            input_path,
+            database,
+            outfile,
+            tmpdir,
+            '--format-output', 'query,target,qaln,taln,qstart,qend,tstart,tend,evalue,alnlen',
+            '--format-mode', '4',
+            '--alignment-type', '1',
+            '--tmscore-threshold', str(tmscore_threshold),
+            '--max-seqs', str(maxseq),
+            '-c', '0.5',
+            '--cov-mode', '2']
+    logging.info('Launching subprocess "%s"', ' '.join(cmd))
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    with utils.timing('Foldseek query'):
+        stdout, stderr = process.communicate()
+        retcode = process.wait()
+    if retcode:
+        # Stderr is truncated to prevent proto size errors in Beam.
+        raise RuntimeError(
+            'Foldseek failed:\nstdout:\n%s\n\nstderr:\n%s\n' % (
+                stdout.decode('utf-8'), stderr[:100_000].decode('utf-8')))
+    return database, outfile
+                
 class Foldseek:
     """Python wrapper of the HHsearch binary."""
 
@@ -61,7 +117,9 @@ class Foldseek:
                 logging.error('Could not find Foldseek database %s', database_path)
                 raise ValueError(f'Could not find Foldseek database {database_path}')
 
-    def query(self, pdb: str, outdir: str, progressive_threshold=1, tmscore_threshold=0.3, maxseq=2000) -> str:
+
+    def query(self, pdb: str, outdir: str, progressive_threshold=1, tmscore_threshold=0.3, maxseq=2000, 
+                    multiprocess=False) -> str:
         """Queries the database using Foldseek."""
         input_path = os.path.join(outdir, 'query.pdb')
         os.system(f"cp {pdb} {input_path}")
@@ -78,33 +136,27 @@ class Foldseek:
         else:
             databases = [self.pdb_database] + self.other_databases
 
+        os.makedirs(os.path.join(outdir, 'tmp'), exist_ok=True)
+        process_list = []
+        search_results = []
         for database in databases:
             database_name = pathlib.Path(database).stem
             outfile = os.path.join(outdir, f'aln.m8_{database_name}')
             if not os.path.exists(outfile):
-                cmd = [self.binary_path,
-                       'easy-search',
-                       input_path,
-                       database,
-                       outfile,
-                       os.path.join(outdir, 'tmp'),
-                       '--format-output', 'query,target,qaln,taln,qstart,qend,tstart,tend,evalue,alnlen',
-                       '--format-mode', '4',
-                       '--max-seqs', str(maxseq),
-                       '-e', '0.001',
-                       '-c', '0.5',
-                       '--cov-mode', '2']
-                logging.info('Launching subprocess "%s"', ' '.join(cmd))
-                process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                with utils.timing('Foldseek query'):
-                    stdout, stderr = process.communicate()
-                    retcode = process.wait()
-                if retcode:
-                    # Stderr is truncated to prevent proto size errors in Beam.
-                    raise RuntimeError(
-                        'Foldseek failed:\nstdout:\n%s\n\nstderr:\n%s\n' % (
-                            stdout.decode('utf-8'), stderr[:100_000].decode('utf-8')))
-            
+                process_list.append([self.binary_path, input_path, database, outfile, os.path.join(outdir, 'tmp', database_name), maxseq])
+            search_results += [(database, outfile)]
+
+        if multiprocess:
+            pool = Pool(processes=20)
+            results = pool.map(query_local_single, process_list)
+            pool.close()
+            pool.join()
+        else:
+            for process_params in process_list:
+                database, outfile = query_local_single(process_params)
+
+        for result in search_results:
+            database, outfile = result
             if database == self.pdb_database:
                 keep_indices = []
                 pdb_df = pd.read_csv(outfile, sep='\t')
@@ -128,34 +180,26 @@ class Foldseek:
 
         if len(evalue_df) < progressive_threshold:
             # search the database using tmalign mode
+            process_list = []
+            search_results = []
             for database in databases:
                 database_name = pathlib.Path(database).stem
                 outfile = os.path.join(outdir, f'aln.m8_{database_name}.tm')
                 if not os.path.exists(outfile):
-                    cmd = [self.binary_path,
-                           'easy-search',
-                           input_path,
-                           database,
-                           outfile,
-                           os.path.join(outdir, 'tmp'),
-                           '--format-output', 'query,target,qaln,taln,qstart,qend,tstart,tend,evalue,alnlen',
-                           '--format-mode', '4',
-                           '--alignment-type', '1',
-                           '--tmscore-threshold', str(tmscore_threshold),
-                           '--max-seqs', str(maxseq),
-                           '-c', '0.5',
-                           '--cov-mode', '2']
-                    logging.info('Launching subprocess "%s"', ' '.join(cmd))
-                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    with utils.timing('Foldseek query'):
-                        stdout, stderr = process.communicate()
-                        retcode = process.wait()
-                    if retcode:
-                        # Stderr is truncated to prevent proto size errors in Beam.
-                        raise RuntimeError(
-                            'Foldseek failed:\nstdout:\n%s\n\nstderr:\n%s\n' % (
-                                stdout.decode('utf-8'), stderr[:100_000].decode('utf-8')))
+                    process_list.append([self.binary_path, input_path, database, outfile, os.path.join(outdir, 'tmp', database_name), tmscore_threshold, maxseq])
+                search_results += [(database, outfile)]
 
+            if multiprocess:
+                pool = Pool(processes=20)
+                results = pool.map(query_global_single, process_list)
+                pool.close()
+                pool.join()
+            else:
+                for process_params in process_list:
+                    database, outfile = query_global_single(process_params)
+
+            for result in search_results:
+                database, outfile = result
                 if database == self.pdb_database:
                     keep_indices = []
                     pdb_df = pd.read_csv(outfile, sep='\t')
@@ -170,7 +214,7 @@ class Foldseek:
                     pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
                     pdb_df_filtered.reset_index(inplace=True, drop=True)
                     pdb_df_filtered.to_csv(outfile, sep='\t')
-
+                
                 tmscore_df = tmscore_df.append(pd.read_csv(outfile, sep='\t'))
             
             tmscore_df = tmscore_df.sort_values(by='evalue', ascending=False)

@@ -23,7 +23,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
         self.non_af2_methods = ['paddle-helix', 'esmfold', 'deepfold', 'megafold']
 
-        self.post_af2_methods = ['foldseek_refine', 'foldseek_refine_esm']
+        self.post_af2_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_high']
 
         if run_methods is None:
             self.run_methods = ['default', 'default_seq_temp','def_drop_s','def_drop_nos',
@@ -276,7 +276,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                     cmd = f"sh {self.params['megafold_program']} {fastadir} {method_out_dir} {out_data_yaml}"
                     cmds += [cmd]
             
-            elif run_method == "foldseek_refine" or run_method == "foldseek_refine_esm":
+            elif run_method == "foldseek_refine" or run_method == "foldseek_refine_esm" or run_method == "foldseek_refine_esm_high":
                 
                 # refine default top-ranked models
                 refinement_inputs = []
