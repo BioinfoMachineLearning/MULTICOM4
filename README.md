@@ -170,7 +170,6 @@ b. Multimer
      | folds_iter_not (pdb + af_db) | Foldseek-found paired alignments| input msa + Foldseek-found paired alignments | no template | false | true (0.1) | Structural-alignment based methods |
      | folds_iter_o (pdb + af_db) | Foldseek-found paired alignments (pdb + af_db) | input msa + Foldseek-found paired alignments | Foldseek-found templates | false | true (0.1) | Structural-alignment based methods |
      | folds_iter_o_not (pdb + af_db) | Foldseek-found paired alignments| input msa + Foldseek-found paired alignments | no template | false | true (0.1) | Structural-alignment based methods |
-
      | folds_iter_esm (esm_atlas) | Foldseek-found paired alignments | input msa + Foldseek-found paired alignments | pdb_seqres (default) | false | true (0.1) | Structural-alignment based methods |
      | folds_iter_esm_not (esm_atlas) | Foldseek-found paired alignments | input msa + Foldseek-found paired alignments | no template | false | true (0.1) | Structural-alignment based methods |
      | folds_iter_o_esm (esm_atlas) | Foldseek-found paired alignments | input msa + Foldseek-found paired alignments | pdb_seqres (default) | false | true (0.1) | Structural-alignment based methods |
