@@ -11,31 +11,57 @@ import pickle
 import numpy as np
 from multicom4.multimer_structure_refinement.util import *
 from multicom4.common.protein import complete_result
+from multicom4.common import config
 
-class Multimer_iterative_refinement_pipeline:
+class Multimer_iterative_refinement_pipeline(config.pipeline):
 
-    def __init__(self, params, max_template_count=50):
-
+    def __init__(self, params):
+        super().__init__()
         self.params = params
-
-        self.max_iteration = 5
-
-        self.max_template_count = max_template_count
-
+        self.predictor_config = self.heteromer_config.predictors[config_name]
         release_date_df = pd.read_csv(params['pdb_release_date_file'])
         self._release_dates = dict(zip(release_date_df['pdbcode'], release_date_df['release_date']))
         self._max_template_date = datetime.datetime.strptime(params['max_template_date'], '%Y-%m-%d')
 
-
     def search_templates_foldseek(self, inpdb, outdir):
+        
         makedir_if_not_exists(outdir)
         foldseek_program = self.params['foldseek_program']
-        foldseek_pdb_database = self.params['foldseek_pdb_database']
-        foldseek_af_database = self.params['foldseek_af_database']
+        foldseek_pdb_database = ""
+
+        other_databases = []
+        if self.predictor_config.foldseek_database == "esm_atlas":
+            esm_atlas_databases = [os.path.join(self.params['foldseek_esm_atlas_database'], database) 
+                                for database in sorted(os.listdir(self.params['foldseek_esm_atlas_database'])) 
+                                if database.endswith('DB')]
+            # e.g, tm_.80_.90_plddt_.80_.90_14.DB
+            pattern = r'tm_([\d.]+)_[\d.]+_plddt_([\d.]+)_[\d.]+'
+            for esm_atlas_database in esm_atlas_databases:
+                match = re.search(pattern, esm_atlas_database)
+                ptm = float(match.group(1))
+                plddt = float(match.group(2))
+                if ptm >= self.predictor_config.ptm_threshold and plddt >= self.predictor_config.plddt_threshold:
+                    other_databases += [esm_atlas_database]
+
+            print(f"Total {len(other_databases)} to be searched!")
+        else:
+            foldseek_pdb_database = self.params['foldseek_pdb_database']
+
+            alphafolddb_databases = [os.path.join(self.params['foldseek_af_database'], database) 
+                                    for database in sorted(os.listdir(self.params['foldseek_af_database'])) 
+                                    if database.endswith('DB')]
+
+            other_databases.append(alphafolddb_databases)
+
         foldseek_runner = Foldseek(binary_path=foldseek_program, pdb_database=foldseek_pdb_database,
                                    max_template_date=self._max_template_date, release_dates=self._release_dates,
-                                   other_databases=[foldseek_af_database])
-        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000, maxseq=300)
+                                   other_databases=other_databases)
+
+        multiprocess = False
+        if len(other_databases) >= 10:
+            multiprocess = True
+
+        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000, multiprocess=multiprocess)
 
     def concatenate_msa_and_templates(self,
                                       chain_id_map,
@@ -87,7 +113,7 @@ class Multimer_iterative_refinement_pipeline:
             seen_complex_seq += ["".join([chain_template_msas[chain_id]['seq'][0] for chain_id in chain_template_msas])]
             seen_pdbcodes = []
             for i in range(len(complex_templates_df)):
-                if len(keep_indices) > self.max_template_count:
+                if len(keep_indices) > self.predictor_config.max_template_count:
                     break
                 template_infos = []
                 for j, chain_id in enumerate(chain_id_map):
@@ -146,7 +172,7 @@ class Multimer_iterative_refinement_pipeline:
                                                inplace=True)
             complex_templates_df_filtered.reset_index(inplace=True, drop=True)
 
-            if len(complex_templates_df_filtered) > self.max_template_count:
+            if len(complex_templates_df_filtered) > self.predictor_config.max_template_count:
                 break
 
         msa_out_path = outpath
@@ -185,21 +211,26 @@ class Multimer_iterative_refinement_pipeline:
 
         top_template_files = []
         for template_result, chain_id in zip(template_results, chain_id_map):
-            top_template_file = os.path.join(outpath, f"{chain_id}.top{self.max_template_count}")
+            top_template_file = os.path.join(outpath, f"{chain_id}.top{self.predictor_config.max_template_count}")
             check_and_rank_monomer_templates_local_and_global(template_result=template_result,
                                                               outfile=top_template_file,
                                                               query_sequence=chain_id_map[chain_id].sequence,
-                                                              max_template_count=self.max_template_count)
+                                                              max_template_count=self.predictor_config.max_template_count)
             top_template_files += [top_template_file]
         return top_template_files, out_monomer_msas, out_multimer_msas, interact_csv
 
     def copy_atoms_and_unzip(self, templates, outdir):
         os.chdir(outdir)
+        templates = pd.read_csv(template_csv, sep='\t')
         for i in range(len(templates)):
             template_pdb = templates.loc[i, 'target']
-            if template_pdb.find('.pdb.gz') > 0:
+            if template_pdb.find('.pdb') > 0:
                 template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
-                os.system(f"cp {template_path} {outdir}")
+                if not os.path.exists(template_path):
+                    http_address = "https://sysbio.rnet.missouri.edu/multicom_cluster/multicom3_db_tools/databases/af_pdbs"
+                    os.system(f"wget -P {outdir} --no-check-certificate {http_address}/{template_pdb}")
+                else:
+                    os.system(f"cp {template_path} {outdir}")
             else:
                 template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb)
                 os.system(f"cp {template_path} {outdir}")
@@ -228,7 +259,29 @@ class Multimer_iterative_refinement_pipeline:
 
         print(f"Start to refine {ref_start_pdb}")
 
-        for num_iteration in range(self.max_iteration):
+        common_parameters =   f"--fasta_path={fasta_path} " \
+                              f"--env_dir={self.params['alphafold_env_dir']} " \
+                              f"--database_dir={self.params['alphafold_database_dir']} " \
+                              f"--benchmark={self.params['alphafold_benchmark']} " \
+                              f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                              f"--max_template_date={self.params['max_template_date']} "
+
+        multimer_num_ensemble = self.get_heteromer_config(self.predictor_config, 'num_ensemble')
+        multimer_num_recycle = self.get_heteromer_config(self.predictor_config, 'num_recycle')
+        num_multimer_predictions_per_model = self.get_heteromer_config(self.predictor_config, 'predictions_per_model')
+        model_preset = self.get_heteromer_config(self.predictor_config, 'model_preset')
+        relax_topn_predictions = self.get_heteromer_config(self.predictor_config, 'relax_topn_predictions')
+        dropout = self.get_heteromer_config(self.predictor_config, 'dropout')
+        dropout_structure_module = self.get_heteromer_config(self.predictor_config, 'dropout_structure_module')
+
+        common_parameters +=  f"--multimer_num_ensemble={multimer_num_ensemble} " \
+                                f"--multimer_num_recycle={multimer_num_recycle} " \
+                                f"--num_multimer_predictions_per_model={num_multimer_predictions_per_model} " \
+                                f"--model_preset={model_preset} " \
+                                f"--relax_topn_predictions={relax_topn_predictions} " \
+                                f"--models_to_relax=TOPN "
+
+        for num_iteration in range(self.predictor_config.max_iteration):
             os.chdir(cwd)
             current_work_dir = os.path.join(outdir, f"iteration{num_iteration + 1}")
             makedir_if_not_exists(current_work_dir)
@@ -300,8 +353,7 @@ class Multimer_iterative_refinement_pipeline:
                 find_templates = True
                 for chain_id, template_file in zip(chain_id_map, template_files):
                     if len(pd.read_csv(template_file, sep='\t')) == 0:
-                        print(
-                            f"Cannot find any templates for {chain_id} in iteration {num_iteration + 1}")
+                        print(f"Cannot find any templates for {chain_id} in iteration {num_iteration + 1}")
                         find_templates = False
 
                 if not find_templates:
@@ -309,44 +361,13 @@ class Multimer_iterative_refinement_pipeline:
 
                 makedir_if_not_exists(out_model_dir)
 
-                if len(template_files) == 1:
-                    cmd = f"python {self.params['alphafold_multimer_program']}  " \
-                          f"--fasta_path={fasta_path} " \
-                          f"--env_dir={self.params['alphafold_env_dir']} " \
-                          f"--database_dir={self.params['alphafold_database_dir']} " \
-                          f"--multimer_num_ensemble={self.params['multimer_num_ensemble']} " \
-                          f"--multimer_num_recycle={self.params['multimer_num_recycle']} " \
-                          f"--num_multimer_predictions_per_model={self.params['num_multimer_predictions_per_model']} " \
-                          f"--model_preset={self.params['multimer_model_preset']} " \
-                          f"--benchmark={self.params['alphafold_benchmark']} " \
-                          f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                          f"--models_to_relax={self.params['models_to_relax']} " \
-                          f"--max_template_date={self.params['max_template_date']} " \
-                          f"--multimer_a3ms={','.join(multimer_msa_files)} " \
-                          f"--monomer_a3ms={','.join(monomer_msa_files)} " \
-                          f"--msa_pair_file={msa_pair_file} " \
-                          f"--temp_struct_csv={template_files[0]} " \
-                          f"--struct_atom_dir={out_template_dir} " \
-                          f"--output_dir={out_model_dir}"
-                else:
-                    cmd = f"python {self.params['alphafold_multimer_program']}  " \
-                          f"--fasta_path={fasta_path} " \
-                          f"--env_dir={self.params['alphafold_env_dir']} " \
-                          f"--database_dir={self.params['alphafold_database_dir']} " \
-                          f"--multimer_num_ensemble={self.params['multimer_num_ensemble']} " \
-                          f"--multimer_num_recycle={self.params['multimer_num_recycle']} " \
-                          f"--num_multimer_predictions_per_model={self.params['num_multimer_predictions_per_model']} " \
-                          f"--model_preset={self.params['multimer_model_preset']} " \
-                          f"--benchmark={self.params['alphafold_benchmark']} " \
-                          f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                          f"--models_to_relax={self.params['models_to_relax']} " \
-                          f"--max_template_date={self.params['max_template_date']} " \
-                          f"--multimer_a3ms={','.join(multimer_msa_files)} " \
-                          f"--monomer_a3ms={','.join(monomer_msa_files)} " \
-                          f"--msa_pair_file={msa_pair_file} " \
-                          f"--monomer_temp_csvs={','.join(template_files)} " \
-                          f"--struct_atom_dir={out_template_dir} " \
-                          f"--output_dir={out_model_dir}"
+                cmd = f"python {self.params['alphafold_multimer_program']}  " \
+                      f"--multimer_a3ms={','.join(multimer_msa_files)} " \
+                      f"--monomer_a3ms={','.join(monomer_msa_files)} " \
+                      f"--msa_pair_file={msa_pair_file} " \
+                      f"--monomer_temp_csvs={','.join(template_files)} " \
+                      f"--struct_atom_dir={out_template_dir} " \
+                      f"--output_dir={out_model_dir}" + common_parameters
 
                 try:
                     os.chdir(self.params['alphafold_program_dir'])
@@ -373,7 +394,7 @@ class Multimer_iterative_refinement_pipeline:
                                                          monomer_msa=os.path.join(out_model_dir, "msas", chain_id, "monomer_final.a3m"))
 
                 print('##################################################')
-                if num_iteration + 1 >= self.max_iteration:
+                if num_iteration + 1 >= self.predictor_config.max_iteration:
                     print("Reach maximum iteration")
                     model_iteration_scores += [max_lddt_score]
             else:

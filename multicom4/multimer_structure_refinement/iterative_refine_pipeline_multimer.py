@@ -9,7 +9,7 @@ from multicom4.multimer_structure_refinement import iterative_refine_pipeline_ho
 import pandas as pd
 import pathlib
 import pickle
-
+from multicom4.common import config
 
 class refinement_input_multimer:
     def __init__(self, chain_id_map, fasta_path, pdb_path, pkl_path, msa_paths):
@@ -22,8 +22,10 @@ class refinement_input_multimer:
 
 class Multimer_iterative_refinement_pipeline_server:
 
-    def __init__(self, params):
+    def __init__(self, params, config_name):
+        super().__init__()
         self.params = params
+        self.config_name = config_name
 
     def search(self, refinement_inputs, outdir, stoichiometry):
         result_dirs = []
@@ -54,11 +56,20 @@ class Multimer_iterative_refinement_pipeline_server:
         return result_dirs
 
 
-class Multimer_refinement_model_selection:
+class Multimer_refinement_model_selection(config.pipeline):
+    
+    def __init__(self, params, config_name, stoichiometry):
 
-    def __init__(self, methods=[]):
+        super().__init__()
 
-        self.methods = methods
+        self.params = params
+
+        self.predictor_config = self.heteromer_config.predictors.def_refine
+
+        if stoichiometry == "heteromer":
+
+            self.predictor_config = self.homomer_config.predictors.def_refine
+        
 
     def select_v1(self, indir, outdir):
         for pdb in os.listdir(indir):
@@ -121,3 +132,39 @@ class Multimer_refinement_model_selection:
                 os.system("cp " + os.path.join(outdir, pdb_name + "_ref.pdb") + " " + os.path.join(outdir, casp_pdb_name + ".pdb"))
                 os.system("cp " + os.path.join(outdir, pdb_name + "_ref.pkl") + " " + os.path.join(outdir, casp_pdb_name + ".pkl"))
         return outdir
+
+    def make_predictor_results(self, indir, outdir):
+
+        ranking_file = indir + '/final_ranking.csv'
+        ranking_df = pd.read_csv(ranking_file)
+        ranking_confidences = {}
+        ranked_order = []
+        model_count = 0
+        for i in range(len(ranking_df)):
+            model_name = ranking_df.loc[i, 'model']
+            if not model_name.endswith('_ref.pdb'):
+                continue
+
+            if not os.path.exists(f"{indir}/{model_name}"):
+                raise Exception(f"Cannot find {indir}/{model_name}")
+
+            trg_model_name = f"ranked_{model_count}"
+
+            result_output_path = f"{indir}/{model_name.replace('.pdb', '.pkl')}"
+            with open(result_output_path, 'rb') as f:
+                prediction_result = pickle.load(f)
+                ranking_confidences[trg_model_name] = prediction_result['ranking_confidence']
+                ranked_order.append(trg_model_name)
+            os.system(f"cp {indir}/{model_name} {outdir}/{trg_model_name}.pdb")
+            os.system(f"cp {result_output_path} {outdir}/result_{trg_model_name}.pkl")
+            model_count += 1
+
+        ranking_output_path = os.path.join(outdir, 'ranking_debug.json')
+        with open(ranking_output_path, 'w') as f:
+            label = 'iptm+ptm' if 'iptm' in prediction_result else 'plddts'
+            f.write(json.dumps(
+                {label: ranking_confidences, 'order': ranked_order}, indent=4))
+
+        msadir = outdir + '/msas'
+        makedir_if_not_exists(msadir)
+        os.system(f"cp {indir}/{model_name.replace('.pdb', '.pkl')} {msadir}/monomer_final.a3m")

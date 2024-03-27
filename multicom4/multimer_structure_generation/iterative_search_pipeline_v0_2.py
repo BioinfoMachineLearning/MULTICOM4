@@ -50,7 +50,12 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
             print(f"Total {len(other_databases)} to be searched!")
         else:
             foldseek_pdb_database = self.params['foldseek_pdb_database']
-            other_databases += [self.params['foldseek_af_database']]
+
+            alphafolddb_databases = [os.path.join(self.params['foldseek_af_database'], database) 
+                                    for database in sorted(os.listdir(self.params['foldseek_af_database'])) 
+                                    if database.endswith('DB')]
+
+            other_databases.append(alphafolddb_databases)
 
         foldseek_runner = Foldseek(binary_path=foldseek_program, pdb_database=foldseek_pdb_database,
                                    max_template_date=self._max_template_date, release_dates=self._release_dates,
@@ -202,9 +207,13 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
         os.chdir(outdir)
         for i in range(len(templates)):
             template_pdb = templates.loc[i, 'target']
-            if template_pdb.find('.pdb.gz') > 0:
+            if template_pdb.find('.pdb') > 0:
                 template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
-                os.system(f"cp {template_path} {outdir}")
+                if not os.path.exists(template_path):
+                    http_address = "https://sysbio.rnet.missouri.edu/multicom_cluster/multicom3_db_tools/databases/af_pdbs"
+                    os.system(f"wget -P {outdir} --no-check-certificate {http_address}/{template_pdb}")
+                else:
+                    os.system(f"cp {template_path} {outdir}")
             else:
                 template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb)
                 os.system(f"cp {template_path} {outdir}")

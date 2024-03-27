@@ -52,9 +52,11 @@ mmseq_program = /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/envs/multicom4
 
 deepmsa2_path = /cluster/pixstor/chengji-lab/bml_casp16/tools/DeepMSA2
 
-DHR_program_path = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR.sh
+disopred_path = /cluster/pixstor/chengji-lab/bml_casp16/tools/disopred/run_disopred.pl
 
-DHR_database_path = /bmlfast/DHR/DHR_DATABASE/
+DHR_program_path = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR_hell.sh
+
+DHR_database_path = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/DHR_DATABASE/
 
 ################################QA option#####################################
 
@@ -84,26 +86,34 @@ afprofile_program = run_AFP.py
 # Common parameters
 alphafold_benchmark = True
 
-use_gpu_relax = False
+use_gpu_relax = True
 
-max_template_date = 9999-06-01
+max_template_date = 2022-04-01
 
 pdb_release_date_file = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_release_date_filtered.csv
 
+# QA
+dncon4_program = /cluster/pixstor/chengji-lab/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/DNCON4/run_dncon4.sh
+
+deepdist_program = /cluster/pixstor/chengji-lab/bml_casp15/tools/casp14/casp14_qa/src/run_deepdist3.sh
+
+gate_qa_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/gate/
 
 # Other tools
 
-paddle_helix_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/paddle_helix.sh
+paddle_helix_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/paddle_helix_local.sh
 
-esmfold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold.sh
+esmfold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold_local.sh
 
-megafold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold.sh
+megafold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_local.sh
 
 megafold_data_yaml_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_data.yaml
 
 deepfold_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/deepfold/
 
 deepfold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/run_deepfold.py
+
+esm_msa_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1_local.sh
 
 ######################Monomer template search option#################################
 
@@ -117,11 +127,11 @@ foldseek_program = /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/envs/multic
 
 foldseek_pdb_database = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/complex
 
-foldseek_pdb_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_complex/pdb
+foldseek_pdb_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
 
-foldseek_af_database = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/af_db
+foldseek_af_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/alphafold_databases_multicom3/af_db/foldseek_database
 
-foldseek_af_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/af_pdbs
+foldseek_af_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/alphafold_databases_multicom3/af_db/pdbs
 
 foldseek_esm_atlas_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/esm_atlas/foldseekdb
 
@@ -135,7 +145,7 @@ metaclust_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/
 
 img_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/img/img_new.fasta
 
-JGIclust_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/DeepMSA2/database/JGIclust
+JGIclust_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/JGIclust
 
 ###########################Complex alignment generation option#######################
 
@@ -155,7 +165,7 @@ uniprot_fasta = /cluster/pixstor/chengji-lab/bml_casp16/tools/alphafold_database
 
 uniprot2pdb_mapping_file = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/uniprot2pdb/uniprot2pdb.map
 
-complexes_list = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/uniprot2pdb/complexes_cm.list
+complexes_list = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/Complex/cm_lib/complexes_cm.list
 
 ###########################STRING database option####################################
 
@@ -174,20 +184,20 @@ pdb70_hhsuite_cluster_tsv = /cluster/pixstor/chengji-lab/bml_casp16/tools/alphaf
 
 pdb_seqs_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/alphafold_databases_multicom3/pdb_seqres/pdb_seqs
 
-pdb_sort90_hhsuite_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_sort90/hhsuitedb3
+pdb_sort90_hhsuite_database = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/hhsuite_pdb/hhsuitedb3
 
-pdb_sort90_hhsuite_cluster_tsv = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_sort90/sort90_clust
+pdb_sort90_hhsuite_cluster_tsv = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/RCSB_PDB/fr_lib/sort90_clust
 
-pdb_sort90_atom_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_sort90/pdb
+pdb_sort90_atom_dir = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/RCSB_PDB/atom
 
-pdb_sort90_hmm_dir =/cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_sort90/hmm
+pdb_sort90_hmm_dir =/cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/RCSB_PDB/msa/hmm
 
-complex_sort90_hhsuite_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_complex/hhsuitedb3
+complex_sort90_hhsuite_database = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/hhsuite_complex/hhsuitedb3
 
-complex_sort90_hhsuite_cluster_tsv = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_complex/sort90_clust
+complex_sort90_hhsuite_cluster_tsv = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/Complex/fr_lib/sort90_clust
 
-complex_sort90_atom_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_complex/pdb
+complex_sort90_atom_dir = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/Complex/atom
 
-complex_sort90_hmm_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_complex/hmm
+complex_sort90_hmm_dir = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/Complex/msa/hmm
 
 #######################End of Complex alignment generation option###################

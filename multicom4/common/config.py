@@ -145,6 +145,10 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
         'default_tmsearch': {
             'template_source': 'tmsearch',
         },
+        'def_esm_msa': {
+            'input_msa_source': 'default',
+            'msa_source': 'esm_msa',
+        },
         'foldseek_refine': {
             'number_of_input_models': 5,
             'max_iteration': 5,
@@ -169,7 +173,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'msa_source': 'foldseek',
             'template_source': 'default',
         },
-        'foldseek_refine_esm_high': {
+        'foldseek_refine_esm_h': {
             'number_of_input_models': 5,
             'max_iteration': 5,
             'max_template_count': 50,
@@ -325,6 +329,10 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
             'max_pairs': 20,
         },
+        'def_mul_esm_msa': {
+            'input_msa_source': 'default',
+            'msa_paired_source': 'esm_msa',
+        },
         'folds_iter': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'msa_unpaired_source': 'foldseek',
@@ -372,7 +380,18 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'confidence_threshold': 0.95,
             'max_iteration': 5 * 5,
             'learning_rate': 0.0001,
-        }
+        },
+        'def_mul_refine': {
+            'number_of_input_models': 5,
+            'max_iteration': 5,
+            'max_template_count': 50,
+            'progressive_threshold': 2000,
+            'number_of_output_models': 5,
+            'relax_topn_predictions': 1,
+            'foldseek_database': 'pdb+afdb',
+            'msa_source': 'foldseek',
+            'template_source': 'foldseek',
+        },
     }
 })
 
@@ -512,6 +531,10 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
             'max_pairs': 20,
         },
+        'def_mul_esm_msa': {
+            'input_msa_source': 'default',
+            'msa_paired_source': 'esm_msa',
+        },
         'AFProfile': 
         {
             'confidence_threshold': 0.95,
@@ -565,6 +588,17 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
+        },
+        'def_mul_refine': {
+            'number_of_input_models': 5,
+            'max_iteration': 5,
+            'max_template_count': 50,
+            'progressive_threshold': 2000,
+            'number_of_output_models': 5,
+            'relax_topn_predictions': 1,
+            'foldseek_database': 'pdb+afdb',
+            'msa_source': 'foldseek',
+            'template_source': 'foldseek',
         },
     }
 })

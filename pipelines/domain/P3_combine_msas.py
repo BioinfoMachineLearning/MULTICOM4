@@ -210,7 +210,7 @@ def write_paired_a3ms(sequence, domain_alignments, domain_ranges, paired_rows, o
 
     # add unpaired sequences
     for domain_alignment, (domain_starts, domain_ends) in zip(domain_alignments, domain_ranges):
-        print(domain_alignment.ids)
+        #print(domain_alignment.ids)
         for seqid in domain_alignment.ids:
             domain_sequence = domain_alignment[seqid]
             unpaired_sequence = ["-"] * len(sequence)
@@ -335,7 +335,7 @@ if __name__ == '__main__':
 
     paired_rows = reorder_paired_rows(paired_chains_to_paired_row_indices)
 
-    print(paired_rows)
+    # print(paired_rows)
 
     outfile = os.path.join(args.outputdir, 'paired.a3m')
     write_paired_a3ms(sequence=sequence, domain_alignments=domain_alignments, 

@@ -46,15 +46,17 @@ colabfold_search_program = /bmlfast/bml_casp16/MULTICOM4/tools/colabfold/search.
 
 colabfold_split_msas_program = /bmlfast/bml_casp16/MULTICOM4/tools/colabfold/split_msas.py
 
-colabfold_databases = /bmlfast/bml_casp16/tools/multicom3_db/colabfold
+colabfold_databases = /home/bml_casp15/tools/multicom3_db/colabfold
 
 mmseq_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/mmseqs
 
 deepmsa2_path = /bmlfast/bml_casp16/tools/DeepMSA2
 
-DHR_program_path = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR.sh
+disopred_path = /bmlfast/bml_casp16/tools/disopred/run_disopred.pl
 
-DHR_database_path = /bmlfast/DHR/DHR_DATABASE/
+DHR_program_path = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR_local.sh
+
+DHR_database_path = /home/bml_casp15/tools/multicom3_db/DHR_DATABASE/
 
 ################################QA option#####################################
 
@@ -64,7 +66,7 @@ DHR_database_path = /bmlfast/DHR/DHR_DATABASE/
 alphafold_env_dir = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/
 
 # alphafold database directory
-alphafold_database_dir = /home/bml_casp15/tools/alphafold_databases_multicom3
+alphafold_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3
 
 # alphafold program path
 alphafold_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/alphafold-v2.3.2
@@ -86,18 +88,24 @@ alphafold_benchmark = True
 
 use_gpu_relax = True
 
-max_template_date = 9999-06-01
+max_template_date = 2022-04-01
 
-pdb_release_date_file = /bmlfast/bml_casp16/tools/multicom3_db/pdb_release_date_filtered.csv
+pdb_release_date_file = /home/bml_casp15/tools/multicom3_db/pdb_release_date_filtered.csv
 
+# QA
+dncon4_program = /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/DNCON4/run_dncon4.sh
+
+deepdist_program = /bmlfast/bml_casp15/tools/casp14/casp14_qa/src/run_deepdist3.sh
+
+gate_qa_program_dir = /bmlfast/bml_casp16/tools/gate/
 
 # Other tools
 
-paddle_helix_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/paddle_helix.sh
+paddle_helix_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/paddle_helix_local.sh
 
-esmfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold.sh
+esmfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold_local.sh
 
-megafold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold.sh
+megafold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_local.sh
 
 megafold_data_yaml_template = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_data.yaml
 
@@ -105,23 +113,27 @@ deepfold_program_dir = /bmlfast/bml_casp16/tools/deepfold/
 
 deepfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/run_deepfold.py
 
+esm_msa_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1_local.sh
+
 ######################Monomer template search option#################################
 
 tmsearch_binary = /bmlfast/bml_casp16/MULTICOM4/tools/TM-search1.0/TMsearch
 
 tmsearch_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/TM-search1.0
 
-tmsearch_database = /bmlfast/bml_casp16/MULTICOM4/tools/TM-search1.0/PDB/
+tmsearch_database = /home/bml_casp15/tools/multicom3_db/TM-search1.0/PDB/
 
 foldseek_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 
-foldseek_pdb_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex
+foldseek_pdb_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/complex/complex
 
-foldseek_pdb_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/pdb_complex/pdb
+foldseek_pdb_database_dir = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/atom
 
-foldseek_af_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/af_db
+foldseek_af_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/af_db
 
-foldseek_af_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/af_pdbs
+foldseek_af_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/pdbs
+
+foldseek_esm_atlas_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/esm_atlas/foldseekdb
 
 ################################databases option#####################################
 
@@ -129,18 +141,18 @@ bfd_database = /home/bml_casp15/tools/alphafold_databases_multicom3/bfd/bfd_meta
 
 mgnify_database = /home/bml_casp15/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
 
-metaclust_database = /bmlfast/bml_casp16/tools/multicom3_db/Metaclust_2018_06/metaclust_50
+metaclust_database = /home/bml_casp15/tools/multicom3_db/Metaclust_2018_06/metaclust_50
 
-img_database = /bmlfast/bml_casp16/tools/multicom3_db/img/img_new.fasta
+img_database = /home/bml_casp15/tools/multicom3_db/img/img_new.fasta
 
-JGIclust_database = /bmlfast/bml_casp16/tools/DeepMSA2/database/JGIclust
+JGIclust_database = /home/bml_casp15/tools/multicom3_db/JGIclust
 
 ###########################Complex alignment generation option#######################
 
 ###########################UNIPROT TO PDB database option############################
 
 # uniclust database
-uniclust_db = /bmlfast/bml_casp16/tools/multicom3_db/uniclust30_2018_08/uniclust30_2018_08
+uniclust_db = /home/bml_casp15/tools/multicom3_db/uniclust30_2018_08/uniclust30_2018_08
 
 # uniref database
 uniref_db = /home/bml_casp15/tools/alphafold_databases_multicom3/uniref30/UniRef30_2023_02
@@ -151,13 +163,13 @@ uniprot_fasta = /home/bml_casp15/tools/alphafold_databases_multicom3/uniprot/uni
 
 ###########################UNIPROT TO PDB database option############################
 
-uniprot2pdb_mapping_file = /bmlfast/bml_casp16/tools/multicom3_db/uniprot2pdb/uniprot2pdb.map
+uniprot2pdb_mapping_file = /home/bml_casp15/tools/multicom3_db/uniprot2pdb/uniprot2pdb.map
 
-complexes_list = /bmlfast/bml_casp16/tools/multicom3_db/uniprot2pdb/complexes_cm.list
+complexes_list = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/cm_lib/complexes_cm.list
 
 ###########################STRING database option####################################
 
-string2uniprot_map = /bmlfast/bml_casp16/tools/multicom3_db/string/string2uniprot.map
+string2uniprot_map = /home/bml_casp15/tools/multicom3_db/string/string2uniprot.map
 
 #######################End of Complex alignment generation option###################
 
@@ -172,20 +184,20 @@ pdb70_hhsuite_cluster_tsv = /home/bml_casp15/tools/alphafold_databases_multicom3
 
 pdb_seqs_dir = /home/bml_casp15/tools/alphafold_databases_multicom3/pdb_seqres/pdb_seqs
 
-pdb_sort90_hhsuite_database = /bmlfast/bml_casp16/tools/multicom3_db/pdb_sort90/hhsuitedb3
+pdb_sort90_hhsuite_database = /home/bml_casp15/update_complex_dbs_newest/databases/hhsuite_pdb/hhsuitedb3
 
-pdb_sort90_hhsuite_cluster_tsv = /bmlfast/bml_casp16/tools/multicom3_db/pdb_sort90/sort90_clust
+pdb_sort90_hhsuite_cluster_tsv = /home/bml_casp15/update_complex_dbs_newest/databases/RCSB_PDB/fr_lib/sort90_clust
 
-pdb_sort90_atom_dir = /bmlfast/bml_casp16/tools/multicom3_db/pdb_sort90/pdb
+pdb_sort90_atom_dir = /home/bml_casp15/update_complex_dbs_newest/databases/RCSB_PDB/atom
 
-pdb_sort90_hmm_dir =/bmlfast/bml_casp16/tools/multicom3_db/pdb_sort90/hmm
+pdb_sort90_hmm_dir = /home/bml_casp15/update_complex_dbs_newest/databases/RCSB_PDB/msa/hmm
 
-complex_sort90_hhsuite_database = /bmlfast/bml_casp16/tools/multicom3_db/pdb_complex/hhsuitedb3
+complex_sort90_hhsuite_database = /home/bml_casp15/update_complex_dbs_newest/databases/hhsuite_complex/hhsuitedb3
 
-complex_sort90_hhsuite_cluster_tsv = /bmlfast/bml_casp16/tools/multicom3_db/pdb_complex/sort90_clust
+complex_sort90_hhsuite_cluster_tsv = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/fr_lib/sort90_clust
 
-complex_sort90_atom_dir = /bmlfast/bml_casp16/tools/multicom3_db/pdb_complex/pdb
+complex_sort90_atom_dir = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/atom
 
-complex_sort90_hmm_dir = /bmlfast/bml_casp16/tools/multicom3_db/pdb_complex/hmm
+complex_sort90_hmm_dir = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/msa/hmm
 
 #######################End of Complex alignment generation option###################

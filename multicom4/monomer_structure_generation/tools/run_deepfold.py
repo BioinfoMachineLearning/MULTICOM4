@@ -30,7 +30,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # os.chdir(args.deepfold_dir)
-    os.chdir('/bmlfast/bml_casp16/tools/deepfold')
+    # os.chdir('/bmlfast/bml_casp16/tools/deepfold')
     cmds = []
     models = ['model1', 'model2', 'model3', 'model4', 'model5']
     for model in models:

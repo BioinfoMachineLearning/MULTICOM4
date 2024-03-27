@@ -23,7 +23,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
         self.non_af2_methods = ['paddle-helix', 'esmfold', 'deepfold', 'megafold']
 
-        self.post_af2_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_high']
+        self.post_af2_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
 
         if run_methods is None:
             self.run_methods = ['default', 'default_seq_temp','def_drop_s','def_drop_nos',
@@ -36,13 +36,13 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                                 'deepmsa_DeepJGI_hms', 'deepmsa_DeepJGI', 'deepmsa_q3JGI', 
                                 'deepmsa_q4JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI_hms',
                                 'paddle-helix', 'esmfold', 'deepfold', 'megafold',
-                                'default_tmsearch',
-                                'foldseek_refine', 'foldseek_refine_esm']
+                                'default_tmsearch', 'def_esm_msa',
+                                'foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
         
         else:
             self.run_methods = run_methods
 
-    def process_single(self, fasta_path, alndir, outdir, template_dir=None):
+    def process_single(self, fasta_path, alndir, outdir, template_dir=None, run_script=False):
         
         targetname = pathlib.Path(fasta_path).stem
 
@@ -50,7 +50,8 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
         makedir_if_not_exists(outdir)
 
-        # run non-alphafold2 predictors
+        predictor_commands = {}
+        
         for run_method in self.run_methods:
             
             cmds = []
@@ -59,8 +60,6 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
             if run_method not in self.non_af2_methods and run_method not in self.post_af2_methods:
                 
-                os.chdir(self.params['alphafold_program_dir'])
-
                 predictor_config = self.monomer_config.predictors[run_method]
     
                 monomer_num_ensemble = self.get_monomer_config(predictor_config, 'num_ensemble')
@@ -103,11 +102,12 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         if len(errormsg) > 0:
                             print(errormsg)
                         else:
-                            cmd = f"python {self.params['alphafold_default_program']} " \
-                                    f"--bfd_uniref_a3ms={bfd_uniref30_a3m} " \
-                                    f"--mgnify_stos={mgnify_sto} " \
-                                    f"--uniref90_stos={uniref90_sto} " \
-                                    f"--output_dir={method_out_dir} " + common_parameters
+                            cmd = f"cd {self.params['alphafold_program_dir']} && " \
+                                  f"python {self.params['alphafold_default_program']} " \
+                                  f"--bfd_uniref_a3ms={bfd_uniref30_a3m} " \
+                                  f"--mgnify_stos={mgnify_sto} " \
+                                  f"--uniref90_stos={uniref90_sto} " \
+                                  f"--output_dir={method_out_dir} " + common_parameters
                             cmds += [cmd]
                 
                 else:
@@ -156,8 +156,8 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
                     elif msa_source == "img":
                         img_a3m = os.path.join(alndir, targetname + '.a3m')
-                        if not os.path.exists(img_a3m):
-                            errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
+                        # if not os.path.exists(img_a3m):
+                        #     errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
                         common_parameters += f"--custom_msa={img_a3m} "
 
                     elif msa_source == "dhr":
@@ -166,12 +166,26 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                             errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {dhr_af_a3m}\n"
                         common_parameters += f"--custom_msa={dhr_af_a3m} "
 
+                    elif msa_source == "esm_msa":
+
+                        input_msa_path = os.path.join(outdir, predictor_config.input_msa_source, 'msas', 'monomer_final.a3m')
+
+                        esm_msa_path = os.path.join(method_out_dir, 'esm.a3m')
+
+                        if not os.path.join(esm_msa_path):
+                            cmd = f"sh {self.params['esm_msa_program']} {input_msa_path} {esm_msa_path}"
+                            os.system(cmd)
+                            if not os.path.exists(esm_msa_path):
+                                print(f"Failed to generate the esm msa: {esm_msa_path}")
+                        
+                        common_parameters += f"--custom_msa={esm_msa_path} "
+
                     elif run_method.find('deepmsa_') >= 0:
                         deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', msa_source + '.a3m')
                         if not os.path.exists(deepmsa_a3m):
                             errormsg = errormsg + f"Cannot find img alignment for {targetname}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
-
+                    
                     if template_source == "pdb70":
                         uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
@@ -228,14 +242,14 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         cmds += [cmd]
 
             elif run_method == "deepfold":
-                os.chdir(self.params['deepfold_program_dir'])
                 os.makedirs(method_out_dir, exist_ok=True)
                 pickle_path = os.path.join(outdir, 'default', 'features.pkl')
                 # if not complete_result(method_out_dir, 5 * int(self.params['num_monomer_predictions_per_model'])):
                 if not complete_result(method_out_dir, 5):
-                    cmd = f"python {self.params['deepfold_program']} " \
-                            f"--pickle_path {pickle_path} " \
-                            f"--outdir {method_out_dir} "
+                    cmd = f"cd {self.params['deepfold_program_dir']} && " \
+                          f"python {self.params['deepfold_program']} " \
+                          f"--pickle_path {pickle_path} " \
+                          f"--outdir {method_out_dir} "
                     cmds += [cmd]
 
             elif run_method == "megafold":
@@ -274,9 +288,10 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                     os.system(f"cp -r {a3m_path} {out_a3m_path}/seq")
                     os.system(f"rm {out_a3m_path}/seq/final.a3m {out_a3m_path}/seq/0.a3m")
                     cmd = f"sh {self.params['megafold_program']} {fastadir} {method_out_dir} {out_data_yaml}"
-                    cmds += [cmd]
-            
-            elif run_method == "foldseek_refine" or run_method == "foldseek_refine_esm" or run_method == "foldseek_refine_esm_high":
+                    cmds += [cmd]     
+                    
+
+            elif run_method == "foldseek_refine" or run_method == "foldseek_refine_esm" or run_method == "foldseek_refine_esm_h":
                 
                 # refine default top-ranked models
                 refinement_inputs = []
@@ -310,13 +325,21 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                 pipeline.select_v1(indir=refine_dir, outdir=final_dir, prefix=run_method)
                 pipeline.make_predictor_results(final_dir, method_out_dir)
 
-    
-            for cmd in cmds:
-                try:
-                    print(cmd)
-                    os.system(cmd)
-                except Exception as e:
-                    print(e)
+            predictor_commands[run_method] = cmds
+
+        bash_script_dir = os.path.join(outdir, 'bash')
+        os.makedirs(bash_script_dir, exist_ok=True)
+
+        bash_files = []
+        for predictor in predictor_commands:
+            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+            with open(bash_file, 'w') as fw:
+                fw.write('\n'.join(cmds))
+            bash_files += [bash_file]
+        
+        if run_script:
+            for bash_file in bash_files:
+                os.system(f"sh {bash_file}")
 
         # add ranking for deepmsa2 alignments
         deepmsa_alns = []

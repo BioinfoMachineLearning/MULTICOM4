@@ -5,6 +5,7 @@ from multicom4.common.util import is_file, is_dir, makedir_if_not_exists, check_
 import pandas as pd
 from multicom4.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
 from multicom4.monomer_structure_evaluation.bfactor_ranking import Bfactor_qa
+from multicom4.monomer_structure_evaluation.gate_qa import Gate_qa
 from multicom4.common.protein import read_qa_txt_as_df
 import copy
 import pickle
@@ -119,7 +120,7 @@ def extract_pkl(src_pkl, output_pkl, residue_start=-1, residue_end=-1):
 class Monomer_structure_evaluation_pipeline:
     """Runs the alignment tools and assembles the input features."""
 
-    def __init__(self, params, run_methods=["alphafold", "apollo", "bfactor"], use_gpu=True):
+    def __init__(self, params, run_methods=["alphafold", "apollo", "bfactor", "gate"], use_gpu=True):
         """Initializes the data pipeline."""
 
         self.params = params
@@ -128,9 +129,11 @@ class Monomer_structure_evaluation_pipeline:
         self.parwise_qa = params['qscore_program']
         self.tmscore = params['tmscore_program']
         self.bfactorqa = Bfactor_qa()
+        self.gate_qa = Gate_qa(params=params)
 
     def run_qas(self, fasta_file, pdbdir, pkldir, output_dir_abs,
-                pdbs_from_monomer, pdbs_from_multimer, pdbs_with_dist):
+                pdbs_from_monomer, pdbs_from_multimer, pdbs_with_dist,
+                contact_map_file, dist_map_file):
 
         result_dict = {}
         cwd = os.getcwd()
@@ -237,11 +240,79 @@ class Monomer_structure_evaluation_pipeline:
             avg_ranking_df_multimer.to_csv(ranking_file)
             result_dict["pairwise_af_avg_multimer"] = ranking_file
 
+        if "gate" in self.run_methods:
+
+            gate_ranking_df_file = self.Gate_qa.run_monomer_qa(fasta_path=fasta_file, 
+                                                              input_dir=pdbdir, 
+                                                              outputdir=os.path.join(output_dir_abs, 'gate'),
+                                                              contact_map_file=contact_map_file,
+                                                              dist_map_file=dist_map_file)
+
+            gate_ranking_df = pd.read_csv(gate_ranking_df_file)
+            gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
+            gate_ranking_df.to_csv(os.path.join(output_dir_abs, 'gate.csv'))
+            
+            result_dict['gate'] = os.path.join(output_dir_abs, 'gate.csv')
+
+            monomer_indices = [i for i in range(len(gate_ranking_df)) if
+                               gate_ranking_df.loc[i, 'model'] in pdbs_from_monomer]
+            gate_ranking_monomer = copy.deepcopy(gate_ranking_df.iloc[monomer_indices])
+            gate_ranking_monomer.reset_index(inplace=True, drop=True)
+            ranking_file = os.path.join(output_dir_abs, 'gate_monomer.csv')
+            gate_ranking_monomer.to_csv(ranking_file)
+            result_dict["gate_monomer"] = ranking_file
+
+            multimer_indices = [i for i in range(len(gate_ranking_df)) if
+                               gate_ranking_df.loc[i, 'model'] in pdbs_from_multimer]
+            gate_ranking_multimer = copy.deepcopy(gate_ranking_df.iloc[multimer_indices])
+            gate_ranking_multimer.reset_index(inplace=True, drop=True)
+            ranking_file = os.path.join(output_dir_abs, 'gate_multimer.csv')
+            gate_ranking_multimer.to_csv(ranking_file)
+            result_dict["gate_multimer"] = ranking_file
+
+        if "gate" in self.run_methods and "alphafold" in self.run_methods:
+            gate_df = pd.read_csv(result_dict['gate'])
+            alphafold_ranking_df = pd.read_csv(result_dict['alphafold'])
+    
+            avg_ranking_df = gate_df.merge(alphafold_ranking_df, how="inner", on='model')
+            avg_scores = []
+            for i in range(len(avg_ranking_df)):
+                pairwise_score = float(avg_ranking_df.loc[i, 'score'])
+                alphafold_score = float(avg_ranking_df.loc[i, 'plddt_avg']) / 100
+                avg_score = (pairwise_score + alphafold_score) / 2
+                avg_scores += [avg_score]
+
+            avg_ranking_df['avg_score'] = avg_scores
+            avg_ranking_df = avg_ranking_df.sort_values(by=['avg_score'], ascending=False)
+            avg_ranking_df.reset_index(inplace=True, drop=True)
+            avg_ranking_df.drop(avg_ranking_df.filter(regex="index"), axis=1, inplace=True)
+            avg_ranking_df.drop(avg_ranking_df.filter(regex="Unnamed"), axis=1, inplace=True)
+            ranking_file = os.path.join(output_dir_abs, 'gate_af_avg.ranking')
+            avg_ranking_df.to_csv(ranking_file)
+            result_dict["gate_af_avg"] = ranking_file
+
+            monomer_indices = [i for i in range(len(avg_ranking_df)) if
+                               avg_ranking_df.loc[i, 'model'] in pdbs_from_monomer]
+            avg_ranking_df_monomer = copy.deepcopy(avg_ranking_df.iloc[monomer_indices])
+            avg_ranking_df_monomer.reset_index(inplace=True, drop=True)
+            ranking_file = os.path.join(output_dir_abs, 'gate_af_avg_monomer.ranking')
+            avg_ranking_df_monomer.to_csv(ranking_file)
+            result_dict["gate_af_avg_monomer"] = ranking_file
+
+            monomer_indices = [i for i in range(len(avg_ranking_df)) if
+                               avg_ranking_df.loc[i, 'model'] in pdbs_from_multimer]
+            avg_ranking_df_multimer = copy.deepcopy(avg_ranking_df.iloc[monomer_indices])
+            avg_ranking_df_multimer.reset_index(inplace=True, drop=True)
+            ranking_file = os.path.join(output_dir_abs, 'gate_af_avg_multimer.ranking')
+            avg_ranking_df_multimer.to_csv(ranking_file)
+            result_dict["gate_af_avg_multimer"] = ranking_file
         os.chdir(cwd)
 
         return result_dict
 
-    def process(self, targetname, fasta_file, monomer_model_dir, output_dir, multimer_model_dir="", model_count=5):
+    def process(self, targetname, fasta_file, monomer_model_dir, 
+                output_dir, multimer_model_dir="", model_count=5,
+                contact_map_file="", dist_map_file=""):
 
         query_sequence = open(fasta_file).readlines()[1].rstrip('\n').strip()
 
@@ -351,7 +422,7 @@ class Monomer_structure_evaluation_pipeline:
 
         return self.run_qas(fasta_file=fasta_file, pdbdir=pdbdir, pkldir=pkldir, output_dir_abs=output_dir_abs,
                             pdbs_from_monomer=pdbs_from_monomer, pdbs_from_multimer=pdbs_from_multimer,
-                            pdbs_with_dist=pdbs_with_dist)
+                            pdbs_with_dist=pdbs_with_dist, contact_map_file=contact_map_file, dist_map_file=dist_map_file)
 
     def reprocess(self, targetname, fasta_file, output_dir):
 

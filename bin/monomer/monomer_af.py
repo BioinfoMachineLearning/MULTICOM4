@@ -14,7 +14,6 @@ from absl import app
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_boolean('run_img', False, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -84,81 +83,29 @@ def main(argv):
     print("3. Start to generate tertiary structure for monomers using alphafold")
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
     makedir_if_not_exists(N3_outdir)
-    run_methods = []
+    run_methods = ['default', 'default_seq_temp','def_drop_s','def_drop_nos',
+                   'def_notemp', 'def_notemp_drop_s', 'def_notemp_drop_nos',
+                   'original', 'ori_seq_temp', 'colabfold', 'colab_seq_temp',
+                   'img', 'img_seq_temp', 'dhr', 
+                   'deepmsa_dMSA_hhb', 'deepmsa_dMSA_jac', 'deepmsa_dMSA_hms',
+                   'deepmsa_dMSA', 'deepmsa_qMSA', 'deepmsa_aMSA', 'deepmsa_qMSA_hhb',
+                   'deepmsa_qMSA_jac', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hms',
+                   'deepmsa_DeepJGI_hms', 'deepmsa_DeepJGI', 'deepmsa_q3JGI', 
+                   'deepmsa_q4JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI_hms']
+
     if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                         fasta_path=FLAGS.fasta_path,
-                                                        alndir=N1_outdir, templatedir=N2_outdir, outdir=N3_outdir):
+                                                        alndir=N1_outdir, 
+                                                        templatedir=N2_outdir, 
+                                                        outdir=N3_outdir,
+                                                        run_methods=run_methods):
         print("Program failed in step 3: monomer structure generation")
-
-
-    if FLAGS.run_img:
-        while not os.path.exists(img_msa):
-            print(f"Waiting for img alignment: {img_msa}")
-            # sleep for 5 mins
-            time.sleep(300)
-
-        print("Found img alignment, start to run monomer model generation again")
-
-        os.system("cp " + os.path.join(N1_outdir, targetname + "_uniref90.sto") + " " + N1_outdir_img)
-        if not run_monomer_structure_generation_pipeline_v2(params=params,
-                                                            run_methods=['img', 'img+seq_template'],
-                                                            fasta_path=FLAGS.fasta_path,
-                                                            alndir=N1_outdir_img, templatedir=N2_outdir, outdir=N3_outdir):
-            print("Program failed in step 3: monomer structure generation: img")
 
     print("The prediction for monomers has finished!")
 
     print("#################################################################################################")
 
     print("#################################################################################################")
-
-    print("4. Start to evaluate monomer models")
-
-    N4_outdir = os.path.join(outdir, 'N4_monomer_structure_evaluation')
-
-    makedir_if_not_exists(N4_outdir)
-
-    result = run_monomer_evaluation_pipeline(params=params, targetname=targetname, fasta_file=FLAGS.fasta_path,
-                                             input_monomer_dir=N3_outdir, outputdir=N4_outdir,
-                                             generate_egnn_models=True)
-
-    if result is None:
-        raise RuntimeError("Program failed in step 4: monomer model evaluation")
-
-    print("The evaluation for monomer models has been finished!")
-
-    print("#################################################################################################")
-
-    print("#################################################################################################")
-
-    # print("5. Start to refine monomer models based on the qa rankings")
-
-    # N5_outdir_avg = os.path.join(outdir, 'N5_monomer_structure_refinement_avg')
-
-    # makedir_if_not_exists(N5_outdir_avg)
-
-    # os.system(f"cp {result['pairwise_af_avg']} {N5_outdir_avg}")
-
-    # ref_ranking_avg = pd.read_csv(result['pairwise_af_avg'])  # apollo or average ranking or the three qas
-
-    # refine_inputs = []
-    # for i in range(5):
-    #     pdb_name = ref_ranking_avg.loc[i, 'model']
-    #     refine_input = iterative_refine_pipeline.refinement_input(fasta_path=FLAGS.fasta_path,
-    #                                                               pdb_path=os.path.join(N4_outdir, 'pdb', pdb_name),
-    #                                                               pkl_path=os.path.join(N4_outdir, 'pkl', pdb_name.replace('.pdb', '.pkl')),
-    #                                                               msa_path=os.path.join(N4_outdir, 'msa', pdb_name.replace('.pdb', '.a3m')))
-    #     refine_inputs += [refine_input]
-
-    # final_dir = N5_outdir_avg + '_final'
-    # run_monomer_refinement_pipeline(params=params, refinement_inputs=refine_inputs, outdir=N5_outdir_avg,
-    #                                 finaldir=final_dir, prefix="refine")
-
-    # print("The refinement for the top-ranked monomer models has been finished!")
-
-    # print("#################################################################################################")
-
-    # print("#################################################################################################")
 
 
 if __name__ == '__main__':

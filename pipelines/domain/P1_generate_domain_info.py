@@ -12,12 +12,15 @@ def correct_domain(domain_info_file, disorder_pred):
 
     for line in contents:
         line = line.rstrip('\n')
-        domain_range = line.split(':')[1]
-        start, end = domain_range.split('-')
+        domain_range_str = line.split(':')[1].split()[0]
 
-        start, end = int(start), int(end)
+        domain_ranges = domain_range_str.split(',')
+        disorder_region = []
+        for domain_range in domain_ranges:
+            start, end = domain_range.split('-')
+            start, end = int(start), int(end)
+            disorder_region += disorder_pred[start-1:end]
 
-        disorder_region = disorder_pred[start-1:end]
         disorder_num = len([char for char in disorder_region if char == "T"])
         ratio = disorder_num / float(len(disorder_region))
         if ratio > 0.7:
@@ -97,12 +100,15 @@ if __name__ == '__main__':
     domain_info_file = os.path.join(dom_parse_out, 'domain_info')
     if len(args.inpdb) > 0 and os.path.exists(args.inpdb):
         print(f"Found input pdb, using domain parser to predict domain boundries")
-        os.makedirs(dom_parse_out, exist_ok=True)
-        if os.path.exists(domain_info_file):
-            print(f"Found {domain_info_file}!!")
+        if len(sequence) < 3000:     
+            os.makedirs(dom_parse_out, exist_ok=True)
+            if os.path.exists(domain_info_file):
+                print(f"Found {domain_info_file}!!")
+            else:
+                print(f"perl /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/P1_get_domains_by_DomainParser_inpdb.pl {args.fasta_path} {args.inpdb} {dom_parse_out} ")
+                os.system(f"perl /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/P1_get_domains_by_DomainParser_inpdb.pl {args.fasta_path} {args.inpdb} {dom_parse_out} ")
         else:
-            print(f"perl /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/P1_get_domains_by_DomainParser_inpdb.pl {args.fasta_path} {args.inpdb} {dom_parse_out} ")
-            os.system(f"perl /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/P1_get_domains_by_DomainParser_inpdb.pl {args.fasta_path} {args.inpdb} {dom_parse_out} ")
+            print(f"Domain parser cannot deal with sequence longer than 3000, skip!")
 
     if os.path.exists(domain_info_file):
         domain_disorder_info, domain_range_info = correct_domain(domain_info_file, disorder_pred)

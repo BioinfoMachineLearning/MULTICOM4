@@ -7,7 +7,7 @@ PDB_CHAIN_IDS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 PDB_MAX_CHAINS = len(PDB_CHAIN_IDS)  # := 62.
 
 
-def read_qa_txt_as_df(infile):
+def read_qa_txt_as_df(infile, add_pdb=False):
     models = []
     scores = []
     for line in open(infile):
@@ -17,7 +17,10 @@ def read_qa_txt_as_df(infile):
                 contents[0] == "END":
             continue
         model, score = line.split()
-        models += [model]
+        if add_pdb:
+            models += [model + '.pdb']
+        else:
+            models += [model]
         scores += [float(score)]
     df = pd.DataFrame({'model': models, 'score': scores})
     df = df.sort_values(by=['score'], ascending=False)

@@ -49,18 +49,6 @@ def main(argv):
     N1_outdir = os.path.join(outdir, 'N1_monomer_alignments_generation')
     makedir_if_not_exists(N1_outdir)
 
-    params['colabfold_search_program'] = ""
-    params['colabfold_split_msas_program'] = ""
-    params['colabfold_databases'] = ""
-    params['mmseq_program'] = ""
-
-    params['deepmsa2_path'] = ""
-    params['JGIclust_database'] = ""
-    params['metaclust_database'] = ""
-    
-    params['DHR_program_path'] = ""
-    params['DHR_database_path'] = ""
-
     print("#################################################################################################")
     print(f"1. Start to generate alignments for monomers")
 
@@ -73,19 +61,19 @@ def main(argv):
         N1_outdir_img = os.path.join(outdir, 'N1_monomer_alignments_generation_img')
         makedir_if_not_exists(N1_outdir_img)
         img_msa = run_monomer_msa_pipeline_img(params=params, fasta=FLAGS.fasta_path, outdir=N1_outdir_img)
-
+    
     print("#################################################################################################")
     print("2. Start to generate template for monomer")
 
     N2_outdir = os.path.join(outdir, 'N2_monomer_template_search')
 
-    # makedir_if_not_exists(N2_outdir)
+    makedir_if_not_exists(N2_outdir)
 
-    # template_file = run_monomer_template_search_pipeline(params=params, targetname=targetname, sequence=sequence,
-    #                                                      a3m=os.path.join(N1_outdir, targetname+"_uniref90.sto"), outdir=N2_outdir)
+    template_file = run_monomer_template_search_pipeline(params=params, targetname=targetname, sequence=sequence,
+                                                         a3m=os.path.join(N1_outdir, targetname+"_uniref90.sto"), outdir=N2_outdir)
 
-    # if template_file is None:
-    #     raise RuntimeError("Program failed in step 2: monomer template search")
+    if template_file is None:
+        raise RuntimeError("Program failed in step 2: monomer template search")
 
     print("The generation for monomer template has finished!")
 
@@ -96,13 +84,12 @@ def main(argv):
     print("3. Start to generate tertiary structure for monomers using alphafold")
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
     makedir_if_not_exists(N3_outdir)
-    run_methods = ['default', 'foldseek_refine_esm', 'foldseek_refine_esm_high']
     if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                         fasta_path=FLAGS.fasta_path,
                                                         alndir=N1_outdir, 
                                                         templatedir=N2_outdir, 
                                                         outdir=N3_outdir,
-                                                        run_methods=run_methods):
+                                                        run_script=True):
         print("Program failed in step 3: monomer structure generation")
 
 

@@ -45,16 +45,18 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
         self.non_af2_methods = ['esmfold']
 
+        self.post_af2_methods = ['def_mul_refine']
+
         if run_methods is None:
             # non-alphafold2 predictors
             self.run_methods = ['default_multimer', 'def_mul_struct', 'def_mul_tmsearch', 'def_mul_pdb70',
-                                'def_mul_pdb', 'def_mul_comp', 'def_mul_af', 'def_mul_drop_s',
+                                'def_mul_pdb', 'def_mul_comp', 'def_mul_drop_s', # 'def_mul_af',
                                 'def_mul_drop_nos', 'def_mul_notemp', 'def_mul_not_drop_s', 
-                                'def_mul_not_drop_nos', 'uniclust_ox_a3m',
+                                'def_mul_not_drop_nos', 'def_mul_esm_msa', 'uniclust_ox_a3m',
                                 'pdb_inter_ref_a3m', 'pdb_inter_ref_sto', 'pdb_inter_prot_sto', 
                                 # 'uniprot_distance_uniref_a3m', 'uniprot_distance_uniref_sto', 'uniprot_distance_uniprot_sto', 
                                 'spec_inter_ref_a3m', 'spec_struct',
-                                'spec_pdb70', 'spec_pdb', 'spec_comp', 'spec_af',
+                                'spec_pdb70', 'spec_pdb', 'spec_comp', # 'spec_af',
                                 'spec_inter_ref_sto', 'spec_inter_prot_sto', 
                                 #'string_interact_uniref_a3m', 'string_interact_uniref_sto', 'str_struct',
                                 #'str_pdb70', 'str_pdb', 'str_comp', 'str_af', 'string_interact_uniprot_sto'
@@ -72,39 +74,28 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                 complex_aln_dir,
                 template_dir,
                 monomer_model_dir,
-                output_dir):
+                output_dir,
+                run_script):
 
         makedir_if_not_exists(output_dir)
 
-        result_dirs, check_num_predictions = [], []
+        predictor_commands = {}
 
-        while True:
+        for method in self.run_methods:
+            
+            common_parameters = f"--fasta_path={fasta_path} " \
+                                f"--env_dir={self.params['alphafold_env_dir']} " \
+                                f"--database_dir={self.params['alphafold_database_dir']} " \
+                                f"--benchmark={self.params['alphafold_benchmark']} " \
+                                f"--use_gpu_relax={self.params['use_gpu_relax']} " \
+                                f"--max_template_date={self.params['max_template_date']} "
 
-            for method in self.run_methods:
-                
-                common_parameters = f"--fasta_path={fasta_path} " \
-                                    f"--env_dir={self.params['alphafold_env_dir']} " \
-                                    f"--database_dir={self.params['alphafold_database_dir']} " \
-                                    f"--benchmark={self.params['alphafold_benchmark']} " \
-                                    f"--use_gpu_relax={self.params['use_gpu_relax']} " \
-                                    f"--max_template_date={self.params['max_template_date']} "
-
-                if method == "esmfold":
-                    # run esmfold
-                    method_out_dir = os.path.join(output_dir, "esmfold")
-                    os.makedirs(method_out_dir, exist_ok=True)
-                    for num_recycle in [4, 10, 50]:
-                        outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
-                        if not os.path.exists(outpdb):
-                            cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
-                            print(cmd)
-                            os.system(cmd)
-                    continue
+            if method not in self.non_af2_methods and method not in self.post_af2_methods:
 
                 outdir = os.path.join(output_dir, method)
 
                 predictor_config = self.homomer_config.predictors[method]
-    
+
                 multimer_num_ensemble = self.get_homomer_config(predictor_config, 'num_ensemble')
                 multimer_num_recycle = self.get_homomer_config(predictor_config, 'num_recycle')
                 num_multimer_predictions_per_model = self.get_homomer_config(predictor_config, 'predictions_per_model')
@@ -114,11 +105,11 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                 dropout_structure_module = self.get_homomer_config(predictor_config, 'dropout_structure_module')     
 
                 common_parameters +=  f"--multimer_num_ensemble={multimer_num_ensemble} " \
-                                      f"--multimer_num_recycle={multimer_num_recycle} " \
-                                      f"--num_multimer_predictions_per_model={num_multimer_predictions_per_model} " \
-                                      f"--model_preset={model_preset} " \
-                                      f"--relax_topn_predictions={relax_topn_predictions} " \
-                                      f"--models_to_relax=TOPN "
+                                        f"--multimer_num_recycle={multimer_num_recycle} " \
+                                        f"--num_multimer_predictions_per_model={num_multimer_predictions_per_model} " \
+                                        f"--model_preset={model_preset} " \
+                                        f"--relax_topn_predictions={relax_topn_predictions} " \
+                                        f"--models_to_relax=TOPN "
 
                 msa_paired_source = self.get_homomer_config(predictor_config, 'msa_paired_source')
                 template_source = self.get_homomer_config(predictor_config, 'template_source')
@@ -155,15 +146,15 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                             uniprot_stos += [monomer_uniprot_sto]
 
                         if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
-                            cmd = f"python {self.params['alphafold_default_program']} " \
-                                  f"--bfd_uniref_a3ms={','.join(bfd_uniref_a3ms)} " \
-                                  f"--mgnify_stos={','.join(mgnify_stos)} " \
-                                  f"--uniref90_stos={','.join(uniref90_stos)} " \
-                                  f"--uniprot_stos={','.join(uniprot_stos)} " \
-                                  f"--output_dir={outdir} " + common_parameters
+                            cmd =  f"cd {self.params['alphafold_program_dir']} && " \
+                                    f"python {self.params['alphafold_default_program']} " \
+                                    f"--bfd_uniref_a3ms={','.join(bfd_uniref_a3ms)} " \
+                                    f"--mgnify_stos={','.join(mgnify_stos)} " \
+                                    f"--uniref90_stos={','.join(uniref90_stos)} " \
+                                    f"--uniprot_stos={','.join(uniprot_stos)} " \
+                                    f"--output_dir={outdir} " + common_parameters
 
-                            print(cmd)
-                            os.system(cmd)
+                            cmds += [cmd]
 
                     result_dirs += [outdir]
                     check_num_predictions += [num_multimer_predictions_per_model * 5]
@@ -183,37 +174,52 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                     max_iteration = self.get_heteromer_config(predictor_config, 'max_iteration')
                     learning_rate = self.get_heteromer_config(predictor_config, 'learning_rate')
 
-                    cmd = f"python {self.params['afprofile_program']} " \
-                          f"--fasta_path={fasta_path} " \
-                          f"--data_dir={self.params['alphafold_database_dir']} " \
-                          f"--model_preset={model_preset} " \
-                          f"--num_recycles={multimer_num_recycle} " \
-                          f"--confidence_threshold={confidence_threshold} " \
-                          f"--max_iter={max_iteration} " \
-                          f"--learning_rate={learning_rate} " \
-                          f"--output_dir={outdir} " \
-                          f"--models_to_relax=TOPN " \
-                          f"--relax_topn_predictions={relax_topn_predictions} "
+                    cmd =  f"cd {self.params['alphafold_program_dir']} && " \
+                            f"python {self.params['afprofile_program']} " \
+                            f"--fasta_path={fasta_path} " \
+                            f"--data_dir={self.params['alphafold_database_dir']} " \
+                            f"--model_preset={model_preset} " \
+                            f"--num_recycles={multimer_num_recycle} " \
+                            f"--confidence_threshold={confidence_threshold} " \
+                            f"--max_iter={max_iteration} " \
+                            f"--learning_rate={learning_rate} " \
+                            f"--output_dir={outdir} " \
+                            f"--models_to_relax=TOPN " \
+                            f"--relax_topn_predictions={relax_topn_predictions} "
 
                     if not complete_result(outdir, max_iteration):
-                        print(cmd)
-                        os.system(cmd)
-
-                    result_dirs += [outdir]
-                    check_num_predictions += [max_iteration]
+                        cmds += [cmd]
 
                 else:
                     
-                    os.chdir(self.params['alphafold_program_dir'])
-                    
                     common_parameters += f"--dropout={dropout} " \
-                                         f"--dropout_structure_module={dropout_structure_module} " \
+                                            f"--dropout_structure_module={dropout_structure_module} " \
 
                     multimer_a3ms = []
 
-                    base_cmd = f"python {self.params['alphafold_multimer_program']} "
+                    base_cmd =  f"cd {self.params['alphafold_program_dir']} && " \
+                                f"python {self.params['alphafold_multimer_program']} "
 
-                    if msa_paired_source == "default":
+                    if msa_paired_source == "esm_msa":
+                        msadir = os.path.join(outdir, 'esm_msas')
+                        os.makedirs(msadir, exist_ok=True)
+
+                        for chain_id in chain_id_map:
+                            monomer = chain_id
+                            default_alphafold_monomer_a3m = os.path.join(output_dir, 'default_multimer', 'msas', chain_id, "monomer_final.a3m")
+                            if not os.path.exists(default_alphafold_monomer_a3m):
+                                raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_monomer_a3m}")
+
+                            esm_msa_path = os.path.join(msadir, f'{monomer}.esm.final.a3m')
+                            if not os.path.join(esm_msa_path):
+                                cmd = f"sh {self.params['esm_msa_program']} {default_alphafold_monomer_a3m} {esm_msa_path}"
+                                os.system(cmd)
+                                if not os.path.exists(esm_msa_path):
+                                    print(f"Failed to generate the esm msa: {esm_msa_path}")
+
+                            multimer_a3ms += [esm_msa_path]
+
+                    elif msa_paired_source == "default":
                         for chain_id in chain_id_map:
                             monomer = chain_id
                             default_alphafold_monomer_a3m = os.path.join(output_dir, 'default_multimer', 'msas', chain_id, "monomer_final.a3m")
@@ -290,21 +296,74 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                     makedir_if_not_exists(outdir)
 
-                    print(base_cmd)
-                    os.system(base_cmd)
+                    cmds += [base_cmd]
 
-                    result_dirs += [outdir]
-                    check_num_predictions += [num_multimer_predictions_per_model * 5]
+            elif method == "esmfold":
+                # run esmfold
+                method_out_dir = os.path.join(output_dir, "esmfold")
+                os.makedirs(method_out_dir, exist_ok=True)
+                for num_recycle in [4, 10, 50]:
+                    outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
+                    if not os.path.exists(outpdb):
+                        cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
+                        cmds += [cmd]
 
-            rerun = False
-            for result_dir, check_num_prediction in zip(result_dirs, check_num_predictions):
-                if not complete_result(result_dir, check_num_prediction):
-                    rerun = True
+            elif method == "def_mul_refine":
+                
+                # refine default top-ranked models
+                refinement_inputs = []
+                default_workdir = os.path.join(outdir, 'default_multimer')
+                ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
+                if not os.path.exists(ranking_json_file):
+                    continue
+                ranking_json = json.loads(open(ranking_json_file).read())
 
-            if not rerun:
-                break
+                for i in range(self.get_heteromer_config.predictors.def_refine.number_of_input_models):
+                    pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
+                    model_name = list(ranking_json["order"])[i]
+                    pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
+                    msa_paths = {}
+                    for chain_id in chain_id_map:
+                        monomer_msa = os.path.join(default_workdir, 'msas', chain_id, "monomer_final.a3m")
+                        paired_msa = os.path.join(default_workdir, 'msas', f"{chain_id}.paired.a3m")
+                        msa_paths[chain_id] = dict(paired_msa=paired_msa,
+                                                   monomer_msa=monomer_msa)
 
-            print("end")
+                    refine_input = iterative_refine_pipeline_multimer.refinement_input_multimer(chain_id_map=chain_id_map,
+                                                                                                fasta_path=fasta_path,
+                                                                                                pdb_path=pdb_path,
+                                                                                                pkl_path=pkl_path,
+                                                                                                msa_paths=msa_paths)
+                    refinement_inputs += [refine_input]
+
+                refine_dir = os.path.join(method_out_dir, 'workdir')
+                makedir_if_not_exists(refine_dir)
+
+                pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=params, config_name=run_method)
+                pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="homomer")
+
+                final_dir = os.path.join(method_out_dir, 'finaldir')
+                makedir_if_not_exists(final_dir)
+
+                pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection()
+                pipeline.select_v1(indir=refine_dir, outdir=final_dir)
+                pipeline.make_predictor_results(final_dir, method_out_dir)
+
+            predictor_commands[method] = cmds
+
+        bash_script_dir = os.path.join(outdir, 'bash')
+        os.makedirs(bash_script_dir, exist_ok=True)
+
+        bash_files = []
+        for predictor in predictor_commands:
+            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+            with open(bash_file, 'w') as fw:
+                fw.write('\n'.join(cmds))
+            bash_files += [bash_file]
+        
+        if run_script:
+            for bash_file in bash_files:
+                os.system(f"sh {bash_file}")
 
         print("The multimer structure generation for multimers has finished!")
 
@@ -313,7 +372,8 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                         chain_id_map,
                         aln_dir,
                         complex_aln_dir,
-                        output_dir):
+                        output_dir,
+                        run_script):
 
         makedir_if_not_exists(output_dir)
 
@@ -344,69 +404,68 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                               f"--models_to_relax=TOPN "
 
         monomers = [chain_id for chain_id in chain_id_map]
+  
+        deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa_species')
 
-        while True:
+        for concatenate_method in os.listdir(deepmsa_complex_aln_dir):
             
-            deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa_species')
+            if concatenate_method.find('.csv') > 0:
+                continue
 
-            for concatenate_method in os.listdir(deepmsa_complex_aln_dir):
-                
-                if concatenate_method.find('.csv') > 0:
-                    continue
+            method_outdir = os.path.join(output_dir, concatenate_method)
 
-                method_outdir = os.path.join(output_dir, concatenate_method)
+            os.chdir(self.params['alphafold_program_dir'])
 
-                os.chdir(self.params['alphafold_program_dir'])
+            msa_pair_file = os.path.join(deepmsa_complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
+            if len(pd.read_csv(msa_pair_file)) <= 1:
+                continue
 
-                msa_pair_file = os.path.join(deepmsa_complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
-                if len(pd.read_csv(msa_pair_file)) <= 1:
-                    continue
+            paired_a3m_paths = [os.path.join(deepmsa_complex_aln_dir, concatenate_method, monomer + "_con.a3m") for monomer in monomers]
+            monomer_a3m_paths = []
+            template_stos = []
 
-                paired_a3m_paths = [os.path.join(deepmsa_complex_aln_dir, concatenate_method, monomer + "_con.a3m") for monomer in monomers]
-                monomer_a3m_paths = []
-                template_stos = []
+            monomer_a3m_names = concatenate_method.split('_')
+            for chain_idx, chain_id in enumerate(chain_id_map):
 
-                monomer_a3m_names = concatenate_method.split('_')
-                for chain_idx, chain_id in enumerate(chain_id_map):
+                monomer = chain_id
 
-                    monomer = chain_id
+                monomer_a3m_path = os.path.join(aln_dir, monomer, 'DeepMSA2_a3m', 'finalMSAs', monomer_a3m_names[chain_idx] + '.a3m')
+                if not os.path.exists(monomer_a3m_path):
+                    raise Exception(f"Cannot find deepmsa a3m for {monomer}: {monomer_a3m_path}")
 
-                    monomer_a3m_path = os.path.join(aln_dir, monomer, 'DeepMSA2_a3m', 'finalMSAs', monomer_a3m_names[chain_idx] + '.a3m')
-                    if not os.path.exists(monomer_a3m_path):
-                        raise Exception(f"Cannot find deepmsa a3m for {monomer}: {monomer_a3m_path}")
+                monomer_a3m_paths += [monomer_a3m_path]
 
-                    monomer_a3m_paths += [monomer_a3m_path]
+                monomer_template_sto = os.path.join(aln_dir, monomer, f"{monomer}_uniref90.sto")
+                if not os.path.exists(monomer_template_sto):
+                    raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
+                template_stos += [monomer_template_sto]
 
-                    monomer_template_sto = os.path.join(aln_dir, monomer, f"{monomer}_uniref90.sto")
-                    if not os.path.exists(monomer_template_sto):
-                        raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
-                    template_stos += [monomer_template_sto]
+            base_cmd = f"python {self.params['alphafold_multimer_program']} " \
+                        f"--monomer_a3ms={','.join(monomer_a3m_paths)} " \
+                        f"--multimer_a3ms={','.join(paired_a3m_paths)} " \
+                        f"--msa_pair_file={msa_pair_file} " \
+                        f"--template_stos {','.join(template_stos)} " \
+                        f"--output_dir={method_outdir} " + common_parameters
 
-                base_cmd = f"python {self.params['alphafold_multimer_program']} " \
-                           f"--monomer_a3ms={','.join(monomer_a3m_paths)} " \
-                           f"--multimer_a3ms={','.join(paired_a3m_paths)} " \
-                           f"--msa_pair_file={msa_pair_file} " \
-                           f"--template_stos {','.join(template_stos)} " \
-                           f"--output_dir={method_outdir} " + common_parameters
+            if complete_result(method_outdir, 5 * num_multimer_predictions_per_model):
+                continue
 
-                if complete_result(method_outdir, 5 * num_multimer_predictions_per_model):
-                    continue
+            makedir_if_not_exists(method_outdir)
 
-                makedir_if_not_exists(method_outdir)
+            predictor_commands[f"deepmsa2_{index}"] = [base_cmd]
 
-                print(base_cmd)
-                os.system(base_cmd)
+        bash_script_dir = os.path.join(outdir, 'bash')
+        os.makedirs(bash_script_dir, exist_ok=True)
 
-                result_dirs += [method_outdir]
-
-            rerun = False
-            for result_dir in result_dirs:
-                if not complete_result(result_dir, 5 * num_multimer_predictions_per_model):
-                    rerun = True
-
-            if not rerun:
-                break
-
-            print("end")
+        bash_files = []
+        for predictor in predictor_commands:
+            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+            with open(bash_file, 'w') as fw:
+                fw.write('\n'.join(cmds))
+            bash_files += [bash_file]
+        
+        if run_script:
+            for bash_file in bash_files:
+                os.system(f"sh {bash_file}")
 
         print("The multimer structure generation for multimers has finished!")

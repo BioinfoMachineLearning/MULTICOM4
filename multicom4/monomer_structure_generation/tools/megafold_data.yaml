@@ -83,6 +83,6 @@ database_search:
   obsolete_pdbs_path: /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/pdb_mmcif/obsolete.dat
   max_template_date: "2100-01-01"
   mmseqs_binary: /bmlfast/bml_casp16/anaconda3/envs/megafold/bin/mmseqs
-  uniref30_path: /home/bml_casp15/BML_CASP15/tools/ColabFold/databases/uniref30_2202_db
-  database_envdb_dir: /home/bml_casp15/BML_CASP15/tools/ColabFold/databases/colabfold_envdb_202108_db
+  uniref30_path: /bmlfast/bml_casp16/tools/multicom3_db/colabfold/uniref30_2302_db
+  database_envdb_dir: /bmlfast/bml_casp16/tools/multicom3_db/colabfold/colabfold_envdb_202108_db
   a3m_result_path: "/bmlfast/bml_casp16/CASP15_benchmark/MEGAFold/a3ms"
