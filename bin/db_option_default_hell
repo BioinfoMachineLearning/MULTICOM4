@@ -54,7 +54,7 @@ deepmsa2_path = /cluster/pixstor/chengji-lab/bml_casp16/tools/DeepMSA2
 
 disopred_path = /cluster/pixstor/chengji-lab/bml_casp16/tools/disopred/run_disopred.pl
 
-DHR_program_path = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR_hell.sh
+DHR_program_path = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR_hellbender.sh
 
 DHR_database_path = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/DHR_DATABASE/
 
@@ -101,11 +101,11 @@ gate_qa_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/gate/
 
 # Other tools
 
-paddle_helix_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/paddle_helix_local.sh
+paddle_helix_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/paddle_helix_hellbender.sh
 
-esmfold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold_local.sh
+esmfold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold_hellbender.sh
 
-megafold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_local.sh
+megafold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_hellbender.sh
 
 megafold_data_yaml_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/megafold_data.yaml
 
@@ -113,7 +113,7 @@ deepfold_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/deepfold/
 
 deepfold_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/run_deepfold.py
 
-esm_msa_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1_local.sh
+esm_msa_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1_hellbender.sh
 
 ######################Monomer template search option#################################
 
