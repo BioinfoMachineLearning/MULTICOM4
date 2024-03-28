@@ -172,7 +172,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
                         esm_msa_path = os.path.join(method_out_dir, 'esm.a3m')
 
-                        if not os.path.join(esm_msa_path):
+                        if not os.path.exists(esm_msa_path):
                             cmd = f"sh {self.params['esm_msa_program']} {input_msa_path} {esm_msa_path}"
                             os.system(cmd)
                             if not os.path.exists(esm_msa_path):
@@ -223,8 +223,9 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         if len(errormsg) > 0:
                             print(errormsg)
                         else:
-                            cmd = f"python {self.params['alphafold_program']} " \
-                                f"--output_dir={method_out_dir} " + common_parameters
+                            cmd = f"cd {self.params['alphafold_program_dir']} && " \
+                                  f"python {self.params['alphafold_program']} " \
+                                  f"--output_dir={method_out_dir} " + common_parameters
                             cmds += [cmd]
 
             elif run_method ==  "paddle-helix":
@@ -327,14 +328,15 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
             predictor_commands[run_method] = cmds
 
-        bash_script_dir = os.path.join(outdir, 'bash')
+        bash_script_dir = os.path.join(outdir, 'bash_scripts')
         os.makedirs(bash_script_dir, exist_ok=True)
 
         bash_files = []
         for predictor in predictor_commands:
             bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+            print(f"Generating bash file for {predictor}: {bash_file}")
             with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(cmds))
+                fw.write('\n'.join(predictor_commands[predictor]))
             bash_files += [bash_file]
         
         if run_script:

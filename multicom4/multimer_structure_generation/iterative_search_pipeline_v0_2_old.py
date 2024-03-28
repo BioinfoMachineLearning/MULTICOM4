@@ -216,7 +216,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
             else:
                 template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb)
                 os.system(f"cp {template_path} {outdir}")
-            os.system(f"gunzip -f {template_pdb}")
+                os.system(f"gunzip -f {template_pdb}")
 
     # def search_single(self, fasta_file, chain_id_map, monomer_pdb_dirs, monomer_alphafold_a3ms, outdir):
 

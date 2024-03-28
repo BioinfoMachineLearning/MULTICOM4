@@ -103,8 +103,8 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             alphafolddb_databases = [os.path.join(self.params['foldseek_af_database'], database) 
                                     for database in sorted(os.listdir(self.params['foldseek_af_database'])) 
                                     if database.endswith('DB')]
-
-            other_databases.append(alphafolddb_databases)
+            # print(alphafolddb_databases)
+            other_databases += alphafolddb_databases
 
         foldseek_runner = Foldseek(binary_path=foldseek_program, pdb_database=foldseek_pdb_database,
                                    max_template_date=self._max_template_date, release_dates=self._release_dates,
@@ -272,8 +272,8 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             else:
                 template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb)
                 os.system(f"cp {template_path} {outdir}")
-            os.system(f"gunzip -f {template_pdb}")
-
+                os.system(f"gunzip -f {template_pdb}")
+                
     def search_single(self, fasta_path, pdb_path, pkl_path, msa_path, outdir, uniref90_sto=""):
 
         query_sequence = ""

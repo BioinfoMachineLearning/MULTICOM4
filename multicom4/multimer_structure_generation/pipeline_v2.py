@@ -406,8 +406,9 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
         bash_files = []
         for predictor in predictor_commands:
             bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+            print(f"Generating bash file for {predictor}: {bash_file}")
             with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(cmds))
+                fw.write('\n'.join(predictor_commands[predictor]))
             bash_files += [bash_file]
         
         if run_script:
@@ -516,8 +517,9 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
         bash_files = []
         for predictor in predictor_commands:
             bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+            print(f"Generating bash file for {predictor}: {bash_file}")
             with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(cmds))
+                fw.write('\n'.join(predictor_commands[predictor]))
             bash_files += [bash_file]
         
         if run_script:

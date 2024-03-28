@@ -234,7 +234,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
             else:
                 template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb)
                 os.system(f"cp {template_path} {outdir}")
-            os.system(f"gunzip -f {template_pdb}")
+                os.system(f"gunzip -f {template_pdb}")
 
 
     def search_single(self, chain_id_map, fasta_path, pdb_path, pkl_path, msa_paths, outdir):

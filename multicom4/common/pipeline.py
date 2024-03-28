@@ -98,6 +98,7 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     logfile = os.path.join(outdir, 'dncon4.log')
     if not os.path.exists(contact_map_file) and not os.path.exists(logfile):
         print("Start to generate contact prediction using DNCON4")
+        os.makedirs(os.path.join(outdir, 'dncon4'), exist_ok=True)
         cmd = f"sh {params['dncon4_program']} {fasta} {outdir}/dncon4 &> {logfile} &"
         os.system(cmd)
 
