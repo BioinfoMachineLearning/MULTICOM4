@@ -51,8 +51,10 @@ def main(argv):
     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
     if not os.path.exists(ranking_json_file):
         raise Exception(f"Haven't generated default models!")
-
+    
     bash_script_dir = os.path.join(N3_outdir, 'post_def_bash_scripts')
+    if os.path.exists(self.params['slurm_script_template']):
+        bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
     run_methods = ['default_tmsearch', 'def_esm_msa', 'foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
@@ -61,11 +63,22 @@ def main(argv):
         cmd = f"python bin/monomer/monomer_single_predictor.py --option_file {FLAGS.option_file} " \
               f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
               f"--config_name {run_method}"
+        print(f"Generating bash scripts for {run_method}")
 
-        bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-        with open(bash_file, 'w') as fw:
-            fw.write('\n'.join(cmds))
-        bash_files += [bash_file]
+        if os.path.exists(self.params['slurm_script_template']):
+            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+            print(f"Generating bash file for {predictor}: {bash_file}")
+            jobname = f"{targetname}_{predictor}"
+            with open(bash_file, 'w') as fw:
+                for line in open(self.params['slurm_script_template']):
+                    line = line.replace("JOBNAME", jobname)
+                    fw.write(line)
+                fw.write(cmd)
+        else:
+            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+            print(bash_file)
+            with open(bash_file, 'w') as fw:
+                fw.write(cmd)
 
 
 if __name__ == '__main__':

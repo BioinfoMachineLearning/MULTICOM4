@@ -1,5 +1,7 @@
 ###########################This is an option file####################################
 
+slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender.bash
+
 ################################tools option#########################################
 
 # hhblits program path

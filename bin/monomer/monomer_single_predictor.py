@@ -50,8 +50,6 @@ def main(argv):
 
     N2_outdir = os.path.join(outdir, 'N2_monomer_template_search')
 
-    print("The generation for monomer template has finished!")
-
     print("#################################################################################################")
 
     print("#################################################################################################")

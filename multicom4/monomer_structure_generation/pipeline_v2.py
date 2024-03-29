@@ -328,20 +328,35 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
             predictor_commands[run_method] = cmds
 
-        bash_script_dir = os.path.join(outdir, 'bash_scripts')
-        os.makedirs(bash_script_dir, exist_ok=True)
-
         bash_files = []
-        for predictor in predictor_commands:
-            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-            print(f"Generating bash file for {predictor}: {bash_file}")
-            with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(predictor_commands[predictor]))
-            bash_files += [bash_file]
-        
-        if run_script:
-            for bash_file in bash_files:
-                os.system(f"sh {bash_file}")
+        if os.path.exists(self.params['slurm_script_template']):
+            bash_script_dir = os.path.join(outdir, 'slurm_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                jobname = f"{targetname}_{predictor}"
+                with open(bash_file, 'w') as fw:
+                    for line in open(self.params['slurm_script_template']):
+                        line = line.replace("JOBNAME", jobname)
+                        fw.write(line)
+                    fw.write('\n'.join(predictor_commands[predictor]))
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sh {bash_file}")
+        else:
+            bash_script_dir = os.path.join(outdir, 'bash_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                with open(bash_file, 'w') as fw:
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sh {bash_file}")
 
         # add ranking for deepmsa2 alignments
         deepmsa_alns = []

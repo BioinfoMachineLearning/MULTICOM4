@@ -56,11 +56,6 @@ def main(argv):
     if result is None:
         raise RuntimeError('The monomer alignment generation has failed!')
 
-    if FLAGS.run_img:
-        N1_outdir_img = os.path.join(outdir, 'N1_monomer_alignments_generation_img')
-        makedir_if_not_exists(N1_outdir_img)
-        img_msa = run_monomer_msa_pipeline_img(params=params, fasta=FLAGS.fasta_path, outdir=N1_outdir_img)
-
     print("#################################################################################################")
     print("2. Start to generate template for monomer")
 
