@@ -242,7 +242,7 @@ class Monomer_structure_evaluation_pipeline:
 
         if "gate" in self.run_methods:
 
-            gate_ranking_df_file = self.Gate_qa.run_monomer_qa(fasta_path=fasta_file, 
+            gate_ranking_df_file = self.gate_qa.run_monomer_qa(fasta_path=fasta_file, 
                                                               input_dir=pdbdir, 
                                                               outputdir=os.path.join(output_dir_abs, 'gate'),
                                                               contact_map_file=contact_map_file,
@@ -269,6 +269,8 @@ class Monomer_structure_evaluation_pipeline:
             ranking_file = os.path.join(output_dir_abs, 'gate_multimer.csv')
             gate_ranking_multimer.to_csv(ranking_file)
             result_dict["gate_multimer"] = ranking_file
+
+            result_dict["gate_cluster"] = os.path.join(output_dir_abs, 'gate', 'cluster.txt')
 
         if "gate" in self.run_methods and "alphafold" in self.run_methods:
             gate_df = pd.read_csv(result_dict['gate'])

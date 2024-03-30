@@ -89,8 +89,9 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     diso_out_file = os.path.join(outdir, fasta_name.replace('.fasta', '.diso'))
     if not os.path.exists(diso_out_file):
         print("Start to generate disorder prediction")
-        print(f"perl {params['disopred_path']} {outdir}/{fasta_name} &> {outdir}/run_diso.log &")
-        os.system(f"perl {params['disopred_path']} {outdir}/{fasta_name} &> {outdir}/run_diso.log &")
+        cmd = f"perl {params['disopred_path']} {outdir}/{fasta_name} &> {outdir}/run_diso.log &"
+        print(cmd)
+        os.system(cmd)
 
     # Run DNCON4 and DeepDist in the background
     targetname = open(fasta).readlines()[0].rstrip('\n')[1:]
@@ -100,6 +101,7 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
         print("Start to generate contact prediction using DNCON4")
         os.makedirs(os.path.join(outdir, 'dncon4'), exist_ok=True)
         cmd = f"sh {params['dncon4_program']} {fasta} {outdir}/dncon4 &> {logfile} &"
+        print(cmd)
         os.system(cmd)
 
     dist_map_file = os.path.join(outdir, 'deepdist', f'{targetname}.txt')
@@ -107,6 +109,7 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     if not os.path.exists(dist_map_file) and not os.path.exists(logfile):
         print("Start to generate distance map prediction using DeepDist")
         cmd = f"sh {params['deepdist_program']} {fasta} {outdir}/deepdist &> {outdir}/deepdist.log &"
+        print(cmd)
         os.system(cmd)
 
     return result
@@ -202,12 +205,14 @@ def cal_tmscores(tmscore_program, src_pdbs, trg_pdb, outputdir):
 
 def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix, tmscore_threshold):
     selected_models = []
+    selected_models_path = []
     ranking_df = pd.read_csv(ranking_df_file)
     for i in range(10):
         model = ranking_df.loc[i, 'model']
-        tmscores = cal_tmscores(tmscore_program, selected_models, os.path.join(outputdir, 'pdb', model), outputdir)
+        tmscores = cal_tmscores(tmscore_program, selected_models_path, os.path.join(outputdir, 'pdb', model), outputdir)
         if len(tmscores) == 0 or np.max(np.array(tmscores)) < tmscore_threshold:
             selected_models += [model]
+            selected_models_path += [os.path.join(outputdir, 'pdb', model)]
 
     for i in range(10):
         model = ranking_df.loc[i, 'model']
@@ -219,7 +224,7 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
 
     for i in range(5):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
-        os.system("cp " + os.path.join(outputdir, 'pdb', selected_models[i]) + " " + final_pdb)
+        os.system("cp " + selected_models_path[i] + " " + final_pdb)
     
     selected_df = pd.DataFrame({'selected_models': selected_models})
     selected_df.to_csv(os.path.join(outputdir, f'{prefix}_selected.csv'))
@@ -229,7 +234,7 @@ def select_models_by_cluster(ranking_df_file, cluster_result_file, outputdir, pr
     clusters = {}
     for line in open(cluster_result_file):
         modelname, cluster_idx = line.rstrip('\n').split()
-        clusters[modelname] += [cluster_idx]
+        clusters[modelname + '.pdb'] = cluster_idx
     
     selected_models = []
     selected_clusters = []
@@ -268,7 +273,7 @@ def select_models_monomer_only(qa_result, outputdir, params):
                              outputdir=outputdir,
                              prefix="gate")
     
-    select_models_by_cluster(ranking_df_file=qa_result["af_gate_avg"],
+    select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
                              cluster_result_file=qa_result["gate_cluster"],
                              outputdir=outputdir,
                              prefix="llm")
@@ -287,7 +292,7 @@ def select_models_with_multimer(qa_result, outputdir):
                              outputdir=outputdir,
                              prefix="gate")
     
-    select_models_by_cluster(ranking_df_file=qa_result["af_gate_avg_multimer"],
+    select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg_multimer"],
                              cluster_result_file=qa_result["gate_cluster"],
                              outputdir=outputdir,
                              prefix="llm")

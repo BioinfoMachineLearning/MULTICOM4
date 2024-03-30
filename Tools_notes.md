@@ -124,3 +124,10 @@ This is the installation note for the tools
      # export LD_LIBRARY_PATH=/bmlfast/bml_casp16/tools/CombFold/boost_1_84_0/lib
      
      ```
+
+- DHR (https://github.com/heathcliff233/Dense-Homolog-Retrieval)
+
+     ```
+     cd /bmlfast/DHR
+     conda env create -f env.yml
+     ```

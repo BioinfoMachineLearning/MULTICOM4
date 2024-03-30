@@ -15,36 +15,39 @@ class Gate_qa:
         self.params = params
 
     def run_monomer_qa(self, fasta_path, input_dir, outputdir, contact_map_file = "", dist_map_file = ""):
-                            
-        process_list = []
 
-        if not os.path.exists(contact_map):
-            cmd = f"sh {self.params['dncon4_program']} {fasta_path} {outputdir}/dncon4 &> {outputdir}/dncon4.log"
-            process_list.append([cmd])
-
-        if not os.path.exists(dist_map):
-            cmd = f"sh {self.params['deepdist_program']} {fasta_path} {outputdir}/deepdist &> {outputdir}/deepdist.log"
-            process_list.append([cmd])
-
-        pool = Pool(processes=len(process_list))
-        results = pool.map(run_commands, process_list)
-        pool.close()
-        pool.join()
-
-        targetname = open(fasta_path).readlines()[0].rstrip('\n')[1:]
-        if not os.path.exists(contact_map_file):
-            contact_map_file = os.path.join(outputdir, 'dncon4', f'{targetname}.dncon2.rr')
-        
-        if not os.path.exists(dist_map_file):
-            dist_map_file = os.path.join(outputdir, 'deepdist', f'{targetname}.txt')
-
-        cmd = f"sh {self.params['gate_qa_program_dir']} monomer {fasta_path} {input_dir} {outputdir} {contact_map_file} {dist_map_file}"
-        os.system(cmd)
-
-        resultfile = os.path.join(outputdir, 'casp15_inhouse_ts', 'ensemble.csv')
+        resultfile = os.path.join(outputdir, 'prediction', 'ensemble.csv')
 
         if not os.path.exists(resultfile):
-            raise Exception(f"Failed to run gate qa!")
+
+            process_list = []
+
+            if not os.path.exists(contact_map_file):
+                cmd = f"sh {self.params['dncon4_program']} {fasta_path} {outputdir}/dncon4 &> {outputdir}/dncon4.log"
+                process_list.append([cmd])
+
+            if not os.path.exists(dist_map_file):
+                cmd = f"sh {self.params['deepdist_program']} {fasta_path} {outputdir}/deepdist &> {outputdir}/deepdist.log"
+                process_list.append([cmd])
+
+            if len(process_list) > 0:
+                pool = Pool(processes=len(process_list))
+                results = pool.map(run_commands, process_list)
+                pool.close()
+                pool.join()
+
+            targetname = open(fasta_path).readlines()[0].rstrip('\n')[1:]
+            if not os.path.exists(contact_map_file):
+                contact_map_file = os.path.join(outputdir, 'dncon4', f'{targetname}.dncon2.rr')
+            
+            if not os.path.exists(dist_map_file):
+                dist_map_file = os.path.join(outputdir, 'deepdist', f'{targetname}.txt')
+
+            cmd = f"sh {self.params['gate_qa_program_dir']} monomer {fasta_path} {input_dir} {outputdir} {contact_map_file} {dist_map_file}"
+            os.system(cmd)
+
+            if not os.path.exists(resultfile):
+                raise Exception(f"Failed to run gate qa!")
 
         return resultfile
 

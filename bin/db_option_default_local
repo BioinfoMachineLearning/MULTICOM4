@@ -1,5 +1,7 @@
 ###########################This is an option file####################################
 
+slurm_script_template = ""
+
 ################################tools option#########################################
 
 # hhblits program path
@@ -97,7 +99,7 @@ dncon4_program = /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scri
 
 deepdist_program = /bmlfast/bml_casp15/tools/casp14/casp14_qa/src/run_deepdist3.sh
 
-gate_qa_program_dir = /bmlfast/bml_casp16/tools/gate/
+gate_qa_program_dir = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_evaluation/gate_local.sh
 
 # Other tools
 

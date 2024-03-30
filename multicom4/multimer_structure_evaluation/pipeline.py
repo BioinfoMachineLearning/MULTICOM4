@@ -158,7 +158,7 @@ class Multimer_structure_evaluation_pipeline:
 
         if "gate" in self.run_methods:
 
-            gate_ranking_txt = self.Gate_qa.run_multimer_qa(fasta_path=fasta_file, 
+            gate_ranking_txt = self.gate_qa.run_multimer_qa(fasta_path=fasta_file, 
                                                                input_dir=pdbdir, 
                                                                outputdir=os.path.join(output_dir, 'gate'))
             gate_ranking_df = pd.read_csv(gate_ranking_df_file)

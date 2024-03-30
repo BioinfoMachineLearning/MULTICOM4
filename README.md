@@ -68,25 +68,51 @@ Monomer
 
 ## **Steps**
 
-```
-python python bin/monomer/monomer_alignment.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
-# if running on hellbender, use option_file: db_option_default_hell
+### Server
+     ```
+     cd /bmlfast/bml_casp16/MULTICOM4
+     source /bmlfast/bml_casp16/anaconda3/bin/activate
+     conda activate multicom4 
+     export PYTHONPATH=/bmlfast/bml_casp16/MULTICOM4
+ 
+     python python bin/monomer/monomer_alignment.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
+     # if running on hellbender, use option_file: db_option_default_hell
 
-python bin/monomer/monomer_af.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
-# bash scripts will be generated in examples/T1131/N3_monomer_structure_generation/bash_scripts
-# One can run the scripts on different servers
+     python bin/monomer/monomer_af.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
+     # bash scripts will be generated in examples/T1131/N3_monomer_structure_generation/bash_scripts
+     # One can run the scripts on different servers
 
-python bin/monomer/monomer_non_af.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
-# This script will run the non-alphafold2 predictors (don't need to manually run the scripts)
+     python bin/monomer/monomer_non_af.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
+     # This script will run the non-alphafold2 predictors (don't need to manually run the scripts)
 
-python bin/monomer/monomer_post_af.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
-# bash scripts will be generated in examples/T1131/N3_monomer_structure_generation/post_def_bash_scripts
-# These predictors takes the top-ranked models in default alphafold2 as input
-# Run the scripts after the default predictors has finished
+     python bin/monomer/monomer_post_af.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
+     # bash scripts will be generated in examples/T1131/N3_monomer_structure_generation/post_def_bash_scripts
+     # These predictors takes the top-ranked models in default alphafold2 as input
+     # Run the scripts after the default predictors has finished
 
-bin/monomer/monomer_ranking.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
-# Rank the models based on the finished predictors (finished: has ranking_debug.json in the directory)
-```
+     bin/monomer/monomer_ranking.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
+     # Rank the models based on the finished predictors (finished: has ranking_debug.json in the directory)
+     ```
+
+### Hellbender
+     ```
+     cd /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4
+     source /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/bin/activate
+     conda activate multicom4 
+     export PYTHONPATH=/cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4
+     export PERL5LIB=/cluster/pixstor/chengji-lab/bml_casp16/tools/DNCON4/tools/SCRATCH-1D_1.1
+     
+     # Need at least 300G memory, can only be run on the H100 nodes
+     python python bin/monomer/monomer_alignment.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/T1104.fasta --output_dir examples/T1104
+
+     # Run the alphafold2 predictors, the jobs will be automatically submitted
+     # Can run multiple times to check whether some of the predictors failed to generate models
+     python bin/monomer/monomer_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/T1104.fasta --output_dir examples/T1104
+
+     python bin/monomer/monomer_post_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/T1104.fasta --output_dir examples/T1104
+     # Note: esm_msa need at least 100G RAM to run
+
+     ```
 
 ## **Output**
 
@@ -228,5 +254,30 @@ For hard targets, use AFsample to generate 1000 models per variant (total 5000) 
 | ESMFold | ESMFold|
 
 
+### Hellbender
+     ```
+     cd /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4
+     source /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/bin/activate
+     conda activate multicom4 
+     export PYTHONPATH=/cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4
+     export PERL5LIB=/cluster/pixstor/chengji-lab/bml_casp16/tools/DNCON4/tools/SCRATCH-1D_1.1
+     
+     # Need at least 300G memory, can only be run on the H100 nodes
+     python bin/multimer/multimer_subunit_alignment.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106
+
+     # Run the alphafold2 predictors, the jobs will be automatically submitted
+     # Can run multiple times to check whether some of the predictors failed to generate models
+     python bin/multimer/multimer_subunit_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106
+     
+     # After the default alphafold2 models have generated, run the script again to run the post-af2 predictors for each subunits
+     python bin/multimer/multimer_subunit_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106
+
+     # Generate multimer alignments and templates
+     # Run default_multimer first, since other methods rquires some files from default_multimer
+     # Didn't submit any jobs for subunits
+     python bin/multimer/multimer_alignment_default.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106/
+
+     python bin/multimer/heteromer_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106/
+     ```
 
 
