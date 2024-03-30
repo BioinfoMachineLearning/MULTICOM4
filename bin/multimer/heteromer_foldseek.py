@@ -10,7 +10,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_v2, \
-    run_multimer_structure_generation_pipeline_foldseek, run_multimer_refinement_pipeline, \
+    run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
     copy_same_sequence_msas
 

@@ -53,7 +53,7 @@ def main(argv):
         raise Exception(f"Haven't generated default models!")
     
     bash_script_dir = os.path.join(N3_outdir, 'post_def_bash_scripts')
-    if os.path.exists(self.params['slurm_script_template']):
+    if os.path.exists(params['slurm_script_template']):
         bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
@@ -65,15 +65,16 @@ def main(argv):
               f"--config_name {run_method}"
         print(f"Generating bash scripts for {run_method}")
 
-        if os.path.exists(self.params['slurm_script_template']):
-            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-            print(f"Generating bash file for {predictor}: {bash_file}")
-            jobname = f"{targetname}_{predictor}"
+        if os.path.exists(params['slurm_script_template']):
+            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+            print(f"Generating bash file for {run_method}: {bash_file}")
+            jobname = f"{targetname}_{run_method}"
             with open(bash_file, 'w') as fw:
-                for line in open(self.params['slurm_script_template']):
+                for line in open(params['slurm_script_template']):
                     line = line.replace("JOBNAME", jobname)
                     fw.write(line)
                 fw.write(cmd)
+            os.system(f"sbatch {bash_file}")
         else:
             bash_file = os.path.join(bash_script_dir, run_method + '.sh')
             print(bash_file)

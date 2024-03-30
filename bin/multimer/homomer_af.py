@@ -94,7 +94,8 @@ def main(argv):
                                                               complex_aln_dir=N4_outdir,
                                                               template_dir=N5_outdir,
                                                               monomer_model_dir=N3_outdir,
-                                                              output_dir=N6_outdir):
+                                                              output_dir=N6_outdir,
+                                                              run_script=os.path.exists(params['slurm_script_template'])):
         print("Program failed in step 6")
 
     print("Multimer structure generation has been finished!")

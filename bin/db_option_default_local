@@ -86,7 +86,7 @@ afprofile_program = run_AFP.py
 # Common parameters
 alphafold_benchmark = True
 
-use_gpu_relax = True
+use_gpu_relax = False
 
 max_template_date = 2022-04-01
 

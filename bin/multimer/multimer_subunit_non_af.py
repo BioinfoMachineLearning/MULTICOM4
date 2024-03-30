@@ -10,7 +10,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_v2, \
-    run_multimer_structure_generation_pipeline_foldseek, run_multimer_refinement_pipeline, \
+    run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
     copy_same_sequence_msas
 
@@ -79,7 +79,7 @@ def main(argv):
             with open(monomer_fasta, "w") as fw:
                 write_fasta({chain_id: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
-
+            N1_monomer_outdir_img = os.path.join(N1_outdir, monomer_id)
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
 
             N3_monomer_outdir = os.path.join(N3_outdir, monomer_id)
@@ -87,6 +87,7 @@ def main(argv):
             if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                                 fasta_path=monomer_fasta,
                                                                 alndir=N1_monomer_outdir,
+                                                                img_alndir=N1_monomer_outdir_img,
                                                                 templatedir=N2_monomer_outdir,
                                                                 outdir=N3_monomer_outdir,
                                                                 run_methods=monomer_run_methods,

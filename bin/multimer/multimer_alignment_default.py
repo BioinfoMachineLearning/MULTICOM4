@@ -10,7 +10,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_v2, \
-    run_multimer_structure_generation_pipeline_foldseek, run_multimer_refinement_pipeline, \
+    run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
     copy_same_sequence_msas
 
@@ -22,7 +22,7 @@ import pandas as pd
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_boolean('run_img', False, 'Whether to use IMG alignment to generate models')
+flags.DEFINE_boolean('run_img', True, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -113,6 +113,7 @@ def main(argv):
             if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                                 fasta_path=monomer_fasta,
                                                                 alndir=N1_monomer_outdir,
+                                                                img_alndir=N1_monomer_outdir_img,
                                                                 templatedir=N2_monomer_outdir,
                                                                 outdir=N3_monomer_outdir,
                                                                 run_methods=monomer_run_methods):
@@ -186,6 +187,24 @@ def main(argv):
     print("#################################################################################################")
 
     print("#################################################################################################")
+
+    print("6. Start to generate complex multimer structures")
+    N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
+
+    makedir_if_not_exists(N6_outdir)
+    run_methods = ['default_multimer']
+    if not run_multimer_structure_generation_pipeline_v2(params=params,
+                                                         fasta_path=FLAGS.fasta_path,
+                                                         chain_id_map=chain_id_map,
+                                                         aln_dir=N1_outdir,
+                                                         complex_aln_dir=N4_outdir,
+                                                         template_dir=N5_outdir,
+                                                         monomer_model_dir=N3_outdir,
+                                                         output_dir=N6_outdir,
+                                                         run_methods=run_methods,
+                                                         run_script=True,
+                                                         run_deepmsa=False):
+        print("Program failed in step 7")
 
 
 if __name__ == '__main__':

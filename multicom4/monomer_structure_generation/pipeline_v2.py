@@ -42,7 +42,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
         else:
             self.run_methods = run_methods
 
-    def process_single(self, fasta_path, alndir, outdir, template_dir=None, run_script=False):
+    def process_single(self, fasta_path, alndir, img_alndir, outdir, template_dir=None, run_script=False):
         
         targetname = pathlib.Path(fasta_path).stem
 
@@ -155,9 +155,9 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         common_parameters += f"--custom_msa={colabfold_a3m} "
 
                     elif msa_source == "img":
-                        img_a3m = os.path.join(alndir, targetname + '.a3m')
-                        # if not os.path.exists(img_a3m):
-                        #     errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
+                        img_a3m = os.path.join(img_alndir, targetname + '.a3m')
+                        if not os.path.exists(img_a3m):
+                            errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
                         common_parameters += f"--custom_msa={img_a3m} "
 
                     elif msa_source == "dhr":
@@ -183,7 +183,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                     elif run_method.find('deepmsa_') >= 0:
                         deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', msa_source + '.a3m')
                         if not os.path.exists(deepmsa_a3m):
-                            errormsg = errormsg + f"Cannot find img alignment for {targetname}: {deepmsa_a3m}\n"
+                            errormsg = errormsg + f"Cannot find deepmsa alignment for {targetname}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
                     
                     if template_source == "pdb70":
@@ -325,25 +325,31 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                 pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(params=self.params, config_name=run_method)
                 pipeline.select_v1(indir=refine_dir, outdir=final_dir, prefix=run_method)
                 pipeline.make_predictor_results(final_dir, method_out_dir)
-
-            predictor_commands[run_method] = cmds
+            
+            if len(cmds) > 0:
+                predictor_commands[run_method] = cmds
 
         bash_files = []
         if os.path.exists(self.params['slurm_script_template']):
             bash_script_dir = os.path.join(outdir, 'slurm_scripts')
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
+                slurm_template_file = self.params['slurm_script_template']
+                if predictor in self.non_af2_methods:
+                    slurm_template_file = self.params['slurm_nonaf_script_template']
+
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
                 print(f"Generating bash file for {predictor}: {bash_file}")
                 jobname = f"{targetname}_{predictor}"
                 with open(bash_file, 'w') as fw:
-                    for line in open(self.params['slurm_script_template']):
+                    for line in open(slurm_template_file):
                         line = line.replace("JOBNAME", jobname)
                         fw.write(line)
                     fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
             if run_script:
                 for bash_file in bash_files:
-                    os.system(f"sh {bash_file}")
+                    os.system(f"sbatch {bash_file}")
         else:
             bash_script_dir = os.path.join(outdir, 'bash_scripts')
             os.makedirs(bash_script_dir, exist_ok=True)
