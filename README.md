@@ -87,8 +87,8 @@ Monomer
 
      python bin/monomer/monomer_post_af.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
      # bash scripts will be generated in examples/T1131/N3_monomer_structure_generation/post_def_bash_scripts
-     # These predictors takes the top-ranked models in default alphafold2 as input
-     # Run the scripts after the default predictors has finished
+     # These predictors take the top-ranked models in default alphafold2 as input
+     # Run the scripts after the default predictors have finished
 
      bin/monomer/monomer_ranking.py --option_file bin/db_option_default_local --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
      # Rank the models based on the finished predictors (finished: has ranking_debug.json in the directory)
@@ -110,8 +110,12 @@ Monomer
      python bin/monomer/monomer_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/T1104.fasta --output_dir examples/T1104
 
      python bin/monomer/monomer_post_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/T1104.fasta --output_dir examples/T1104
-     # Note: esm_msa need at least 100G RAM to run
+     # Note: esm_msa needs at least 100G RAM to run
+     # Note: programmed to run these predictors on A100 (cannot run esmfold on H100 due to pytorch version issue)
 
+     bin/monomer/monomer_ranking.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/T1131.fasta --output_dir examples/T1131
+     # Rank the models based on the finished predictors (finished: has ranking_debug.json in the directory)
+     # Note: currently disabled gate ranking (one issue to solve)
      ```
 
 ## **Output**
@@ -132,6 +136,12 @@ $OUTPUT_DIR/                                   # Your output directory
         - alphafold_ranking.csv    # AlphaFold2 pLDDT ranking
         - pairwise_ranking.tm      # Pairwise (APOLLO) ranking
         - pairwise_af_avg.ranking  # Average ranking of the two
+        - gate.csv                 # Gate ranking scores
+        - gate/cluster.txt         # Clustered models
+        - gate_af_avg.ranking      # Average score of gate and AlphaFold2 pLDDT score
+        - ai[1-5].pdb              # Selected models for MULTICOM-AI (AlphaFold pLDDT score, TS similarity TM-score < 0.8)
+        - gate[1-5].pdb            # Selected models for MULTICOM-GATE (Gate ranking score, different clusters from gate)
+        - llm[1-5].pdb             # Selected models for MULTICOM-LLM (Average score of Gate and AlphaFold pLDDT, different clusters from gate)
 ```
 
 b. Multimer
@@ -269,11 +279,11 @@ For hard targets, use AFsample to generate 1000 models per variant (total 5000) 
      # Can run multiple times to check whether some of the predictors failed to generate models
      python bin/multimer/multimer_subunit_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106
      
-     # After the default alphafold2 models have generated, run the script again to run the post-af2 predictors for each subunits
+     # After the default alphafold2 models have been generated, run the script again to run the post-af2 predictors for each subunits
      python bin/multimer/multimer_subunit_af.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106
 
      # Generate multimer alignments and templates
-     # Run default_multimer first, since other methods rquires some files from default_multimer
+     # Run default_multimer first, since other methods require some files from default_multimer
      # Didn't submit any jobs for subunits
      python bin/multimer/multimer_alignment_default.py --option_file bin/db_option_default_hell --fasta_path examples/fasta/H1106.fasta --output_dir examples/H1106/
 
