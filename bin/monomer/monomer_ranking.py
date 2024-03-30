@@ -86,6 +86,10 @@ def main(argv):
 
     makedir_if_not_exists(N4_outdir)
 
+    run_methods = None
+    if os.path.exists(params['slurm_script_template']):
+        run_methods = ["alphafold", "apollo", "bfactor"]
+
     result = run_monomer_evaluation_pipeline(params=params, targetname=targetname, fasta_file=FLAGS.fasta_path,
                                              input_monomer_dir=N3_outdir, outputdir=N4_outdir,
                                              generate_final_models=True, contact_map_file=contact_map_file,

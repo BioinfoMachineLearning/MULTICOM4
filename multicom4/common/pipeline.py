@@ -301,13 +301,15 @@ def select_models_with_multimer(qa_result, outputdir):
 
 def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monomer_dir, outputdir, 
                                     contact_map_file, dist_map_file,
+                                    run_methods=None,
                                     input_multimer_dir="",
                                     generate_final_models=False, model_count=5):
 
     makedir_if_not_exists(outputdir)
     qa_result = None
     pipeline = Monomer_structure_evaluation_pipeline(params=params,
-                                                     use_gpu=True)
+                                                     use_gpu=True,
+                                                     run_methods=run_methods)
     try:
         qa_result = pipeline.process(targetname=targetname, fasta_file=fasta_file,
                                      monomer_model_dir=input_monomer_dir, multimer_model_dir=input_multimer_dir,
