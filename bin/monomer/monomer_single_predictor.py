@@ -47,7 +47,7 @@ def main(argv):
     makedir_if_not_exists(outdir)
 
     N1_outdir = os.path.join(outdir, 'N1_monomer_alignments_generation')
-
+    N1_outdir_img = os.path.join(outdir, 'N1_monomer_alignments_generation_img')
     N2_outdir = os.path.join(outdir, 'N2_monomer_template_search')
 
     print("#################################################################################################")
@@ -61,6 +61,7 @@ def main(argv):
     if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                         fasta_path=FLAGS.fasta_path,
                                                         alndir=N1_outdir, 
+                                                        img_alndir=N1_outdir_img,
                                                         templatedir=N2_outdir, 
                                                         outdir=N3_outdir,
                                                         run_methods=run_methods,

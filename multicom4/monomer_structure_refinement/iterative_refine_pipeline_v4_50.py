@@ -263,6 +263,9 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         for i in range(len(templates)):
             template_pdb = templates.loc[i, 'target']
             if template_pdb.find('.pdb') > 0:
+                trg_pdb_path = os.path.join(outdir, template_pdb)
+                if os.path.exists(trg_pdb_path):
+                    continue
                 template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
                 if not os.path.exists(template_path):
                     http_address = "https://sysbio.rnet.missouri.edu/multicom_cluster/multicom3_db_tools/databases/af_pdbs"

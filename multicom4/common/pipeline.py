@@ -180,11 +180,12 @@ def run_monomer_template_search_pipeline(params, targetname, sequence, a3m, outd
         print(e)
     return template_file
 
-def run_monomer_structure_generation_pipeline_v2(params, fasta_path, alndir, templatedir, outdir, run_methods=None, run_script=False):
+def run_monomer_structure_generation_pipeline_v2(params, fasta_path, alndir, img_alndir, templatedir, outdir, run_methods=None, run_script=False):
     try:
         pipeline = Monomer_structure_prediction_pipeline_v2(params, run_methods=run_methods)
         pipeline.process_single(fasta_path=fasta_path,
                                 alndir=alndir,
+                                img_alndir=img_alndir,
                                 template_dir=templatedir,
                                 outdir=outdir,
                                 run_script=run_script)

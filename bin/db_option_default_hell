@@ -1,6 +1,8 @@
 ###########################This is an option file####################################
 
-slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender.bash
+slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_all.bash
+
+slurm_nonaf_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_A100.bash
 
 ################################tools option#########################################
 
@@ -88,16 +90,16 @@ afprofile_program = run_AFP.py
 # Common parameters
 alphafold_benchmark = True
 
-use_gpu_relax = True
+use_gpu_relax = False
 
 max_template_date = 2022-04-01
 
 pdb_release_date_file = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/pdb_release_date_filtered.csv
 
 # QA
-dncon4_program = /cluster/pixstor/chengji-lab/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/DNCON4/run_dncon4.sh
+dncon4_program = /cluster/pixstor/chengji-lab/bml_casp16/tools/DNCON4/run_dncon4.sh
 
-deepdist_program = /cluster/pixstor/chengji-lab/bml_casp15/tools/casp14/casp14_qa/src/run_deepdist3.sh
+deepdist_program = /cluster/pixstor/chengji-lab/bml_casp16/tools/DeepDist/run_deepdist3.sh
 
 gate_qa_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/gate/
 
@@ -131,11 +133,11 @@ foldseek_pdb_database = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/
 
 foldseek_pdb_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
 
-foldseek_af_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/alphafold_databases_multicom3/af_db/foldseek_database
+foldseek_af_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db//foldseek_databases/af_db
 
-foldseek_af_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/alphafold_databases_multicom3/af_db/pdbs
+foldseek_af_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db//foldseek_databases/af_db/pdbs
 
-foldseek_esm_atlas_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/esm_atlas/foldseekdb
+foldseek_esm_atlas_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db//foldseek_databases/esm_atlas/foldseekdb
 
 ################################databases option#####################################
 

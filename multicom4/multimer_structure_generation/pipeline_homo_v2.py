@@ -118,7 +118,6 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                     # run alphafold default pipeline:
                     monomers = [chain_id for chain_id in chain_id_map]
                     if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
-                        os.chdir(self.params['alphafold_program_dir'])
                         bfd_uniref_a3ms = []
                         mgnify_stos = []
                         uniref90_stos = []
@@ -163,8 +162,6 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                     makedir_if_not_exists(outdir)
                     
-                    os.chdir(self.params['alphafold_program_dir'])
-
                     default_feature_pkl = os.path.join(output_dir, 'default_multimer', 'features.pkl')
                     os.system(f"cp {default_feature_pkl} {outdir}")
                     
@@ -351,20 +348,36 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
             predictor_commands[method] = cmds
 
-        bash_script_dir = os.path.join(outdir, 'bash')
-        os.makedirs(bash_script_dir, exist_ok=True)
-
         bash_files = []
-        for predictor in predictor_commands:
-            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-            print(f"Generating bash file for {predictor}: {bash_file}")
-            with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(predictor_commands[predictor]))
-            bash_files += [bash_file]
-        
-        if run_script:
-            for bash_file in bash_files:
-                os.system(f"sh {bash_file}")
+        if os.path.exists(self.params['slurm_script_template']):
+            bash_script_dir = os.path.join(outdir, 'slurm_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                jobname = f"{targetname}_{predictor}"
+                with open(bash_file, 'w') as fw:
+                    for line in open(self.params['slurm_script_template']):
+                        line = line.replace("JOBNAME", jobname)
+                        fw.write(line)
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sbatch {bash_file}")
+        else:
+            bash_script_dir = os.path.join(outdir, 'bash_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                with open(bash_file, 'w') as fw:
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sh {bash_file}")
 
         print("The multimer structure generation for multimers has finished!")
 
@@ -415,8 +428,6 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
             method_outdir = os.path.join(output_dir, concatenate_method)
 
-            os.chdir(self.params['alphafold_program_dir'])
-
             msa_pair_file = os.path.join(deepmsa_complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
             if len(pd.read_csv(msa_pair_file)) <= 1:
                 continue
@@ -441,7 +452,8 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                     raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
                 template_stos += [monomer_template_sto]
 
-            base_cmd = f"python {self.params['alphafold_multimer_program']} " \
+            base_cmd = f"cd {self.params['alphafold_program_dir']} && " \
+                        f"python {self.params['alphafold_multimer_program']} " \
                         f"--monomer_a3ms={','.join(monomer_a3m_paths)} " \
                         f"--multimer_a3ms={','.join(paired_a3m_paths)} " \
                         f"--msa_pair_file={msa_pair_file} " \
@@ -455,19 +467,35 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
             predictor_commands[f"deepmsa2_{index}"] = [base_cmd]
 
-        bash_script_dir = os.path.join(outdir, 'bash')
-        os.makedirs(bash_script_dir, exist_ok=True)
-
         bash_files = []
-        for predictor in predictor_commands:
-            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-            print(f"Generating bash file for {predictor}: {bash_file}")
-            with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(predictor_commands[predictor]))
-            bash_files += [bash_file]
-        
-        if run_script:
-            for bash_file in bash_files:
-                os.system(f"sh {bash_file}")
-
+        if os.path.exists(self.params['slurm_script_template']):
+            bash_script_dir = os.path.join(outdir, 'slurm_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                jobname = f"{targetname}_{predictor}"
+                with open(bash_file, 'w') as fw:
+                    for line in open(self.params['slurm_script_template']):
+                        line = line.replace("JOBNAME", jobname)
+                        fw.write(line)
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sbatch {bash_file}")
+        else:
+            bash_script_dir = os.path.join(outdir, 'bash_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                with open(bash_file, 'w') as fw:
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sh {bash_file}")
+                    
         print("The multimer structure generation for multimers has finished!")

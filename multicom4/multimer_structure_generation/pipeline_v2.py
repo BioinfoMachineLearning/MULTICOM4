@@ -114,12 +114,11 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 msa_unpaired_source = self.get_heteromer_config(predictor_config, 'msa_unpaired_source')
                 msa_paired_source = self.get_heteromer_config(predictor_config, 'msa_paired_source')
                 template_source = self.get_heteromer_config(predictor_config, 'template_source')
-
+                
+                monomers = [chain_id for chain_id in chain_id_map]
                 if method == "default_multimer":
                     # run alphafold default pipeline:
-                    monomers = [chain_id for chain_id in chain_id_map]
                     if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
-                        os.chdir(self.params['alphafold_program_dir'])
                         bfd_uniref_a3ms = []
                         mgnify_stos = []
                         uniref90_stos = []
@@ -159,8 +158,6 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 elif method == "AFProfile": 
                     
                     os.makedirs(outdir, exist_ok=True)
-
-                    os.chdir(self.params['alphafold_program_dir'])
 
                     default_feature_pkl = os.path.join(output_dir, 'default_multimer', 'features.pkl')
                     os.system(f"cp {default_feature_pkl} {outdir}")
@@ -203,7 +200,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                             monomer = chain_id
                             default_alphafold_monomer_a3m = os.path.join(output_dir, 'default_multimer', 'msas', chain_id, "monomer_final.a3m")
                             if not os.path.exists(default_alphafold_monomer_a3m):
-                                raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_monomer_a3m}")
+                                print(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_monomer_a3m}")
                             monomer_a3ms += [default_alphafold_monomer_a3m]
 
                     base_cmd += f"--monomer_a3ms={','.join(monomer_a3ms)} "
@@ -220,11 +217,12 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                                 monomer = chain_id
                                 default_alphafold_multimer_a3m = os.path.join(output_dir, 'default_multimer', 'msas', monomer + '.paired.a3m')
                                 if not os.path.exists(default_alphafold_multimer_a3m):
-                                    raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_multimer_a3m}")
+                                    print(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_multimer_a3m}")
                                 
                                 esm_msa_path = os.path.join(msadir, f'{monomer}.esm.paired.a3m')
-                                if not os.path.join(esm_msa_path):
+                                if not os.path.exists(esm_msa_path):
                                     cmd = f"sh {self.params['esm_msa_program']} {default_alphafold_multimer_a3m} {esm_msa_path}"
+                                    print(cmd)
                                     os.system(cmd)
                                     if not os.path.exists(esm_msa_path):
                                         print(f"Failed to generate the esm msa: {esm_msa_path}")
@@ -242,7 +240,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                                 if msa_len == -1:
                                     msa_len = current_len
                                 elif current_len != msa_len:
-                                    raise Exception(f"The length of each msas are not equal! {multimer_a3ms}")
+                                    print(f"The length of each msas are not equal! {multimer_a3ms}")
                                 interact_dict[f'index_{i + 1}'] = [j for j in range(msa_len)]
                             interact_df = pd.DataFrame(interact_dict)
                             interact_df.to_csv(msa_pair_file)
@@ -252,7 +250,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                                 monomer = chain_id
                                 default_alphafold_multimer_a3m = os.path.join(output_dir, 'default_multimer', 'msas', monomer + '.paired.a3m')
                                 if not os.path.exists(default_alphafold_multimer_a3m):
-                                    raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_multimer_a3m}")
+                                    print(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_multimer_a3m}")
                                 multimer_a3ms += [default_alphafold_multimer_a3m]
 
                             msa_pair_file = os.path.join(output_dir, "default_multimer/msas/interact.csv")
@@ -360,7 +358,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 
                 # refine default top-ranked models
                 refinement_inputs = []
-                default_workdir = os.path.join(outdir, 'default_multimer')
+                default_workdir = os.path.join(output_dir, 'default_multimer')
                 ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
                 if not os.path.exists(ranking_json_file):
                     continue
@@ -387,7 +385,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 refine_dir = os.path.join(method_out_dir, 'workdir')
                 makedir_if_not_exists(refine_dir)
 
-                pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=params, config_name=run_method)
+                pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=params, config_name=method)
                 pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="heteromer")
 
                 final_dir = os.path.join(method_out_dir, 'finaldir')
@@ -397,23 +395,40 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 pipeline.select_v1(indir=refine_dir, outdir=final_dir)
                 pipeline.make_predictor_results(final_dir, method_out_dir)
 
-
-            predictor_commands[method] = cmds
-
-        bash_script_dir = os.path.join(outdir, 'bash')
-        os.makedirs(bash_script_dir, exist_ok=True)
+            if len(cmds) > 0:
+                predictor_commands[method] = cmds
 
         bash_files = []
-        for predictor in predictor_commands:
-            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-            print(f"Generating bash file for {predictor}: {bash_file}")
-            with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(predictor_commands[predictor]))
-            bash_files += [bash_file]
-        
-        if run_script:
-            for bash_file in bash_files:
-                os.system(f"sh {bash_file}")
+        if os.path.exists(self.params['slurm_script_template']):
+            bash_script_dir = os.path.join(output_dir, 'slurm_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                targetname = os.path.basename(fasta_path).replace('.fasta', '')
+                jobname = f"{targetname}_{predictor}"
+                with open(bash_file, 'w') as fw:
+                    for line in open(self.params['slurm_script_template']):
+                        line = line.replace("JOBNAME", jobname)
+                        fw.write(line)
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sbatch {bash_file}")
+        else:
+            bash_script_dir = os.path.join(output_dir, 'bash_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                with open(bash_file, 'w') as fw:
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sh {bash_file}")
 
         print("The multimer structure generation for multimers has finished!")
 
@@ -470,8 +485,6 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
 
             method_outdir = os.path.join(output_dir, f"deepmsa2_{index}")
 
-            os.chdir(self.params['alphafold_program_dir'])
-
             msa_pair_file = os.path.join(deepmsa_complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
             if len(pd.read_csv(msa_pair_file)) <= 1:
                 continue
@@ -497,7 +510,8 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                     raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
                 template_stos += [monomer_template_sto]
 
-            base_cmd = f"python {self.params['alphafold_multimer_program']} " \
+            base_cmd =  f"cd {self.params['alphafold_program_dir']} && " \
+                        f"python {self.params['alphafold_multimer_program']} " \
                         f"--monomer_a3ms={','.join(monomer_a3m_paths)} " \
                         f"--multimer_a3ms={','.join(paired_a3m_paths)} " \
                         f"--msa_pair_file={msa_pair_file} " \
@@ -511,19 +525,36 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
 
             predictor_commands[f"deepmsa2_{index}"] = [base_cmd]
 
-        bash_script_dir = os.path.join(outdir, 'bash')
-        os.makedirs(bash_script_dir, exist_ok=True)
-
         bash_files = []
-        for predictor in predictor_commands:
-            bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-            print(f"Generating bash file for {predictor}: {bash_file}")
-            with open(bash_file, 'w') as fw:
-                fw.write('\n'.join(predictor_commands[predictor]))
-            bash_files += [bash_file]
-        
-        if run_script:
-            for bash_file in bash_files:
-                os.system(f"sh {bash_file}")
+        if os.path.exists(self.params['slurm_script_template']):
+            bash_script_dir = os.path.join(output_dir, 'slurm_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                targetname = os.path.basename(fasta_path).replace('.fasta', '')
+                jobname = f"{targetname}_{predictor}"
+                with open(bash_file, 'w') as fw:
+                    for line in open(self.params['slurm_script_template']):
+                        line = line.replace("JOBNAME", jobname)
+                        fw.write(line)
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sbatch {bash_file}")
+        else:
+            bash_script_dir = os.path.join(output_dir, 'bash_scripts')
+            os.makedirs(bash_script_dir, exist_ok=True)
+            for predictor in predictor_commands:
+                bash_file = os.path.join(bash_script_dir, predictor + '.sh')
+                print(f"Generating bash file for {predictor}: {bash_file}")
+                with open(bash_file, 'w') as fw:
+                    fw.write('\n'.join(predictor_commands[predictor]))
+                bash_files += [bash_file]
+            
+            if run_script:
+                for bash_file in bash_files:
+                    os.system(f"sh {bash_file}")
 
         print("The multimer structure generation for multimers has finished!")

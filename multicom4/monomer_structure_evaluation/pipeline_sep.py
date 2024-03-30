@@ -120,7 +120,7 @@ def extract_pkl(src_pkl, output_pkl, residue_start=-1, residue_end=-1):
 class Monomer_structure_evaluation_pipeline:
     """Runs the alignment tools and assembles the input features."""
 
-    def __init__(self, params, run_methods=["alphafold", "apollo", "bfactor", "gate"], use_gpu=True):
+    def __init__(self, params, run_methods=["alphafold", "apollo", "bfactor"], use_gpu=True):
         """Initializes the data pipeline."""
 
         self.params = params

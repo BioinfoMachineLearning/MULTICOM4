@@ -48,11 +48,13 @@ def main(argv):
     N1_outdir = os.path.join(outdir, 'N1_monomer_alignments_generation')
     makedir_if_not_exists(N1_outdir)
 
+    N1_outdir_img = os.path.join(outdir, 'N1_monomer_alignments_generation_img')
+
     print("#################################################################################################")
     print(f"1. Start to generate alignments for monomers")
 
     result = run_monomer_msa_pipeline(fasta=FLAGS.fasta_path, outdir=N1_outdir, params=params, only_monomer=True)
-
+    
     if result is None:
         raise RuntimeError('The monomer alignment generation has failed!')
 
@@ -91,9 +93,11 @@ def main(argv):
     if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                         fasta_path=FLAGS.fasta_path,
                                                         alndir=N1_outdir, 
+                                                        img_alndir=N1_outdir_img,
                                                         templatedir=N2_outdir, 
                                                         outdir=N3_outdir,
-                                                        run_methods=run_methods):
+                                                        run_methods=run_methods,
+                                                        run_script=os.path.exists(params['slurm_script_template'])):
         print("Program failed in step 3: monomer structure generation")
 
     print("The prediction for monomers has finished!")
