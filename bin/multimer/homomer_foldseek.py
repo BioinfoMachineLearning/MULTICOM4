@@ -118,32 +118,6 @@ def main(argv):
 
         N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
 
-        processed_seuqences = {}
-        for chain_id in chain_id_map:
-            monomer_id = chain_id
-            monomer_sequence = chain_id_map[chain_id].sequence
-            if monomer_sequence not in processed_seuqences:
-                N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
-                makedir_if_not_exists(N7_monomer_outdir)
-                result = run_monomer_evaluation_pipeline(params=params,
-                                                        targetname=monomer_id,
-                                                        fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
-                                                        input_monomer_dir=os.path.join(N3_outdir, monomer_id),
-                                                        input_multimer_dir="",
-                                                        outputdir=N7_monomer_outdir, generate_egnn_models=True)
-                if result is None:
-                    raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
-                monomer_qas_res[monomer_id] = result
-
-                processed_seuqences[monomer_sequence] = monomer_id
-
-            else:
-                # make a copy
-                N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
-                os.system("cp -r " + os.path.join(N7_outdir, processed_seuqences[monomer_sequence]) + " " + N7_monomer_outdir)
-                for msa in os.listdir(os.path.join(N7_monomer_outdir, 'msa')):
-                    os.system(f"sed -i 's/>{processed_seuqences[monomer_sequence]}/>{monomer_id}/g' " + os.path.join(N7_monomer_outdir, 'msa', msa))
-
         print("#################################################################################################")
 
         print("8. Start to run multimer iterative generation pipeline using top-ranked monomer models")
@@ -162,7 +136,8 @@ def main(argv):
             first_monomer_id = ""
             for chain_id in chain_id_map:
                 first_monomer_id = chain_id
-                monomer_ranking = pd.read_csv(monomer_qas_res[first_monomer_id]['apollo_monomer'])
+                ranking_file = os.path.join(N7_outdir, first_monomer_id, 'pairwise_ranking_monomer.csv')
+                monomer_ranking = pd.read_csv(ranking_file)
                 pdb_name = monomer_ranking.loc[i, 'model']
                 break
 
@@ -213,37 +188,6 @@ def main(argv):
                                                                         outdir=N6_outdir,
                                                                         is_homomers=True, monomer_template_stos=monomer_template_stos):
                 print("Program failed in step 6 foldseek_iter")
-
-
-    # print("10. Start to refine multimer models based on the qa rankings")
-
-    # if len(chain_id_map) <= 5:
-    #     N9_outdir = os.path.join(FLAGS.output_dir, 'N9_multimer_structure_refinement')
-
-    #     makedir_if_not_exists(N9_outdir)
-    #     ref_ranking = pd.read_csv(multimer_qa_result['pairwise_af_avg'])  # apollo or average ranking or the three qas
-
-    #     refine_inputs = []
-    #     for i in range(5):
-    #         pdb_name = ref_ranking.loc[i, 'model']
-    #         msa_paths = {}
-    #         for chain_id in chain_id_map:
-    #             msa_paths[chain_id] = dict(paired_msa=os.path.join(N8_outdir, 'msa', chain_id, pdb_name.replace('.pdb', '') + ".paired.a3m"),
-    #                                        monomer_msa=os.path.join(N8_outdir, 'msa', chain_id, pdb_name.replace('.pdb', '') + ".monomer.a3m"))
-
-    #         refine_input = iterative_refine_pipeline_multimer.refinement_input_multimer(chain_id_map=chain_id_map,
-    #                                                                                     fasta_path=FLAGS.fasta_path,
-    #                                                                                     pdb_path=os.path.join(N8_outdir, 'pdb', pdb_name),
-    #                                                                                     pkl_path=os.path.join(N8_outdir, 'pkl', pdb_name.replace('.pdb', '.pkl')),
-    #                                                                                     msa_paths=msa_paths)
-    #         refine_inputs += [refine_input]
-
-    #     final_dir = N9_outdir + '_final'
-    #     run_multimer_refinement_pipeline(chain_id_map=chain_id_map,
-    #                                      params=params, refinement_inputs=refine_inputs, outdir=N9_outdir,
-    #                                      finaldir=final_dir, stoichiometry="homomer")
-
-    #     print("The refinement for the top-ranked multimer models has been finished!")
 
 
 if __name__ == '__main__':

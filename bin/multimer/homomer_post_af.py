@@ -52,23 +52,82 @@ def main(argv):
     if not os.path.exists(ranking_json_file):
         raise Exception(f"Haven't generated default_multimer models!")
 
-    bash_script_dir = os.path.join(N6_outdir, 'post_def_bash_scripts')
+    run_methods = None
+    if os.path.exists(params['slurm_script_template']):
+        run_methods = ["alphafold", "apollo", "bfactor"]
+
+    N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
+    monomer_qas_res = {}
+    processed_seuqences = {}
+    for chain_id_idx, chain_id in enumerate(chain_id_map):
+        monomer_id = chain_id
+        monomer_sequence = chain_id_map[chain_id].sequence
+        if monomer_sequence not in processed_seuqences:
+
+            N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
+            N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
+            makedir_if_not_exists(N7_monomer_outdir)
+            
+            contact_map_file = os.path.join(N1_monomer_outdir, 'dncon4', f'{monomer_id}.dncon2.rr')
+            if not os.path.exists(contact_map_file):
+                raise Exception("The contact map file hasn't been generated!")
+
+            dist_map_file = os.path.join(N1_monomer_outdir, 'deepdist', f'{monomer_id}.txt')
+            if not os.path.exists(dist_map_file):
+                raise Exception("The distance map file hasn't been generated!")
+
+            result = run_monomer_evaluation_pipeline(params=params,
+                                                    targetname=monomer_id,
+                                                    fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
+                                                    input_monomer_dir=os.path.join(N3_outdir, monomer_id),
+                                                    input_multimer_dir="",
+                                                    contact_map_file=contact_map_file,
+                                                    dist_map_file=dist_map_file,
+                                                    outputdir=N7_monomer_outdir, 
+                                                    generate_final_models=False,
+                                                    run_methods=run_methods)
+            if result is None:
+                raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
+            monomer_qas_res[monomer_id] = result
+            processed_seuqences[monomer_sequence] = monomer_id
+        else:
+            # make a copy
+            N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
+            os.system("cp -r " + os.path.join(N7_outdir, processed_seuqences[monomer_sequence]) + " " + N7_monomer_outdir)
+            for msa in os.listdir(os.path.join(N7_monomer_outdir, 'msa')):
+                os.system(f"sed -i 's/>{processed_seuqences[monomer_sequence]}/>{monomer_id}/g' " + os.path.join(N7_monomer_outdir, 'msa', msa))
+            monomer_qas_res[monomer_id] = copy.deepcopy(monomer_qas_res[processed_seuqences[monomer_sequence]])
+
+
+    bash_script_dir = os.path.join(N3_outdir, 'post_def_bash_scripts')
+    if os.path.exists(params['slurm_script_template']):
+        bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
     run_methods = ['folds_iter', 'folds_iter_not', 'folds_iter_o', 'folds_iter_o_not',
                    'folds_iter_esm', 'folds_iter_esm_not', 'folds_iter_esm_o', 'folds_iter_esm_o_not',
-                   'def_refine']
+                   'def_mul_refine']
 
     for run_method in run_methods:
         cmd = f"python bin/multimer/homomer_foldseek.py --option_file {FLAGS.option_file} " \
               f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
               f"--config_name {run_method}"
 
-        bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-        with open(bash_file, 'w') as fw:
-            fw.write('\n'.join(cmds))
-        bash_files += [bash_file]
-
+        if os.path.exists(params['slurm_script_template']):
+            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+            print(f"Generating bash file for {run_method}: {bash_file}")
+            jobname = f"{targetname}_{run_method}"
+            with open(bash_file, 'w') as fw:
+                for line in open(params['slurm_script_template']):
+                    line = line.replace("JOBNAME", jobname)
+                    fw.write(line)
+                fw.write(cmd)
+            os.system(f"sbatch {bash_file}")
+        else:
+            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+            print(bash_file)
+            with open(bash_file, 'w') as fw:
+                fw.write(cmd)
     
 
 if __name__ == '__main__':
