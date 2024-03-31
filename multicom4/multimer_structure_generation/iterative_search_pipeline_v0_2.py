@@ -61,7 +61,11 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
                                    max_template_date=self._max_template_date, release_dates=self._release_dates,
                                    other_databases=other_databases)
 
-        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000)
+        multiprocess = False
+        if len(other_databases) >= 10:
+            multiprocess = True
+
+        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000, multiprocess=multiprocess)
 
     def concatenate_msa_and_templates(self,
                                       chain_id_map,
