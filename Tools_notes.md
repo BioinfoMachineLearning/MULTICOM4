@@ -1,7 +1,13 @@
 # MULTICOM4
 This is the installation note for the tools
 
-
+- AFProfile (https://github.com/patrickbryant1/AFProfile)
+  
+     ```
+     pip install optax
+     pip install --upgrade --no-cache-dir jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+     pip install chex==0.1.5
+     ```
 - DeepFold (https://github.com/newtonjoo/deepfold), surprisingly can use our conda environment to run
 
 - MEGAFold (https://gitee.com/mindspore/mindscience/tree/master/MindSPONGE/applications/MEGAProtein)
