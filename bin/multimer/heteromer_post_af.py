@@ -1,15 +1,23 @@
-import os, sys, argparse, time, copy, pathlib
+import os, sys, argparse, time
 from multiprocessing import Pool
 from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
+from multicom4.monomer_alignment_generation.alignment import write_fasta
+from multicom4.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
+from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer
 from multicom4.monomer_structure_refinement import iterative_refine_pipeline
-from multicom4.common.protein import read_qa_txt_as_df, complete_result
 from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
-    run_monomer_msa_pipeline_img
-import pandas as pd
+    run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
+    run_multimer_structure_generation_pipeline_v2, \
+    run_multimer_structure_generation_pipeline_foldseek, \
+    run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
+    copy_same_sequence_msas
 from absl import flags
 from absl import app
+import copy
+import pandas as pd
+
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
@@ -38,12 +46,17 @@ def main(argv):
 
     check_file(FLAGS.fasta_path)
 
-    targetname = pathlib.Path(FLAGS.fasta_path).stem
-    sequence = open(FLAGS.fasta_path).readlines()[1].rstrip('\n').strip()
+    with open(FLAGS.fasta_path) as f:
+        input_fasta_str = f.read()
+    input_seqs, input_descs = parse_fasta(fasta_string=input_fasta_str)
+    chain_id_map, chain_id_seq_map = make_chain_id_map(sequences=input_seqs,
+                                                       descriptions=input_descs)
 
     outdir = FLAGS.output_dir
 
     makedir_if_not_exists(outdir)
+
+    N1_outdir = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation')
 
     N3_outdir = os.path.join(FLAGS.output_dir, 'N3_monomer_structure_generation')
     
@@ -71,13 +84,26 @@ def main(argv):
         monomer_id = chain_id
         monomer_sequence = chain_id_map[chain_id].sequence
         if monomer_sequence not in processed_seuqences:
+
+            N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
             N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
             makedir_if_not_exists(N7_monomer_outdir)
+            
+            contact_map_file = os.path.join(N1_monomer_outdir, 'dncon4', f'{monomer_id}.dncon2.rr')
+            if not os.path.exists(contact_map_file):
+                raise Exception("The contact map file hasn't been generated!")
+
+            dist_map_file = os.path.join(N1_monomer_outdir, 'deepdist', f'{monomer_id}.txt')
+            if not os.path.exists(dist_map_file):
+                raise Exception("The distance map file hasn't been generated!")
+
             result = run_monomer_evaluation_pipeline(params=params,
                                                     targetname=monomer_id,
                                                     fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
                                                     input_monomer_dir=os.path.join(N3_outdir, monomer_id),
                                                     input_multimer_dir="",
+                                                    contact_map_file=contact_map_file,
+                                                    dist_map_file=dist_map_file,
                                                     outputdir=N7_monomer_outdir, 
                                                     generate_final_models=False,
                                                     run_methods=run_methods)
@@ -104,11 +130,10 @@ def main(argv):
         cmd = f"python bin/multimer/heteromer_foldseek.py --option_file {FLAGS.option_file} " \
               f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
               f"--config_name {run_method}"
-
         bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+        print(f"Generating bash files for {run_method}: {bash_file}")
         with open(bash_file, 'w') as fw:
             fw.write(cmd)
-        bash_files += [bash_file]
 
     
 

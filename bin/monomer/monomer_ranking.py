@@ -93,7 +93,7 @@ def main(argv):
     result = run_monomer_evaluation_pipeline(params=params, targetname=targetname, fasta_file=FLAGS.fasta_path,
                                              input_monomer_dir=N3_outdir, outputdir=N4_outdir,
                                              generate_final_models=True, contact_map_file=contact_map_file,
-                                             dist_map_file=dist_map_file)
+                                             dist_map_file=dist_map_file, run_methods=run_methods)
 
     if result is None:
         raise RuntimeError("Program failed in step 4: monomer model evaluation")
