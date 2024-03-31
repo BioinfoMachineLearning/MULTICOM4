@@ -120,46 +120,6 @@ def main(argv):
         print("7. Start to evaluate monomer models")
 
         N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
-        monomer_qas_res = {}
-        processed_seuqences = {}
-        for chain_id_idx, chain_id in enumerate(chain_id_map):
-            monomer_id = chain_id
-            monomer_sequence = chain_id_map[chain_id].sequence
-            if monomer_sequence not in processed_seuqences:
-                N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
-                N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
-                makedir_if_not_exists(N7_monomer_outdir)
-
-                contact_map_file = os.path.join(N1_monomer_outdir, 'dncon4', f'{monomer_id}.dncon2.rr')
-                if not os.path.exists(contact_map_file):
-                    raise Exception("The contact map file hasn't been generated!")
-
-                dist_map_file = os.path.join(N1_monomer_outdir, 'deepdist', f'{monomer_id}.txt')
-                if not os.path.exists(dist_map_file):
-                    raise Exception("The distance map file hasn't been generated!")
-
-                result = run_monomer_evaluation_pipeline(params=params,
-                                                    targetname=monomer_id,
-                                                    fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
-                                                    input_monomer_dir=os.path.join(N3_outdir, monomer_id),
-                                                    input_multimer_dir="",
-                                                    contact_map_file=contact_map_file,
-                                                    dist_map_file=dist_map_file,
-                                                    outputdir=N7_monomer_outdir,
-                                                    generate_final_models=False,
-                                                    run_methods=run_methods)
-
-                if result is None:
-                    raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
-                monomer_qas_res[monomer_id] = result
-                processed_seuqences[monomer_sequence] = monomer_id
-            else:
-                # make a copy
-                N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
-                os.system("cp -r " + os.path.join(N7_outdir, processed_seuqences[monomer_sequence]) + " " + N7_monomer_outdir)
-                for msa in os.listdir(os.path.join(N7_monomer_outdir, 'msa')):
-                    os.system(f"sed -i 's/>{processed_seuqences[monomer_sequence]}/>{monomer_id}/g' " + os.path.join(N7_monomer_outdir, 'msa', msa))
-                monomer_qas_res[monomer_id] = copy.deepcopy(monomer_qas_res[processed_seuqences[monomer_sequence]])
 
         print("#################################################################################################")
 
@@ -173,7 +133,8 @@ def main(argv):
             monomer_alphafold_a3ms = {}
             for chain_id in chain_id_map:
                 monomer_id = chain_id
-                monomer_ranking = pd.read_csv(monomer_qas_res[monomer_id]['apollo_monomer'])
+                ranking_file = os.path.join(N7_outdir, monomer_id, 'pairwise_ranking_monomer.csv')
+                monomer_ranking = pd.read_csv(ranking_file)
                 pdb_name = monomer_ranking.loc[i, 'model']
                 monomer_pdb_dirs[chain_id] = os.path.join(N7_outdir, monomer_id, 'pdb', pdb_name)
                 monomer_alphafold_a3ms[chain_id] =  os.path.join(N7_outdir, monomer_id, 'msa', pdb_name.replace('.pdb', '.a3m'))
