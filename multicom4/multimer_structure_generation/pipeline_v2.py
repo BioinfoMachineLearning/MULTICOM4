@@ -403,12 +403,16 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
             bash_script_dir = os.path.join(output_dir, 'slurm_scripts')
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
+                slurm_template_file = self.params['slurm_script_template']
+                if predictor in self.non_af2_methods:
+                    slurm_template_file = self.params['slurm_nonaf_script_template']
+
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
                 print(f"Generating bash file for {predictor}: {bash_file}")
                 targetname = os.path.basename(fasta_path).replace('.fasta', '')
                 jobname = f"{targetname}_{predictor}"
                 with open(bash_file, 'w') as fw:
-                    for line in open(self.params['slurm_script_template']):
+                    for line in open(slurm_template_file):
                         line = line.replace("JOBNAME", jobname)
                         fw.write(line)
                     fw.write('\n'.join(predictor_commands[predictor]))

@@ -22,7 +22,7 @@ import pandas as pd
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_boolean('config_name', True, 'Whether to use IMG alignment to generate models')
+flags.DEFINE_string('config_name', None, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -100,13 +100,18 @@ def main(argv):
                                                             monomer_model_dir=N3_outdir,
                                                             output_dir=N6_outdir,
                                                             run_method=[FLAGS.config_name],
-                                                            run_script=True
+                                                            run_script=True,
                                                             run_deepmsa=False):
             print("Program failed in step 6")
             
         print("Multimer structure generation has been finished!")
 
     else:
+
+        run_methods = None
+        if os.path.exists(params['slurm_script_template']):
+            run_methods = ["alphafold", "apollo", "bfactor"]
+
 
         print("#################################################################################################")
 
@@ -121,14 +126,29 @@ def main(argv):
             monomer_id = chain_id
             monomer_sequence = chain_id_map[chain_id].sequence
             if monomer_sequence not in processed_seuqences:
+                N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
                 N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
                 makedir_if_not_exists(N7_monomer_outdir)
+
+                contact_map_file = os.path.join(N1_monomer_outdir, 'dncon4', f'{monomer_id}.dncon2.rr')
+                if not os.path.exists(contact_map_file):
+                    raise Exception("The contact map file hasn't been generated!")
+
+                dist_map_file = os.path.join(N1_monomer_outdir, 'deepdist', f'{monomer_id}.txt')
+                if not os.path.exists(dist_map_file):
+                    raise Exception("The distance map file hasn't been generated!")
+
                 result = run_monomer_evaluation_pipeline(params=params,
-                                                        targetname=monomer_id,
-                                                        fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
-                                                        input_monomer_dir=os.path.join(N3_outdir, monomer_id),
-                                                        input_multimer_dir="",
-                                                        outputdir=N7_monomer_outdir, generate_final_models=False)
+                                                    targetname=monomer_id,
+                                                    fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
+                                                    input_monomer_dir=os.path.join(N3_outdir, monomer_id),
+                                                    input_multimer_dir="",
+                                                    contact_map_file=contact_map_file,
+                                                    dist_map_file=dist_map_file,
+                                                    outputdir=N7_monomer_outdir,
+                                                    generate_final_models=False,
+                                                    run_methods=run_methods)
+
                 if result is None:
                     raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
                 monomer_qas_res[monomer_id] = result

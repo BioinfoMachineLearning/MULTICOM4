@@ -1,4 +1,4 @@
-import os, sys, argparse, time
+import os, sys, argparse, time, pathlib
 from multiprocessing import Pool
 from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
@@ -45,6 +45,8 @@ def main(argv):
     check_dirs(params, ['hhblits_program', 'jackhmmer_program'], isdir=False)
 
     check_file(FLAGS.fasta_path)
+    
+    targetname = pathlib.Path(FLAGS.fasta_path).stem
 
     with open(FLAGS.fasta_path) as f:
         input_fasta_str = f.read()
@@ -141,7 +143,7 @@ def main(argv):
                     line = line.replace("JOBNAME", jobname)
                     fw.write(line)
                 fw.write(cmd)
-            # os.system(f"sbatch {bash_file}")
+            os.system(f"sbatch {bash_file}")
         else:
             bash_file = os.path.join(bash_script_dir, run_method + '.sh')
             print(bash_file)
