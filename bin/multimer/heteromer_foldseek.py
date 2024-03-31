@@ -91,17 +91,17 @@ def main(argv):
 
     if FLAGS.config_name == "def_mul_refine":
         N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
-        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
-                                                                fasta_path=FLAGS.fasta_path,
-                                                                chain_id_map=chain_id_map,
-                                                                aln_dir=N1_outdir,
-                                                                complex_aln_dir=N4_outdir,
-                                                                template_dir=N5_outdir,
-                                                                monomer_model_dir=N3_outdir,
-                                                                output_dir=N6_outdir,
-                                                                run_method=[FLAGS.config_name],
-                                                                run_script=True
-                                                                run_deepmsa=False):
+        if not run_multimer_structure_generation_pipeline_v2(params=params,
+                                                            fasta_path=FLAGS.fasta_path,
+                                                            chain_id_map=chain_id_map,
+                                                            aln_dir=N1_outdir,
+                                                            complex_aln_dir=N4_outdir,
+                                                            template_dir=N5_outdir,
+                                                            monomer_model_dir=N3_outdir,
+                                                            output_dir=N6_outdir,
+                                                            run_method=[FLAGS.config_name],
+                                                            run_script=True
+                                                            run_deepmsa=False):
             print("Program failed in step 6")
             
         print("Multimer structure generation has been finished!")

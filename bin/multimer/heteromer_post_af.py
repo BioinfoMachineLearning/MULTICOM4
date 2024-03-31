@@ -45,12 +45,54 @@ def main(argv):
 
     makedir_if_not_exists(outdir)
 
+    N3_outdir = os.path.join(FLAGS.output_dir, 'N3_monomer_structure_generation')
+    
     N6_outdir = os.path.join(outdir, 'N6_multimer_structure_generation')
     
     default_workdir = os.path.join(N6_outdir, 'default_multimer')
     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
     if not os.path.exists(ranking_json_file):
         raise Exception(f"Haven't generated default_multimer models!")
+
+    print("#################################################################################################")
+
+    print("#################################################################################################")
+
+    print("7. Start to evaluate monomer models")
+
+    run_methods = None
+    if os.path.exists(params['slurm_script_template']):
+        run_methods = ["alphafold", "apollo", "bfactor"]
+
+    N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
+    monomer_qas_res = {}
+    processed_seuqences = {}
+    for chain_id_idx, chain_id in enumerate(chain_id_map):
+        monomer_id = chain_id
+        monomer_sequence = chain_id_map[chain_id].sequence
+        if monomer_sequence not in processed_seuqences:
+            N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
+            makedir_if_not_exists(N7_monomer_outdir)
+            result = run_monomer_evaluation_pipeline(params=params,
+                                                    targetname=monomer_id,
+                                                    fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
+                                                    input_monomer_dir=os.path.join(N3_outdir, monomer_id),
+                                                    input_multimer_dir="",
+                                                    outputdir=N7_monomer_outdir, 
+                                                    generate_final_models=False,
+                                                    run_methods=run_methods)
+            if result is None:
+                raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
+            monomer_qas_res[monomer_id] = result
+            processed_seuqences[monomer_sequence] = monomer_id
+        else:
+            # make a copy
+            N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
+            os.system("cp -r " + os.path.join(N7_outdir, processed_seuqences[monomer_sequence]) + " " + N7_monomer_outdir)
+            for msa in os.listdir(os.path.join(N7_monomer_outdir, 'msa')):
+                os.system(f"sed -i 's/>{processed_seuqences[monomer_sequence]}/>{monomer_id}/g' " + os.path.join(N7_monomer_outdir, 'msa', msa))
+            monomer_qas_res[monomer_id] = copy.deepcopy(monomer_qas_res[processed_seuqences[monomer_sequence]])
+
 
     bash_script_dir = os.path.join(N6_outdir, 'post_def_bash_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
@@ -65,7 +107,7 @@ def main(argv):
 
         bash_file = os.path.join(bash_script_dir, run_method + '.sh')
         with open(bash_file, 'w') as fw:
-            fw.write('\n'.join(cmds))
+            fw.write(cmd)
         bash_files += [bash_file]
 
     
