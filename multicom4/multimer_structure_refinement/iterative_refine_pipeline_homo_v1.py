@@ -242,9 +242,12 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
 
     def copy_atoms_and_unzip(self, templates, outdir):
         os.chdir(outdir)
-        templates = pd.read_csv(template_csv, sep='\t')
-        for i in range(len(templates)):
+        num_templates = min(len(templates), 50)
+        for i in range(num_templates):
             template_pdb = templates.loc[i, 'target']
+            trg_pdb_path = os.path.join(outdir, template_pdb)
+                if os.path.exists(trg_pdb_path):
+                    continue
             if template_pdb.find('.pdb') > 0:
                 template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
                 if not os.path.exists(template_path):
@@ -252,6 +255,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                     os.system(f"wget -P {outdir} --no-check-certificate {http_address}/{template_pdb}")
                 else:
                     os.system(f"cp {template_path} {outdir}")
+
             else:
                 template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb)
                 os.system(f"cp {template_path} {outdir}")

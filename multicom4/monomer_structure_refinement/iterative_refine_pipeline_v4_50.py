@@ -260,7 +260,8 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
     def copy_atoms_and_unzip(self, template_csv, outdir):
         os.chdir(outdir)
         templates = pd.read_csv(template_csv, sep='\t')
-        for i in range(len(templates)):
+        num_templates = min(len(templates), 50)
+        for i in range(num_templates):
             template_pdb = templates.loc[i, 'target']
             if template_pdb.find('.pdb') > 0:
                 trg_pdb_path = os.path.join(outdir, template_pdb)

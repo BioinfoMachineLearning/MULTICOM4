@@ -203,8 +203,12 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
 
     def copy_atoms_and_unzip(self, templates, outdir):
         os.chdir(outdir)
-        for i in range(len(templates)):
+        num_templates = min(len(templates), 50)
+        for i in range(num_templates):
             template_pdb = templates.loc[i, 'target']
+            trg_pdb_path = os.path.join(outdir, template_pdb)
+                if os.path.exists(trg_pdb_path):
+                    continue
             if template_pdb.find('.pdb') > 0:
                 template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
                 if not os.path.exists(template_path):
