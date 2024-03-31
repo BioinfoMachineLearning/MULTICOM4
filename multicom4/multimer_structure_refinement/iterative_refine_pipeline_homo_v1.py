@@ -246,8 +246,8 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
         for i in range(num_templates):
             template_pdb = templates.loc[i, 'target']
             trg_pdb_path = os.path.join(outdir, template_pdb)
-                if os.path.exists(trg_pdb_path):
-                    continue
+            if os.path.exists(trg_pdb_path):
+                continue
             if template_pdb.find('.pdb') > 0:
                 template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
                 if not os.path.exists(template_path):

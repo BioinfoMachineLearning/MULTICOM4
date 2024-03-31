@@ -132,6 +132,8 @@ class Monomer_structure_evaluation_pipeline:
 
         if run_methods is None:
             self.run_methods = ["alphafold", "apollo", "bfactor", "gate"]
+        else:
+            self.run_methods = run_methods
 
     def run_qas(self, fasta_file, pdbdir, pkldir, output_dir_abs,
                 pdbs_from_monomer, pdbs_from_multimer, pdbs_with_dist,

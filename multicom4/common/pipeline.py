@@ -220,6 +220,7 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
         if model in selected_models:
             continue
         selected_models += [model]
+        selected_models_path += [os.path.join(outputdir, 'pdb', model)]
         if len(selected_models) >= 5:
             break
 
@@ -268,6 +269,9 @@ def select_models_monomer_only(qa_result, outputdir, params):
                              outputdir=outputdir,
                              prefix="ai",
                              tmscore_threshold=0.8)
+    
+    if "gate" not in qa_result:
+        return
 
     select_models_by_cluster(ranking_df_file=qa_result["gate"],
                              cluster_result_file=qa_result["gate_cluster"],
@@ -287,6 +291,9 @@ def select_models_with_multimer(qa_result, outputdir):
                              outputdir=outputdir,
                              prefix="ai",
                              tmscore_threshold=0.8)
+
+    if "gate" not in qa_result:
+        return
 
     select_models_by_cluster(ranking_df_file=qa_result["gate_multimer"],
                              cluster_result_file=qa_result["gate_cluster"],
