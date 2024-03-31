@@ -54,7 +54,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
                                     for database in sorted(os.listdir(self.params['foldseek_af_database'])) 
                                     if database.endswith('DB')]
 
-            other_databases.append(alphafolddb_databases)
+            other_databases += alphafolddb_databases
 
         foldseek_runner = Foldseek(binary_path=foldseek_program, pdb_database=foldseek_pdb_database,
                                    max_template_date=self._max_template_date, release_dates=self._release_dates,
