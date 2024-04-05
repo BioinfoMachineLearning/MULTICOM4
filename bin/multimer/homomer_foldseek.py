@@ -11,8 +11,8 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_homo_pipeline_v2, \
     run_multimer_structure_generation_pipeline_foldseek, run_multimer_structure_generation_pipeline_foldseek_old, \
-    run_multimer_refinement_pipeline, run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, \
-    foldseek_iterative_monomer_input, copy_same_sequence_msas, run_multimer_structure_generation_homo_pipeline_img_v2
+    run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, \
+    foldseek_iterative_monomer_input, copy_same_sequence_msas
 
 from absl import flags
 from absl import app
@@ -22,6 +22,7 @@ import pandas as pd
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
+flags.DEFINE_string('config_name', None, 'config name')
 FLAGS = flags.FLAGS
 
 
@@ -101,8 +102,8 @@ def main(argv):
                                                                 template_dir=N5_outdir,
                                                                 monomer_model_dir=N3_outdir,
                                                                 output_dir=N6_outdir,
-                                                                run_method=[FLAGS.config_name],
-                                                                run_script=True
+                                                                run_methods=[FLAGS.config_name],
+                                                                run_script=True,
                                                                 run_deepmsa=False):
             print("Program failed in step 6")
             

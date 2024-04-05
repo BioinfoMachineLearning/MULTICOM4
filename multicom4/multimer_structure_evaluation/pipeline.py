@@ -158,13 +158,15 @@ class Multimer_structure_evaluation_pipeline:
 
         if "gate" in self.run_methods:
 
-            gate_ranking_txt = self.gate_qa.run_multimer_qa(fasta_path=fasta_file, 
-                                                               input_dir=pdbdir, 
-                                                               outputdir=os.path.join(output_dir, 'gate'))
+            gate_ranking_df_file = self.gate_qa.run_multimer_qa(fasta_path=fasta_path, 
+                                                            input_dir=pdbdir, 
+                                                            pkl_dir=pkldir,
+                                                            outputdir=os.path.join(output_dir, 'gate'))
             gate_ranking_df = pd.read_csv(gate_ranking_df_file)
             gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
             gate_ranking_df.to_csv(os.path.join(output_dir, 'gate.csv'))
             result_dict['gate'] = os.path.join(output_dir, 'gate.csv')
+            result_dict["gate_cluster"] = os.path.join(output_dir, 'gate', 'cluster.txt')
 
         if "gate" in self.run_methods and "alphafold" in self.run_methods:
             gate_df = pd.read_csv(result_dict["gate"])
@@ -183,7 +185,7 @@ class Multimer_structure_evaluation_pipeline:
             avg_ranking_df.reset_index(inplace=True, drop=True)
             avg_ranking_df.drop(avg_ranking_df.filter(regex="index"), axis=1, inplace=True)
             avg_ranking_df.drop(avg_ranking_df.filter(regex="Unnamed"), axis=1, inplace=True)
-            ranking_file = os.path.join(output_dir_abs, 'gate_af_avg.ranking')
+            ranking_file = os.path.join(output_dir, 'gate_af_avg.ranking')
             avg_ranking_df.to_csv(ranking_file)
             result_dict["gate_af_avg"] = ranking_file
 

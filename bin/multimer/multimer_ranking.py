@@ -95,6 +95,10 @@ def main(argv):
     print("#################################################################################################")
 
     print("7. Start to evaluate monomer models")
+    
+    run_methods = None
+    if os.path.exists(params['slurm_script_template']):
+        run_methods = ["alphafold", "apollo", "bfactor"]
 
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_structure_evaluation')
     monomer_qas_res = {}
@@ -103,6 +107,18 @@ def main(argv):
         monomer_id = chain_id
         monomer_sequence = chain_id_map[chain_id].sequence
         if monomer_sequence not in processed_seuqences:
+            N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
+            N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
+            makedir_if_not_exists(N7_monomer_outdir)
+
+            contact_map_file = os.path.join(N1_monomer_outdir, 'dncon4', f'{monomer_id}.dncon2.rr')
+            if not os.path.exists(contact_map_file):
+                raise Exception("The contact map file hasn't been generated!")
+
+            dist_map_file = os.path.join(N1_monomer_outdir, 'deepdist', f'{monomer_id}.txt')
+            if not os.path.exists(dist_map_file):
+                raise Exception("The distance map file hasn't been generated!")
+
             N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
             makedir_if_not_exists(N7_monomer_outdir)
             result = run_monomer_evaluation_pipeline(params=params,
@@ -110,7 +126,9 @@ def main(argv):
                                                      fasta_file=os.path.join(FLAGS.output_dir, f"{monomer_id}.fasta"),
                                                      input_monomer_dir=os.path.join(N3_outdir, monomer_id),
                                                      input_multimer_dir=N6_outdir,
-                                                     outputdir=N7_monomer_outdir, generate_egnn_models=True)
+                                                     contact_map_file=contact_map_file,
+                                                     dist_map_file=dist_map_file,
+                                                     outputdir=N7_monomer_outdir, generate_final_models=True, run_methods=run_methods)
             if result is None:
                 raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
             monomer_qas_res[monomer_id] = result

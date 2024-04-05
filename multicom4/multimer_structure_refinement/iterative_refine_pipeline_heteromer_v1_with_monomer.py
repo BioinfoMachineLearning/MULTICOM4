@@ -15,7 +15,7 @@ from multicom4.common import config
 
 class Multimer_iterative_refinement_pipeline(config.pipeline):
 
-    def __init__(self, params):
+    def __init__(self, params, config_name):
         super().__init__()
         self.params = params
         self.predictor_config = self.heteromer_config.predictors[config_name]
@@ -225,6 +225,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
         for i in range(num_templates):
             template_pdb = templates.loc[i, 'target']
             trg_pdb_path = os.path.join(outdir, template_pdb)
+            print(trg_pdb_path)
             if os.path.exists(trg_pdb_path):
                 continue
             if template_pdb.find('.pdb') > 0:
@@ -313,7 +314,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
 
             out_model_dir = os.path.join(current_work_dir, "alphafold")
 
-            if not complete_result(out_model_dir, 5 * int(self.params['num_multimer_predictions_per_model'])):
+            if not complete_result(out_model_dir, 5 * int(num_multimer_predictions_per_model)):
 
                 chain_pdbs = split_pdb_unrelax2relax(start_pdb, current_work_dir)
 
@@ -340,8 +341,8 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
 
                     template_results += [foldseek_res]
 
-                    self.copy_atoms_and_unzip(templates=foldseek_res['all_alignment'],
-                                              outdir=out_template_dir)
+                    #self.copy_atoms_and_unzip(templates=foldseek_res['all_alignment'],
+                    #                          outdir=out_template_dir)
 
                 if len(template_results) != len(chain_id_map):
                     break
@@ -356,9 +357,12 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
 
                 find_templates = True
                 for chain_id, template_file in zip(chain_id_map, template_files):
-                    if len(pd.read_csv(template_file, sep='\t')) == 0:
+                    templates = pd.read_csv(template_file, sep='\t')
+                    if len(templates) == 0:
                         print(f"Cannot find any templates for {chain_id} in iteration {num_iteration + 1}")
                         find_templates = False
+                        continue
+                    self.copy_atoms_and_unzip(templates=templates, outdir=out_template_dir)
 
                 if not find_templates:
                     break
@@ -371,7 +375,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                       f"--msa_pair_file={msa_pair_file} " \
                       f"--monomer_temp_csvs={','.join(template_files)} " \
                       f"--struct_atom_dir={out_template_dir} " \
-                      f"--output_dir={out_model_dir}" + common_parameters
+                      f"--output_dir={out_model_dir} " + common_parameters
 
                 try:
                     os.chdir(self.params['alphafold_program_dir'])

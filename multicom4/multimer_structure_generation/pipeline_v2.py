@@ -8,6 +8,8 @@ import pandas as pd
 from multiprocessing import Pool
 import pathlib
 from multicom4.common import config
+import json
+from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer 
 
 def get_complex_alignments_by_method(monomers, concatenate_method, aln_dir):
     a3ms_path = []
@@ -355,7 +357,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                         cmds += [cmd]
 
             elif method == "def_mul_refine":
-                
+                method_out_dir = os.path.join(output_dir, method) 
                 # refine default top-ranked models
                 refinement_inputs = []
                 default_workdir = os.path.join(output_dir, 'default_multimer')
@@ -364,7 +366,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                     continue
                 ranking_json = json.loads(open(ranking_json_file).read())
 
-                for i in range(self.get_heteromer_config.predictors.def_refine.number_of_input_models):
+                for i in range(self.heteromer_config.predictors.def_mul_refine.number_of_input_models):
                     pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
                     model_name = list(ranking_json["order"])[i]
                     pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
@@ -385,7 +387,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 refine_dir = os.path.join(method_out_dir, 'workdir')
                 makedir_if_not_exists(refine_dir)
 
-                pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=params, config_name=method)
+                pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=self.params, config_name=method)
                 pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="heteromer")
 
                 final_dir = os.path.join(method_out_dir, 'finaldir')

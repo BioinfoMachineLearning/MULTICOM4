@@ -216,7 +216,13 @@ class DeepMSA2_runner:
             contents = open(deepmsa_noimg_a3m).readlines()
             with open(f"{finalMSAdir}/{tag}.a3m", 'w') as fw:
                 fw.write(f'>{targetname}\n')
-                fw.writelines(contents[1:])
+                i = 1
+                while i < len(contents):
+                    if contents[i].find('>seq') == 0:
+                        i += 1
+                    else:
+                        fw.write(contents[i])
+                    i += 1
         
         for tag in deepmsa_deepjgi_tags:
             deepmsa_img_a3m = os.path.join(outpath, 'JGI', tag + 'a3m')
@@ -227,7 +233,13 @@ class DeepMSA2_runner:
             contents = open(deepmsa_img_a3m).readlines()
             with open(f"{finalMSAdir}/{tag}.a3m", 'w') as fw:
                 fw.write(f'>{targetname}\n')
-                fw.writelines(contents[1:])
+                i = 1
+                while i < len(contents):
+                    if contents[i].find('>seq') == 0:
+                        i += 1
+                    else:
+                        fw.write(contents[i])
+                    i += 1
         
         for tag in deepmsa_jgi_tags:
             deepmsa_img_a3m = os.path.join(outpath, 'JGI', tag + 'a3m')

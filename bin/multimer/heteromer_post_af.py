@@ -121,9 +121,9 @@ def main(argv):
                 os.system(f"sed -i 's/>{processed_seuqences[monomer_sequence]}/>{monomer_id}/g' " + os.path.join(N7_monomer_outdir, 'msa', msa))
             monomer_qas_res[monomer_id] = copy.deepcopy(monomer_qas_res[processed_seuqences[monomer_sequence]])
 
-    bash_script_dir = os.path.join(N3_outdir, 'post_def_bash_scripts')
+    bash_script_dir = os.path.join(N6_outdir, 'post_def_bash_scripts')
     if os.path.exists(params['slurm_script_template']):
-        bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
+        bash_script_dir = os.path.join(N6_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
     run_methods = ['folds_iter', 'folds_iter_nop', 'folds_iter_not', 'folds_iter_esm', 'folds_iter_esm_nop',
@@ -143,7 +143,7 @@ def main(argv):
                     line = line.replace("JOBNAME", jobname)
                     fw.write(line)
                 fw.write(cmd)
-            os.system(f"sbatch {bash_file}")
+            #os.system(f"sbatch {bash_file}")
         else:
             bash_file = os.path.join(bash_script_dir, run_method + '.sh')
             print(bash_file)

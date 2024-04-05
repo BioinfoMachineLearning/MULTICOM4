@@ -99,7 +99,7 @@ def main(argv):
                                                             template_dir=N5_outdir,
                                                             monomer_model_dir=N3_outdir,
                                                             output_dir=N6_outdir,
-                                                            run_method=[FLAGS.config_name],
+                                                            run_methods=[FLAGS.config_name],
                                                             run_script=True,
                                                             run_deepmsa=False):
             print("Program failed in step 6")
@@ -150,7 +150,7 @@ def main(argv):
             monomer_template_stos += [monomer_template_sto]
 
         if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
-                                                                chain_id_map=chain_id_map, config_name=config_name,
+                                                                chain_id_map=chain_id_map, config_name=FLAGS.config_name,
                                                                 pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
                                                                 monomer_template_stos=monomer_template_stos):
             print("Program failed in step 6 foldseek_iter")

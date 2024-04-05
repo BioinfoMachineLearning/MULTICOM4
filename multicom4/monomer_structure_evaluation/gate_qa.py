@@ -56,7 +56,7 @@ class Gate_qa:
         cmd = f"sh {self.params['gate_qa_program_dir']} multimer {fasta_path} {input_dir} {outputdir} {pkl_dir}"
         os.system(cmd)
 
-        resultfile = os.path.join(outputdir, 'casp15_inhouse_top_v8', 'ensemble.csv')
+        resultfile = os.path.join(outputdir, 'prediction', 'casp15_inhouse_top_v8', 'ensemble.csv')
 
         if not os.path.exists(resultfile):
             raise Exception(f"Failed to run gate qa!")

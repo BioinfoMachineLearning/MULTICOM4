@@ -359,12 +359,11 @@ def concatenate_alignments(inparams):
                     method_outdir = os.path.join(outdir, 'deepmsa2')
                     for comb_msa_name in comb_pairs:
                         print(comb_msa_name)
+                        interact_dict = {}
                         if is_homomers:
+                            msa_len = -1
                             for i in range(len(comb_pairs[comb_msa_name])):
-                                with open(comb_pairs[comb_msa_name][i]) as f:
-                                    input_fasta_str = f.read()
-                                msa_sequences, msa_descriptions = parse_fasta(input_fasta_str)
-                                current_len = len(msa_descriptions)
+                                current_len = len(comb_pairs[comb_msa_name][i].seqs) + 1
                                 if msa_len == -1:
                                     msa_len = current_len
                                 elif current_len != msa_len:
@@ -373,7 +372,8 @@ def concatenate_alignments(inparams):
                             pair_ids = pd.DataFrame(interact_dict)
                         else:
                             pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
-
+                        
+                        pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
                         alignment[comb_msa_name] = write_multimer_a3ms(pair_ids,
                                                                        comb_pairs[comb_msa_name],
                                                                        method_outdir,

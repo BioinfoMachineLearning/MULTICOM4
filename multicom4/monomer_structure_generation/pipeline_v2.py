@@ -209,15 +209,17 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
                     elif template_source == "tmsearch":
                         default_ranked_0_pdb = os.path.join(outdir, 'default', 'ranked_0.pdb')
-
-                        workdir = os.path.join(method_out_dir, 'tmsearch')
-                        makedir_if_not_exists(workdir)
+                        if not os.path.exists(default_ranked_0_pdb):
+                            errormsg = errormsg + f"Cannot find ranked_0.pdb for default"
+                        else:
+                            workdir = os.path.join(method_out_dir, 'tmsearch')
+                            makedir_if_not_exists(workdir)
                         
-                        pipeline = monomer_tmsearch_based_template_search_pipeline(self.params)
-                        template_file, template_dir = pipeline.search(fasta_path=fasta_path, inpdb=default_ranked_0_pdb, outdir=workdir)
+                            pipeline = monomer_tmsearch_based_template_search_pipeline(self.params)
+                            template_file, template_dir = pipeline.search(fasta_path=fasta_path, inpdb=default_ranked_0_pdb, outdir=workdir)
 
-                        common_parameters += f"--temp_struct_csv={template_file} " \
-                                             f"--struct_atom_dir={template_dir} " \
+                            common_parameters += f"--temp_struct_csv={template_file} " \
+                                                 f"--struct_atom_dir={template_dir} " 
 
                     if not complete_result(method_out_dir, 5 * num_monomer_predictions_per_model): 
                         if len(errormsg) > 0:
@@ -328,7 +330,9 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
             
             if len(cmds) > 0:
                 predictor_commands[run_method] = cmds
-
+       
+        print("1111111111111111111111111")
+        print(predictor_commands)
         bash_files = []
         if os.path.exists(self.params['slurm_script_template']):
             bash_script_dir = os.path.join(outdir, 'slurm_scripts')

@@ -3,7 +3,7 @@ from multiprocessing import Pool
 from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
 from multicom4.monomer_structure_refinement import iterative_refine_pipeline
-from multicom4.common.protein import read_qa_txt_as_df, complete_result
+from multicom4.common.protein import read_qa_txt_as_df, parse_fasta, make_chain_id_map, complete_result
 from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msa_pipeline_img
@@ -40,10 +40,19 @@ def main(argv):
 
     targetname = pathlib.Path(FLAGS.fasta_path).stem
     sequence = open(FLAGS.fasta_path).readlines()[1].rstrip('\n').strip()
+    
+    with open(FLAGS.fasta_path) as f:
+        input_fasta_str = f.read()
+    input_seqs, input_descs = parse_fasta(fasta_string=input_fasta_str)
+    chain_id_map, chain_id_seq_map = make_chain_id_map(sequences=input_seqs, descriptions=input_descs)
 
     outdir = FLAGS.output_dir
 
     makedir_if_not_exists(outdir)
+
+
+    N1_outdir = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation') 
+    N3_outdir = os.path.join(FLAGS.output_dir, 'N3_monomer_structure_generation')
 
     N6_outdir = os.path.join(outdir, 'N6_multimer_structure_generation')
     

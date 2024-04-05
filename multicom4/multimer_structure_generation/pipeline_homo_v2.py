@@ -89,6 +89,8 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                                 f"--benchmark={self.params['alphafold_benchmark']} " \
                                 f"--use_gpu_relax={self.params['use_gpu_relax']} " \
                                 f"--max_template_date={self.params['max_template_date']} "
+            
+            cmds = []
 
             if method not in self.non_af2_methods and method not in self.post_af2_methods:
 
@@ -155,9 +157,6 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                             cmds += [cmd]
 
-                    result_dirs += [outdir]
-                    check_num_predictions += [num_multimer_predictions_per_model * 5]
-
                 elif method == "AFProfile": 
 
                     makedir_if_not_exists(outdir)
@@ -208,7 +207,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                                 raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_monomer_a3m}")
 
                             esm_msa_path = os.path.join(msadir, f'{monomer}.esm.final.a3m')
-                            if not os.path.join(esm_msa_path):
+                            if not os.path.exists(esm_msa_path):
                                 cmd = f"sh {self.params['esm_msa_program']} {default_alphafold_monomer_a3m} {esm_msa_path}"
                                 os.system(cmd)
                                 if not os.path.exists(esm_msa_path):
@@ -345,16 +344,18 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                 pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection()
                 pipeline.select_v1(indir=refine_dir, outdir=final_dir)
                 pipeline.make_predictor_results(final_dir, method_out_dir)
-
-            predictor_commands[method] = cmds
+            
+            if len(cmds) > 0:
+                predictor_commands[method] = cmds
 
         bash_files = []
         if os.path.exists(self.params['slurm_script_template']):
-            bash_script_dir = os.path.join(outdir, 'slurm_scripts')
+            bash_script_dir = os.path.join(output_dir, 'slurm_scripts')
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
                 print(f"Generating bash file for {predictor}: {bash_file}")
+                targetname = os.path.basename(fasta_path).replace('.fasta', '')
                 jobname = f"{targetname}_{predictor}"
                 with open(bash_file, 'w') as fw:
                     for line in open(self.params['slurm_script_template']):
@@ -366,7 +367,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                 for bash_file in bash_files:
                     os.system(f"sbatch {bash_file}")
         else:
-            bash_script_dir = os.path.join(outdir, 'bash_scripts')
+            bash_script_dir = os.path.join(output_dir, 'bash_scripts')
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
@@ -419,9 +420,10 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
         monomers = [chain_id for chain_id in chain_id_map]
   
-        deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa_species')
+        deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa2')
 
-        for concatenate_method in os.listdir(deepmsa_complex_aln_dir):
+        predictor_commands = {}
+        for index, concatenate_method in enumerate(sorted(os.listdir(deepmsa_complex_aln_dir))):
             
             if concatenate_method.find('.csv') > 0:
                 continue
@@ -469,11 +471,12 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
         bash_files = []
         if os.path.exists(self.params['slurm_script_template']):
-            bash_script_dir = os.path.join(outdir, 'slurm_scripts')
+            bash_script_dir = os.path.join(output_dir, 'slurm_scripts')
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
                 print(f"Generating bash file for {predictor}: {bash_file}")
+                targetname = os.path.basename(fasta_path).replace('.fasta', '')
                 jobname = f"{targetname}_{predictor}"
                 with open(bash_file, 'w') as fw:
                     for line in open(self.params['slurm_script_template']):
@@ -485,7 +488,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                 for bash_file in bash_files:
                     os.system(f"sbatch {bash_file}")
         else:
-            bash_script_dir = os.path.join(outdir, 'bash_scripts')
+            bash_script_dir = os.path.join(output_dir, 'bash_scripts')
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')

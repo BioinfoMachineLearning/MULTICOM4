@@ -33,6 +33,8 @@ tmalign_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/tmalig
 # mmalign program path
 mmalign_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/mmalign/MMalign
 
+usalign_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/USalign
+
 # dockq program
 dockq_program = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/DockQ/DockQ.py
 
@@ -101,7 +103,7 @@ dncon4_program = /cluster/pixstor/chengji-lab/bml_casp16/tools/DNCON4/run_dncon4
 
 deepdist_program = /cluster/pixstor/chengji-lab/bml_casp16/tools/DeepDist/run_deepdist3.sh
 
-gate_qa_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/tools/gate/
+gate_qa_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/multicom4/monomer_structure_evaluation/gate_hell.sh
 
 # Other tools
 

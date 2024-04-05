@@ -261,6 +261,7 @@ def select_models_by_cluster(ranking_df_file, cluster_result_file, outputdir, pr
     
     selected_df = pd.DataFrame({'selected_models': selected_models})
     selected_df.to_csv(os.path.join(outputdir, f'{prefix}_selected.csv'))
+    return selected_models
 
 def select_models_monomer_only(qa_result, outputdir, params):
 
@@ -284,7 +285,7 @@ def select_models_monomer_only(qa_result, outputdir, params):
                              prefix="llm")
 
 
-def select_models_with_multimer(qa_result, outputdir):
+def select_models_with_multimer(qa_result, outputdir, params):
     
     select_models_by_tmscore(tmscore_program=params['tmscore_program'],
                              ranking_df_file=qa_result["alphafold_multimer"],
@@ -329,7 +330,7 @@ def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monome
         if input_multimer_dir == "" or not os.path.exists(input_multimer_dir):
             select_models_monomer_only(qa_result=qa_result, outputdir=outputdir, params=params)
         else:
-            select_models_with_multimer(qa_result=qa_result, outputdir=outputdir)
+            select_models_with_multimer(qa_result=qa_result, outputdir=outputdir, params=params)
 
     return qa_result
 
@@ -725,7 +726,7 @@ def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, outdir,
 def cal_tmscores_usalign(usalign_program, src_pdbs, trg_pdb, outputdir):
     tmscores = []
     for src_pdb in src_pdbs:
-        cmd = usalign_program + ' ' + inpdb + ' ' + nativepdb + " -TMscore 6 -ter 1 | grep TM-score | awk '{print $2}' "
+        cmd = usalign_program + ' ' + src_pdb + ' ' + trg_pdb + " -TMscore 6 -ter 1 | grep TM-score | awk '{print $2}' "
         tmscore_contents = os.popen(cmd).read().split('\n')
         tmscore = float(tmscore_contents[1].rstrip('\n'))
         tmscores += [tmscore]
@@ -734,24 +735,27 @@ def cal_tmscores_usalign(usalign_program, src_pdbs, trg_pdb, outputdir):
 
 def select_models_by_usalign(usalign_program, ranking_df_file, outputdir, prefix, tmscore_threshold):
     selected_models = []
+    selected_model_paths = []
     ranking_df = pd.read_csv(ranking_df_file)
     for i in range(10):
         model = ranking_df.loc[i, 'model']
-        tmscores = cal_tmscores_usalign(usalign_program, selected_models, os.path.join(outputdir, 'pdb', model), outputdir)
+        tmscores = cal_tmscores_usalign(usalign_program, selected_model_paths, os.path.join(outputdir, 'pdb', model), outputdir)
         if len(tmscores) == 0 or np.max(np.array(tmscores)) < tmscore_threshold:
             selected_models += [model]
+            selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
 
     for i in range(10):
         model = ranking_df.loc[i, 'model']
         if model in selected_models:
             continue
         selected_models += [model]
+        selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
         if len(selected_models) >= 5:
             break
 
     for i in range(5):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
-        os.system("cp " + os.path.join(outputdir, 'pdb', selected_models[i]) + " " + final_pdb)
+        os.system("cp " + selected_model_paths[i] + " " + final_pdb)
     
     selected_df = pd.DataFrame({'selected_models': selected_models})
     selected_df.to_csv(os.path.join(outputdir, f'{prefix}_selected.csv'))
@@ -773,20 +777,18 @@ def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
     except Exception as e:
         print(e)
 
-    if generate_final_models:
-
-        select_models_multimer(qa_result=qa_result, outputdir=outputdir, params=params, is_homomer=is_homomer)
+    select_models_multimer(chain_id_map=chain_id_map, qa_result=multimer_qa_result, outputdir=outdir, params=params, is_homomer=is_homomer)
 
     return multimer_qa_result
 
-def extract_final_monomer_models_from_complex(selected_models, outputdir, prefix, is_homomer):
+def extract_final_monomer_models_from_complex(chain_id_map, selected_models, outputdir, prefix, is_homomer):
     for i in range(5):
         final_pdb = os.path.join(outputdir, f"{prefix}{i + 1}.pdb")
         if not is_homomer:
             chain_group = extract_monomer_models_from_complex(complex_pdb=final_pdb,
                                                               complex_pkl=os.path.join(outputdir, 'pkl', selected_models[i].replace('.pdb', '.pkl')),
                                                               chain_id_map=chain_id_map, 
-                                                              workdir=os.path.join(outputdir, f"ai{i + 1}"))
+                                                              workdir=os.path.join(outputdir, f"{prefix}{i + 1}"))
             for chain_id in chain_group:
                 chain_outdir = os.path.join(outputdir, f"{prefix}_{chain_id}")
                 makedir_if_not_exists(chain_outdir)
@@ -794,36 +796,39 @@ def extract_final_monomer_models_from_complex(selected_models, outputdir, prefix
                 trgpdb = os.path.join(chain_outdir, f'{prefix}{i+1}.pdb')
                 os.system(f"cp {srcpdb} {trgpdb}")
 
-def select_models_multimer(qa_result, outputdir, params, is_homomer):
+def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homomer):
     
-    selected_models = select_models_by_usalign(usalign_program=params['usalign_program'],
+    ai_selected_models = select_models_by_usalign(usalign_program=params['usalign_program'],
                                                 ranking_df_file=qa_result["alphafold"],
                                                 outputdir=outputdir,
                                                 prefix="ai",
                                                 tmscore_threshold=0.6)
 
-    extract_final_monomer_models_from_complex(selected_models=selected_models, 
+    extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
+                                              selected_models=ai_selected_models, 
                                               outputdir=outputdir, 
                                               prefix="ai", 
                                               is_homomer=is_homomer)
 
-    select_models_by_cluster(ranking_df_file=qa_result["gate"],
+    gate_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate"],
                              cluster_result_file=qa_result["gate_cluster"],
                              outputdir=outputdir,
                              prefix="gate")
     
 
-    extract_final_monomer_models_from_complex(selected_models=selected_models, 
+    extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
+                                              selected_models=gate_selected_models, 
                                               outputdir=outputdir, 
                                               prefix="gate", 
                                               is_homomer=is_homomer)
 
-    select_models_by_cluster(ranking_df_file=qa_result["af_gate_avg"],
+    llm_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
                              cluster_result_file=qa_result["gate_cluster"],
                              outputdir=outputdir,
                              prefix="llm")
 
-    extract_final_monomer_models_from_complex(selected_models=selected_models, 
+    extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
+                                              selected_models=llm_selected_models, 
                                               outputdir=outputdir, 
                                               prefix="llm", 
                                               is_homomer=is_homomer)

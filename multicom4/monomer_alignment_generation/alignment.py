@@ -91,6 +91,7 @@ def retrieve_sequence_ids(ids, regex=None):
     id_to_full_header = defaultdict(list)
 
     for current_id in ids:
+        match=False
         for pattern in regex:
             m = re.search(pattern, current_id)
             # require a non-None match and at least one extracted pattern
@@ -99,7 +100,10 @@ def retrieve_sequence_ids(ids, regex=None):
                 sequence_ids.append(m.group(1))
                 id_to_full_header[m.group(1)].append(current_id)
                 headers += [current_id]
+                match=True
                 break
+        if not match:
+            print(f"cannot match {current_id}")
 
     return sequence_ids, id_to_full_header, headers
 

@@ -466,7 +466,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
         return top_template_files, out_monomer_msas
 
     def search_single_homo(self, fasta_file, chain_id_map, monomer_pdb_dirs, 
-                           monomer_alphafold_a3ms, outdir, template_stos = []):
+                           monomer_alphafold_a3ms, outdir, monomer_template_stos = []):
 
         fasta_file = os.path.abspath(fasta_file)
 

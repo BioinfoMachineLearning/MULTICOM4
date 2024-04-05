@@ -158,15 +158,17 @@ def main(argv):
 
     N4_outdir = os.path.join(FLAGS.output_dir, 'N4_monomer_alignments_concatenation')
     makedir_if_not_exists(N4_outdir)
-
+    
+    is_homomers = len(processed_seuqences) == 1
     try:
         concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
                            'string_interact', 'uniprot_distance', 'deepmsa2']
-
+        if is_homomers:
+            concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch', 'deepmsa2'] 
         run_monomer_msas_concatenation_pipeline(
             multimer=','.join([chain_id for chain_id in chain_id_map]),
             run_methods=concat_methods,
-            monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params)
+            monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params, is_homomers=is_homomers)
     except Exception as e:
         print(e)
         print("Program failed in step 5")

@@ -147,7 +147,7 @@ class Foldseek:
             search_results += [(database, outfile)]
 
         if multiprocess:
-            pool = Pool(processes=20)
+            pool = Pool(processes=10)
             results = pool.map(query_local_single, process_list)
             pool.close()
             pool.join()
