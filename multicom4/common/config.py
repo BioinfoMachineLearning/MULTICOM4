@@ -33,9 +33,9 @@ class pipeline():
 
 MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
-        'num_ensemble': 1,
-        'num_recycle': 3,
-        'predictions_per_model': 1,
+        'num_ensemble': 8,
+        'num_recycle': 8,
+        'predictions_per_model': 20,
         'model_preset': 'monomer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -191,9 +191,9 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
 
 HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
-        'num_ensemble': 1,
+        'num_ensemble': 3,
         'num_recycle': 20,
-        'predictions_per_model': 5,
+        'predictions_per_model': 20,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -397,9 +397,9 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
 
 HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
-        'num_ensemble': 1,
+        'num_ensemble': 3,
         'num_recycle': 20,
-        'predictions_per_model': 5,
+        'predictions_per_model': 20,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,

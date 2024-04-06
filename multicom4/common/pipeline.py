@@ -28,6 +28,8 @@ from multicom4.monomer_structure_refinement.util import cal_tmscore
 from multicom4.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
 from multicom4.common import config
 
+NUM_FINAL_MODELS = 10
+
 def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     uniref30 = params['uniref_db']
     uniclust30 = params['uniclust_db']
@@ -87,9 +89,10 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     # Run disorder prediction in the background
     fasta_name = os.path.basename(fasta)
     diso_out_file = os.path.join(outdir, fasta_name.replace('.fasta', '.diso'))
-    if not os.path.exists(diso_out_file):
+    logfile = os.path.join(outdir, 'run_diso.log')
+    if not os.path.exists(diso_out_file) and not os.path.exists(logfile):
         print("Start to generate disorder prediction")
-        cmd = f"perl {params['disopred_path']} {outdir}/{fasta_name} &> {outdir}/run_diso.log &"
+        cmd = f"perl {params['disopred_path']} {outdir}/{fasta_name} &> {logfile} &"
         print(cmd)
         os.system(cmd)
 
@@ -208,23 +211,23 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
     selected_models = []
     selected_models_path = []
     ranking_df = pd.read_csv(ranking_df_file)
-    for i in range(10):
+    for i in range(30):
         model = ranking_df.loc[i, 'model']
         tmscores = cal_tmscores(tmscore_program, selected_models_path, os.path.join(outputdir, 'pdb', model), outputdir)
         if len(tmscores) == 0 or np.max(np.array(tmscores)) < tmscore_threshold:
             selected_models += [model]
             selected_models_path += [os.path.join(outputdir, 'pdb', model)]
 
-    for i in range(10):
+    for i in range(30):
         model = ranking_df.loc[i, 'model']
         if model in selected_models:
             continue
         selected_models += [model]
         selected_models_path += [os.path.join(outputdir, 'pdb', model)]
-        if len(selected_models) >= 5:
+        if len(selected_models) >= NUM_FINAL_MODELS:
             break
 
-    for i in range(5):
+    for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
         os.system("cp " + selected_models_path[i] + " " + final_pdb)
     
@@ -241,21 +244,21 @@ def select_models_by_cluster(ranking_df_file, cluster_result_file, outputdir, pr
     selected_models = []
     selected_clusters = []
     ranking_df = pd.read_csv(ranking_df_file)
-    for i in range(10):
+    for i in range(30):
         model = ranking_df.loc[i, 'model']
         if clusters[model] not in selected_clusters:
             selected_models += [model]
             selected_clusters += [clusters[model]]
 
-    for i in range(10):
+    for i in range(30):
         model = ranking_df.loc[i, 'model']
         if model in selected_models:
             continue
         selected_models += [model]
-        if len(selected_models) >= 5:
+        if len(selected_models) >= NUM_FINAL_MODELS:
             break
 
-    for i in range(5):
+    for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
         os.system("cp " + os.path.join(outputdir, 'pdb', selected_models[i]) + " " + final_pdb)
     
@@ -737,23 +740,23 @@ def select_models_by_usalign(usalign_program, ranking_df_file, outputdir, prefix
     selected_models = []
     selected_model_paths = []
     ranking_df = pd.read_csv(ranking_df_file)
-    for i in range(10):
+    for i in range(30):
         model = ranking_df.loc[i, 'model']
         tmscores = cal_tmscores_usalign(usalign_program, selected_model_paths, os.path.join(outputdir, 'pdb', model), outputdir)
         if len(tmscores) == 0 or np.max(np.array(tmscores)) < tmscore_threshold:
             selected_models += [model]
             selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
 
-    for i in range(10):
+    for i in range(30):
         model = ranking_df.loc[i, 'model']
         if model in selected_models:
             continue
         selected_models += [model]
         selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
-        if len(selected_models) >= 5:
+        if len(selected_models) >= NUM_FINAL_MODELS:
             break
 
-    for i in range(5):
+    for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
         os.system("cp " + selected_model_paths[i] + " " + final_pdb)
     
@@ -782,7 +785,7 @@ def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
     return multimer_qa_result
 
 def extract_final_monomer_models_from_complex(chain_id_map, selected_models, outputdir, prefix, is_homomer):
-    for i in range(5):
+    for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f"{prefix}{i + 1}.pdb")
         if not is_homomer:
             chain_group = extract_monomer_models_from_complex(complex_pdb=final_pdb,
