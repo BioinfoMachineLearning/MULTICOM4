@@ -543,11 +543,6 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
 
                 template_results += [foldseek_res]
 
-                if self.predictor_config.template_source == "foldseek":
-                    makedir_if_not_exists(out_template_dir)
-                    self.copy_atoms_and_unzip(templates=foldseek_res['all_alignment'],
-                                            outdir=out_template_dir)
-
             if len(template_results) != len(chain_id_map):
                 return None
 
@@ -556,6 +551,11 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
                                                         template_results=template_results,
                                                         alphafold_monomer_a3ms=alphafold_monomer_a3ms,
                                                         outpath=outdir)
+
+            if self.predictor_config.template_source == "foldseek":
+                for template_file in template_files:
+                    templates = pd.read_csv(template_file, sep='\t')
+                    self.copy_atoms_and_unzip(templates=templates, outdir=out_template_dir)
 
             cmd = f"python {self.params['alphafold_multimer_program']} " + common_parameters + f"--output_dir={out_model_dir} "
 

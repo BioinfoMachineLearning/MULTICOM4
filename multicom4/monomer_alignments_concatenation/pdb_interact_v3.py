@@ -127,6 +127,14 @@ class PDB_interact_v3:
 
         return pd.DataFrame({'id': ids, 'pdbcode': pdbcodes, 'msa_similarity': msa_similarity, 'msa_row': msa_row})
 
+    def read_complex_pdbcodes(self):
+        complex_pdbcodes = []
+        for line in open(self.complexes_cm_file):
+            line = line.rstrip('\n')
+            if line.split() > 1:
+                complex_pdbcodes += [line.split()[0][0:4]]
+        return complex_pdbcodes
+
     def get_interactions_v2(self, alignments, is_homomers=False):
         num_examples = len(alignments)
 
@@ -142,11 +150,9 @@ class PDB_interact_v3:
 
         if is_homomers:
             common_species_filtered = set()
+            complex_pdb_codes = self.read_complex_pdbcodes()
             for pdbcode in common_species:
-                cmd = f"grep {pdbcode} {self.complexes_cm_file}"
-                contents = os.popen(cmd).read().split('\n')
-                is_complex = len(contents[0].split()) > 1
-                if is_complex:
+                if pdbcode in complex_pdb_codes:
                     common_species_filtered.add(pdbcode)
             common_species = common_species_filtered
 
