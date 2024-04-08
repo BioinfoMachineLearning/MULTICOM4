@@ -171,6 +171,8 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         input_msa_path = os.path.join(outdir, predictor_config.input_msa_source, 'msas', 'monomer_final.a3m')
 
                         esm_msa_path = os.path.join(method_out_dir, 'esm.a3m')
+                        
+                        os.makedirs(method_out_dir, exist_ok=True)
 
                         if not os.path.exists(esm_msa_path):
                             cmd = f"sh {self.params['esm_msa_program']} {input_msa_path} {esm_msa_path}"

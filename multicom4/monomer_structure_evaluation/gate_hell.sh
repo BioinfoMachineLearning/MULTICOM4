@@ -1,4 +1,4 @@
-source /cluster/pixstor/chengji-lab/bml_casp16/tools/gate/mambaforge/bin/activate
+source /cluster/pixstor/chengji-lab/bml_casp16/tools/gate/mambaforge/bin/activate base
 
 conda activate gate
 

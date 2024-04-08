@@ -131,7 +131,7 @@ class PDB_interact_v3:
         complex_pdbcodes = []
         for line in open(self.complexes_cm_file):
             line = line.rstrip('\n')
-            if line.split() > 1:
+            if len(line.split()) > 1:
                 complex_pdbcodes += [line.split()[0][0:4]]
         return complex_pdbcodes
 

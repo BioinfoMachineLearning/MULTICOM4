@@ -90,7 +90,7 @@ alphafold_default_program = run_alphafold_pre.py
 afprofile_program = run_AFP.py
 
 # Common parameters
-alphafold_benchmark = True
+alphafold_benchmark = False
 
 use_gpu_relax = False
 
