@@ -67,11 +67,7 @@ def check_file(dirname):
 
 
 def makedir_if_not_exists(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    directory = os.path.abspath(directory)
-    return directory
-
+    os.makedirs(directory, exist_ok=True)
 
 def run_command(cmd, log_file=None):
     flag = os.system(cmd)
