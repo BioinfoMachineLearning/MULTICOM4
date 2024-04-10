@@ -10,6 +10,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
 import pandas as pd
 from absl import flags
 from absl import app
+import json
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
@@ -74,17 +75,17 @@ def main(argv):
     model_name = list(ranking_json["order"])[i]
     pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
     msa_path = os.path.join(default_workdir, 'msas', "monomer_final.a3m")
-    refine_input = iterative_refine_pipeline.refinement_input(fasta_path=fasta_path,
+    refine_input = iterative_refine_pipeline.refinement_input(fasta_path=FLAGS.fasta_path,
                                                                 pdb_path=pdb_path,
                                                                 pkl_path=pkl_path,
                                                                 msa_path=msa_path)
     refinement_inputs += [refine_input]
 
-    refine_dir = os.path.join(method_out_dir, 'workdir')
+    refine_dir = os.path.join(N3_outdir, FLAGS.config_name, 'workdir')
     makedir_if_not_exists(refine_dir)
     pipeline = iterative_refine_pipeline.Monomer_iterative_refinement_pipeline_server(params=params, config_name=FLAGS.config_name)
     pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir,
-                    uniref90_sto=os.path.join(alndir, targetname + '_uniref90.sto'))
+                    uniref90_sto=os.path.join(N1_outdir, targetname + '_uniref90.sto'))
     
 
 if __name__ == '__main__':

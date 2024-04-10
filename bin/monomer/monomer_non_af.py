@@ -81,7 +81,8 @@ def main(argv):
     run_methods = ['paddle-helix', 'esmfold', 'deepfold', 'megafold']
     if not run_monomer_structure_generation_pipeline_v2(params=params,
                                                         fasta_path=FLAGS.fasta_path,
-                                                        alndir=N1_outdir, 
+                                                        alndir=N1_outdir,
+                                                        img_alndir="",
                                                         templatedir=N2_outdir, 
                                                         outdir=N3_outdir,
                                                         run_methods=run_methods,

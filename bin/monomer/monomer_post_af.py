@@ -10,6 +10,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
 import pandas as pd
 from absl import flags
 from absl import app
+from multicom4.common.config import *
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
@@ -106,7 +107,7 @@ def main(argv):
                 bash_file = os.path.join(bash_script_dir, run_method + '.sh')
                 print(bash_file)
                 with open(bash_file, 'w') as fw:
-                fw.write(cmd)
+                    fw.write(cmd)
 
 
 if __name__ == '__main__':

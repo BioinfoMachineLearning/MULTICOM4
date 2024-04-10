@@ -1,6 +1,6 @@
 ###########################This is an option file####################################
 
-slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_all.bash
+slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_gpu.bash
 
 slurm_nonaf_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_A100.bash
 
@@ -90,7 +90,7 @@ alphafold_default_program = run_alphafold_pre.py
 afprofile_program = run_AFP.py
 
 # Common parameters
-alphafold_benchmark = False
+alphafold_benchmark = True
 
 use_gpu_relax = False
 
