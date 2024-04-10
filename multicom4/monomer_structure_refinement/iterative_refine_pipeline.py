@@ -57,12 +57,13 @@ class Monomer_refinement_model_selection(config.pipeline):
             iteration_dir = os.path.join(indir, pdb, 'iteration1')
             if not os.path.exists(iteration_dir):
                 continue
-            start_pdb = os.path.join(iteration_dir, 'start.pdb')
-            start_pkl = os.path.join(iteration_dir, 'start.pkl') 
-            start_a3m = os.path.join(iteration_dir, 'start.a3m') 
-            os.system("cp " + start_pdb + " " + os.path.join(outdir, pdb + "_ori.pdb"))
-            os.system("cp " + start_pkl + " " + os.path.join(outdir, pdb + "_ori.pkl"))
-            os.system("cp " + start_a3m + " " + os.path.join(outdir, pdb + "_ori.a3m"))
+                
+            # start_pdb = os.path.join(iteration_dir, 'start.pdb')
+            # start_pkl = os.path.join(iteration_dir, 'start.pkl') 
+            # start_a3m = os.path.join(iteration_dir, 'start.a3m') 
+            # os.system("cp " + start_pdb + " " + os.path.join(outdir, pdb + "_ori.pdb"))
+            # os.system("cp " + start_pkl + " " + os.path.join(outdir, pdb + "_ori.pkl"))
+            # os.system("cp " + start_a3m + " " + os.path.join(outdir, pdb + "_ori.a3m"))
 
             refine_pdb = os.path.join(indir, pdb, 'final', 'final.pdb')
             refine_pkl = os.path.join(indir, pdb, 'final', 'final.pkl')

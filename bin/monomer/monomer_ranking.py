@@ -74,6 +74,16 @@ def main(argv):
 
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
 
+    run_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
+
+    for run_method in run_methods:
+        if not complete_result(os.path.join(N3_outdir, run_method), 5):
+            refine_dir = os.path.join(N3_outdir, run_method, 'workdir')
+            final_dir = os.path.join(N3_outdir, run_method, 'finaldir')
+            pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(params=params, config_name=run_method)
+            pipeline.select_v1(indir=refine_dir, outdir=final_dir)
+            pipeline.make_predictor_results(final_dir, os.path.join(N3_outdir, run_method))
+
     print("The prediction for monomers has finished!")
 
     print("#################################################################################################")
