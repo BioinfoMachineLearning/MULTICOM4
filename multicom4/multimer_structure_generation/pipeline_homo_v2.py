@@ -430,7 +430,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
             if concatenate_method.find('.csv') > 0:
                 continue
 
-            method_outdir = os.path.join(output_dir, concatenate_method)
+            method_outdir = os.path.join(output_dir, f"deepmsa2_{index}")
 
             msa_pair_file = os.path.join(deepmsa_complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
             if len(pd.read_csv(msa_pair_file)) <= 1:
