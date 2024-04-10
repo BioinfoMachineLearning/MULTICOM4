@@ -86,7 +86,7 @@ def main(argv):
 
         if monomer_sequence not in processed_seuqences:
             with open(monomer_fasta, "w") as fw:
-                write_fasta({chain_id: monomer_sequence}, fw)
+                write_fasta({chain_id_map[chain_id].description: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
             N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
 

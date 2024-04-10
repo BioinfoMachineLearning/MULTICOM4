@@ -110,7 +110,7 @@ def main(argv):
         print("Multimer structure generation has been finished!")
     
     else:
-
+        
         print("Multimer structure generation has been finished!")
 
         print("#################################################################################################")

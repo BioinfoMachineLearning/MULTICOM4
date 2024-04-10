@@ -86,7 +86,7 @@ def main(argv):
 
         if monomer_sequence not in processed_seuqences:
             with open(monomer_fasta, "w") as fw:
-                write_fasta({chain_id: monomer_sequence}, fw)
+                write_fasta({chain_id_map[chain_id].description: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir)
             result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params)
@@ -122,7 +122,7 @@ def main(argv):
             processed_seuqences[monomer_sequence] = monomer_id
         else:
             with open(monomer_fasta, "w") as fw:
-                write_fasta({chain_id: monomer_sequence}, fw)
+                write_fasta({chain_id_map[chain_id].description: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir)
 

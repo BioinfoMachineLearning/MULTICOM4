@@ -1,4 +1,4 @@
-source /bmlfast/bml_casp16/tools/gate/mambaforge/bin/activate
+source /bmlfast/bml_casp16/tools/gate/mambaforge/bin/activate base
 
 conda activate gate
 

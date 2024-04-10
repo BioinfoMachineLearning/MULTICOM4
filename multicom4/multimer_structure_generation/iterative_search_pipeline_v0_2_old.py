@@ -206,6 +206,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
     #     return top_template_files, out_multimer_msas, out_monomer_msas, interact_csv
 
     def copy_atoms_and_unzip(self, templates, outdir):
+        os.makedirs(outdir, exist_ok=True)
         os.chdir(outdir)
         num_templates = min(len(templates), 50)
         for i in range(num_templates):
@@ -572,7 +573,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
             try:
                 os.chdir(self.params['alphafold_program_dir'])
                 print(cmd)
-                os.system(cmd)
+                #os.system(cmd)
             except Exception as e:
                 print(e)
 

@@ -40,6 +40,8 @@ qscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/pairwiseQA/q_score
 # tmscore program
 tmscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/tmscore/TMscore
 
+usalign_program = /bmlfast/bml_casp16/MULTICOM4/tools/USalign
+
 calNf_program = /bmlfast/bml_casp16/MULTICOM4/tools/calNf
 
 ################################MSA generation tool###########################
@@ -59,6 +61,18 @@ disopred_path = /bmlfast/bml_casp16/tools/disopred/run_disopred.pl
 DHR_program_path = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR_local.sh
 
 DHR_database_path = /home/bml_casp15/tools/multicom3_db/DHR_DATABASE/
+
+################################domain information generation###########################
+
+hhsearch15db = /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dependency/databases/hhsearch15db
+
+dom_hhsearch_script = /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/P1_get_domains_by_hhsearch15.pl
+
+dom_parser_script = /bmlfast/bml_casp15/tools/casp14/Human_TS_CASP14_dncon4_v2/scripts/P1_get_domains_by_DomainParser_inpdb.pl
+
+unidoc_program_path = /bmlfast/bml_casp16/tools/UniDoc
+
+unidoc_program_script = Run_UniDoc_from_scratch_structure.py
 
 ################################QA option#####################################
 

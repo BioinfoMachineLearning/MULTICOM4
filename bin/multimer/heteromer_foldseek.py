@@ -108,11 +108,6 @@ def main(argv):
 
     else:
 
-        run_methods = None
-        if os.path.exists(params['slurm_script_template']):
-            run_methods = ["alphafold", "apollo", "bfactor"]
-
-
         print("#################################################################################################")
 
         print("#################################################################################################")

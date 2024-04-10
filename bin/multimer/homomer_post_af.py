@@ -61,9 +61,7 @@ def main(argv):
     if not os.path.exists(ranking_json_file):
         raise Exception(f"Haven't generated default_multimer models!")
 
-    run_methods = None
-    if os.path.exists(params['slurm_script_template']):
-        run_methods = ["alphafold", "apollo", "bfactor"]
+    run_methods = ["alphafold", "apollo", "bfactor"]
 
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
     monomer_qas_res = {}
@@ -108,9 +106,9 @@ def main(argv):
             monomer_qas_res[monomer_id] = copy.deepcopy(monomer_qas_res[processed_seuqences[monomer_sequence]])
 
 
-    bash_script_dir = os.path.join(N3_outdir, 'post_def_bash_scripts')
+    bash_script_dir = os.path.join(N6_outdir, 'post_def_bash_scripts')
     if os.path.exists(params['slurm_script_template']):
-        bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
+        bash_script_dir = os.path.join(N6_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
     run_methods = ['folds_iter', 'folds_iter_not', 'folds_iter_o', 'folds_iter_o_not',

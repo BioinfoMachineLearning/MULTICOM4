@@ -92,7 +92,7 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
     logfile = os.path.join(outdir, 'run_diso.log')
     if not os.path.exists(diso_out_file) and not os.path.exists(logfile):
         print("Start to generate disorder prediction")
-        cmd = f"perl {params['disopred_path']} {outdir}/{fasta_name} &> {logfile} &"
+        cmd = f"perl {params['disopred_path']} {outdir}/{fasta_name} &> {outdir}/run_diso.log &"
         print(cmd)
         os.system(cmd)
 

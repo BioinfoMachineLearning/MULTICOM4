@@ -75,9 +75,7 @@ def main(argv):
 
     print("7. Start to evaluate monomer models")
 
-    run_methods = None
-    if os.path.exists(params['slurm_script_template']):
-        run_methods = ["alphafold", "apollo", "bfactor"]
+    run_methods = ["alphafold", "apollo", "bfactor"]
 
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
     monomer_qas_res = {}
