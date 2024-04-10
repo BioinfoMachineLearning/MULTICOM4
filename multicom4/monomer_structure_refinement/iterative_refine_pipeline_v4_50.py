@@ -268,25 +268,19 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                 trg_pdb_path = os.path.join(outdir, template_pdb)
                 if os.path.exists(trg_pdb_path):
                     continue
-                template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
-                if not os.path.exists(template_path):
-                    http_address = "https://sysbio.rnet.missouri.edu/multicom_cluster/multicom3_db_tools/databases/af_pdbs"
-                    files_to_be_downloaded += [f"{http_address}/{template_pdb}"]
-                    # os.system(f"wget -P {outdir} --no-check-certificate {http_address}/{template_pdb}")
-                else:
-                    os.system(f"cp {template_path} {outdir}")
+                if template_pdb.find('.pdb') > 0:
+                    template_path = find_template_in_alphafolddb(self.params['foldseek_af_database_dir'], template_pdb)
+                    if template_path is None:
+                        http_address = "https://sysbio.rnet.missouri.edu/multicom_cluster/multicom3_db_tools/databases/af_pdbs"
+                        os.system(f"wget -P {outdir} --no-check-certificate {http_address}/{template_pdb}")
+                    else:
+                        os.system(f"cp {template_path} {outdir}")
             else:
                 template_path = os.path.join(self.params['foldseek_pdb_database_dir'], template_pdb)
                 os.system(f"cp {template_path} {outdir}")
                 os.system(f"gunzip -f {template_pdb}")
 
-        if len(files_to_be_downloaded) > 0:
-            url_txt = "urls.txt"
-            with open(url_txt, 'w') as fw:
-                fw.write('\n'.join(files_to_be_downloaded))
-            os.system(f"aria2c --check-certificate=false --max-tries 100 -i {url_txt} -j 5")
 
-                
     def search_single(self, fasta_path, pdb_path, pkl_path, msa_path, outdir, uniref90_sto=""):
 
         query_sequence = ""

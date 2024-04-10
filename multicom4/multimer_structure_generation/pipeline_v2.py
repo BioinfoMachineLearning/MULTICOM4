@@ -356,47 +356,6 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                         cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
                         cmds += [cmd]
 
-            elif method == "def_mul_refine":
-                method_out_dir = os.path.join(output_dir, method) 
-                # refine default top-ranked models
-                refinement_inputs = []
-                default_workdir = os.path.join(output_dir, 'default_multimer')
-                ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-                if not os.path.exists(ranking_json_file):
-                    continue
-                ranking_json = json.loads(open(ranking_json_file).read())
-
-                for i in range(self.heteromer_config.predictors.def_mul_refine.number_of_input_models):
-                    pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
-                    model_name = list(ranking_json["order"])[i]
-                    pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
-                    msa_paths = {}
-                    for chain_id in chain_id_map:
-                        monomer_msa = os.path.join(default_workdir, 'msas', chain_id, "monomer_final.a3m")
-                        paired_msa = os.path.join(default_workdir, 'msas', f"{chain_id}.paired.a3m")
-                        msa_paths[chain_id] = dict(paired_msa=paired_msa,
-                                                   monomer_msa=monomer_msa)
-
-                    refine_input = iterative_refine_pipeline_multimer.refinement_input_multimer(chain_id_map=chain_id_map,
-                                                                                                fasta_path=fasta_path,
-                                                                                                pdb_path=pdb_path,
-                                                                                                pkl_path=pkl_path,
-                                                                                                msa_paths=msa_paths)
-                    refinement_inputs += [refine_input]
-
-                refine_dir = os.path.join(method_out_dir, 'workdir')
-                makedir_if_not_exists(refine_dir)
-
-                pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=self.params, config_name=method)
-                pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="heteromer")
-
-                final_dir = os.path.join(method_out_dir, 'finaldir')
-                makedir_if_not_exists(final_dir)
-
-                pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection()
-                pipeline.select_v1(indir=refine_dir, outdir=final_dir)
-                pipeline.make_predictor_results(final_dir, method_out_dir)
-
             if len(cmds) > 0:
                 predictor_commands[method] = cmds
 
@@ -515,13 +474,13 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 if not os.path.exists(monomer_template_sto):
                     raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
                 template_stos += [monomer_template_sto]
-
+            
             base_cmd =  f"cd {self.params['alphafold_program_dir']} && " \
                         f"python {self.params['alphafold_multimer_program']} " \
                         f"--monomer_a3ms={','.join(monomer_a3m_paths)} " \
                         f"--multimer_a3ms={','.join(paired_a3m_paths)} " \
                         f"--msa_pair_file={msa_pair_file} " \
-                        f"--template_stos {','.join(template_stos)} " \
+                        f"--template_stos={','.join(template_stos)} " \
                         f"--output_dir={method_outdir} " + common_parameters
 
             if complete_result(method_outdir, 5 * num_multimer_predictions_per_model):

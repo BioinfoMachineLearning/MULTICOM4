@@ -656,41 +656,6 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                     os.system(f"rm {out_a3m_path}/seq/final.a3m {out_a3m_path}/seq/0.a3m")
                     cmd = f"sh {self.params['megafold_program']} {fastadir} {method_out_dir} {out_data_yaml}"
                     cmds += [cmd]     
-                    
-
-            elif run_method == "foldseek_refine" or run_method == "foldseek_refine_esm" or run_method == "foldseek_refine_esm_h":
-                
-                # refine default top-ranked models
-                refinement_inputs = []
-                default_workdir = os.path.join(outdir, 'default')
-                ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-                if not os.path.exists(ranking_json_file):
-                    continue
-                ranking_json = json.loads(open(ranking_json_file).read())
-                
-                for i in range(self.monomer_config.predictors.foldseek_refine.number_of_input_models):
-                    pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
-                    model_name = list(ranking_json["order"])[i]
-                    pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
-                    msa_path = os.path.join(default_workdir, 'msas', "monomer_final.a3m")
-                    refine_input = iterative_refine_pipeline.refinement_input(fasta_path=fasta_path,
-                                                                              pdb_path=pdb_path,
-                                                                              pkl_path=pkl_path,
-                                                                              msa_path=msa_path)
-                    refinement_inputs += [refine_input]
-
-                refine_dir = os.path.join(method_out_dir, 'workdir')
-                makedir_if_not_exists(refine_dir)
-                pipeline = iterative_refine_pipeline.Monomer_iterative_refinement_pipeline_server(params=self.params, config_name=run_method)
-                pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir,
-                                uniref90_sto=os.path.join(alndir, targetname + '_uniref90.sto'))
-
-                final_dir = os.path.join(method_out_dir, 'finaldir')
-                makedir_if_not_exists(final_dir)
-
-                pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(params=self.params, config_name=run_method)
-                pipeline.select_v1(indir=refine_dir, outdir=final_dir, prefix=run_method)
-                pipeline.make_predictor_results(final_dir, method_out_dir)
             
             if len(cmds) > 0:
                 predictor_commands[run_method] = cmds

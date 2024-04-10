@@ -215,8 +215,8 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
             if os.path.exists(trg_pdb_path):
                 continue
             if template_pdb.find('.pdb') > 0:
-                template_path = os.path.join(self.params['foldseek_af_database_dir'], template_pdb)
-                if not os.path.exists(template_path):
+                template_path = find_template_in_alphafolddb(self.params['foldseek_af_database_dir'], template_pdb)
+                if template_path is None:
                     http_address = "https://sysbio.rnet.missouri.edu/multicom_cluster/multicom3_db_tools/databases/af_pdbs"
                     os.system(f"wget -P {outdir} --no-check-certificate {http_address}/{template_pdb}")
                 else:
@@ -573,7 +573,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
             try:
                 os.chdir(self.params['alphafold_program_dir'])
                 print(cmd)
-                #os.system(cmd)
+                os.system(cmd)
             except Exception as e:
                 print(e)
 

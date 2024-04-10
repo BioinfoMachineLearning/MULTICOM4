@@ -28,6 +28,18 @@ from multiprocessing import Pool
 
 # Internal import (7716).
 
+def find_template_in_alphafolddb(af_db_dir, template_name):
+    template_pdb = os.path.join(af_db_dir, template_name)
+    if os.path.exists(template_pdb):
+        return template_pdb
+    
+    for groupdir in os.listdir(af_db_dir):
+        template_pdb = os.path.join(af_db_dir, groupdir, template_name)
+        if os.path.exists(template_pdb):
+            return template_pdb
+    
+    return None
+
 def query_local_single(inparams):
     binary_path, input_path, database, outfile, tmpdir, maxseq = inparams
     os.makedirs(tmpdir, exist_ok=True)

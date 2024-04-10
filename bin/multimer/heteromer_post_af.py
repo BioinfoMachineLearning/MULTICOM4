@@ -17,7 +17,7 @@ from absl import flags
 from absl import app
 import copy
 import pandas as pd
-
+from multicom4.common.config import *
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
@@ -128,25 +128,51 @@ def main(argv):
                    'folds_iter_esm_not', 'def_mul_refine']
 
     for run_method in run_methods:
-        cmd = f"python bin/multimer/heteromer_foldseek.py --option_file {FLAGS.option_file} " \
-              f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
-              f"--config_name {run_method}"
 
-        if os.path.exists(params['slurm_script_template']):
-            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-            print(f"Generating bash file for {run_method}: {bash_file}")
-            jobname = f"{targetname}_{run_method}"
-            with open(bash_file, 'w') as fw:
-                for line in open(params['slurm_script_template']):
-                    line = line.replace("JOBNAME", jobname)
-                    fw.write(line)
-                fw.write(cmd)
-            #os.system(f"sbatch {bash_file}")
+        if run_method == "def_mul_refine":
+            
+            for i in range(HETEROMULTIMER_CONFIG.predictors.def_mul_refine.number_of_input_models):
+
+                cmd = f"python bin/multimer/heteromer_refine.py --option_file {FLAGS.option_file} " \
+                f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
+                f"--config_name {run_method} --idx {i}"
+
+                if os.path.exists(params['slurm_script_template']):
+                    bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
+                    print(f"Generating bash file for {run_method}: {bash_file}")
+                    jobname = f"{targetname}_{run_method}"
+                    with open(bash_file, 'w') as fw:
+                        for line in open(params['slurm_script_template']):
+                            line = line.replace("JOBNAME", jobname)
+                            fw.write(line)
+                        fw.write(cmd)
+                    #os.system(f"sbatch {bash_file}")
+                else:
+                    bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
+                    print(bash_file)
+                    with open(bash_file, 'w') as fw:
+                        fw.write(cmd)
+
         else:
-            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-            print(bash_file)
-            with open(bash_file, 'w') as fw:
-                fw.write(cmd)
+            cmd = f"python bin/multimer/heteromer_foldseek.py --option_file {FLAGS.option_file} " \
+                f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
+                f"--config_name {run_method}"
+
+            if os.path.exists(params['slurm_script_template']):
+                bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+                print(f"Generating bash file for {run_method}: {bash_file}")
+                jobname = f"{targetname}_{run_method}"
+                with open(bash_file, 'w') as fw:
+                    for line in open(params['slurm_script_template']):
+                        line = line.replace("JOBNAME", jobname)
+                        fw.write(line)
+                    fw.write(cmd)
+                #os.system(f"sbatch {bash_file}")
+            else:
+                bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+                print(bash_file)
+                with open(bash_file, 'w') as fw:
+                    fw.write(cmd)
 
     
 

@@ -388,6 +388,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
             'relax_topn_predictions': 1,
+            'predictions_per_model': 5,
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',

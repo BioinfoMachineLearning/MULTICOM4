@@ -147,7 +147,7 @@ foldseek_pdb_database_dir = /home/bml_casp15/update_complex_dbs_newest/databases
 
 foldseek_af_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/af_db
 
-foldseek_af_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/pdbs
+foldseek_af_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/groups
 
 foldseek_esm_atlas_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/esm_atlas/foldseekdb
 
