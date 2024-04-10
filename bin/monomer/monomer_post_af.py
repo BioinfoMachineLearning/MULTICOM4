@@ -64,7 +64,7 @@ def main(argv):
 
         for i in range(MONOMER_CONFIG.predictors[run_method].number_of_input_models):
 
-            cmd = f"python bin/multimer/monomer_refine.py --option_file {FLAGS.option_file} " \
+            cmd = f"python bin/monomer/monomer_refine.py --option_file {FLAGS.option_file} " \
             f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
             f"--config_name {run_method} --idx {i}"
 
