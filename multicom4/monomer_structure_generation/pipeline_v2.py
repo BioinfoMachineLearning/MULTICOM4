@@ -540,7 +540,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                             cmd = f"sh {self.params['esm_msa_program']} {input_msa_path} {esm_msa_path}"
                             os.system(cmd)
                             if not os.path.exists(esm_msa_path):
-                                print(f"Failed to generate the esm msa: {esm_msa_path}")
+                                errormsg = errormsg + f"Failed to generate the esm msa: {esm_msa_path}"
                         
                         common_parameters += f"--custom_msa={esm_msa_path} "
 

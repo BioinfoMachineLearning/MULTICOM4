@@ -57,43 +57,18 @@ def main(argv):
         bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
-    run_methods = ['default_tmsearch', 'def_esm_msa', 'foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
+    run_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
 
     for run_method in run_methods:
 
-        if run_method.find('refine') > 0:
-            
-            for i in range(MONOMER_CONFIG.predictors[run_method].number_of_input_models):
+        for i in range(MONOMER_CONFIG.predictors[run_method].number_of_input_models):
 
-                cmd = f"python bin/multimer/monomer_refine.py --option_file {FLAGS.option_file} " \
-                f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
-                f"--config_name {run_method} --idx {i}"
-
-                if os.path.exists(params['slurm_script_template']):
-                    bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
-                    print(f"Generating bash file for {run_method}: {bash_file}")
-                    jobname = f"{targetname}_{run_method}"
-                    with open(bash_file, 'w') as fw:
-                        for line in open(params['slurm_script_template']):
-                            line = line.replace("JOBNAME", jobname)
-                            fw.write(line)
-                        fw.write(cmd)
-                    #os.system(f"sbatch {bash_file}")
-                else:
-                    bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
-                    print(bash_file)
-                    with open(bash_file, 'w') as fw:
-                        fw.write(cmd)
-
-        else:
-
-            cmd = f"python bin/monomer/monomer_single_predictor.py --option_file {FLAGS.option_file} " \
-                f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
-                f"--config_name {run_method}"
-            print(f"Generating bash scripts for {run_method}")
+            cmd = f"python bin/multimer/monomer_refine.py --option_file {FLAGS.option_file} " \
+            f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
+            f"--config_name {run_method} --idx {i}"
 
             if os.path.exists(params['slurm_script_template']):
-                bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+                bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
                 print(f"Generating bash file for {run_method}: {bash_file}")
                 jobname = f"{targetname}_{run_method}"
                 with open(bash_file, 'w') as fw:
@@ -101,13 +76,12 @@ def main(argv):
                         line = line.replace("JOBNAME", jobname)
                         fw.write(line)
                     fw.write(cmd)
-                os.system(f"sbatch {bash_file}")
+                #os.system(f"sbatch {bash_file}")
             else:
-                bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+                bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
                 print(bash_file)
                 with open(bash_file, 'w') as fw:
-                fw.write(cmd)
-
+                    fw.write(cmd)
 
 if __name__ == '__main__':
     flags.mark_flags_as_required([

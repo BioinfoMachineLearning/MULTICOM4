@@ -86,7 +86,19 @@ def main(argv):
     print("#################################################################################################")
 
     print("6. Start to generate complex multimer structures")
+
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
+
+    run_methods = ['def_mul_refine']
+
+    stoichiometry = "homomers" if len(processed_seuqences) == 1 else 'heteromers'
+    for run_method in run_methods:
+        if not complete_result(os.path.join(N6_outdir, run_method), 5):
+            refine_dir = os.path.join(N6_outdir, run_method, 'workdir')
+            final_dir = os.path.join(N6_outdir, run_method, 'finaldir')
+            pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection(params=params, stoichiometry=stoichiometry)
+            pipeline.select_v1(indir=refine_dir, outdir=final_dir)
+            pipeline.make_predictor_results(final_dir, os.path.join(N6_outdir, run_method))
 
     print("Multimer structure generation has been finished!")
 
@@ -95,10 +107,6 @@ def main(argv):
     print("#################################################################################################")
 
     print("7. Start to evaluate monomer models")
-    
-    run_methods = None
-    if os.path.exists(params['slurm_script_template']):
-        run_methods = ["alphafold", "apollo", "bfactor"]
 
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_structure_evaluation')
     monomer_qas_res = {}

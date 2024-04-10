@@ -58,7 +58,7 @@ class Multimer_iterative_refinement_pipeline_server:
 
 class Multimer_refinement_model_selection(config.pipeline):
     
-    def __init__(self, params, config_name, stoichiometry):
+    def __init__(self, params, stoichiometry):
 
         super().__init__()
 
@@ -73,10 +73,10 @@ class Multimer_refinement_model_selection(config.pipeline):
 
     def select_v1(self, indir, outdir):
         for pdb in os.listdir(indir):
-            start_pdb = os.path.join(indir, pdb, 'iteration1/start.pdb')
-            start_pkl = os.path.join(indir, pdb, 'iteration1/start.pkl')
-            os.system("cp " + start_pdb + " " + os.path.join(outdir, pdb + "_ori.pdb"))
-            os.system("cp " + start_pkl + " " + os.path.join(outdir, pdb + "_ori.pkl"))
+            # start_pdb = os.path.join(indir, pdb, 'iteration1/start.pdb')
+            # start_pkl = os.path.join(indir, pdb, 'iteration1/start.pkl')
+            # os.system("cp " + start_pdb + " " + os.path.join(outdir, pdb + "_ori.pdb"))
+            # os.system("cp " + start_pkl + " " + os.path.join(outdir, pdb + "_ori.pkl"))
 
             refine_pdb = os.path.join(indir, pdb, 'final/final.pdb')
             refine_pkl = os.path.join(indir, pdb, 'final/final.pkl')
@@ -95,43 +95,36 @@ class Multimer_refinement_model_selection(config.pipeline):
         df = pd.DataFrame({'model': pdbs, 'confidence': confidences})
         df = df.sort_values(by=['confidence'], ascending=False)
         df.reset_index(inplace=True)
-
-        for i in range(5):
-            pdb_name = df.loc[i, 'model']
-            deep_name = f"deep{i+1}"
-            os.system("cp " + os.path.join(outdir, pdb_name) + " " + os.path.join(outdir, deep_name + ".pdb"))
-            os.system("cp " + os.path.join(outdir, pdb_name.replace('.pdb', '.pkl')) + " " + os.path.join(outdir, deep_name + ".pkl"))
-
         df.to_csv(os.path.join(outdir, 'final_ranking.csv'))
         return outdir
 
-    def select_v2(self, ranking_df, indir, outdir):
-        for i in range(5):
-            pdb_name = ranking_df.loc[i, 'model']
-            start_pdb = os.path.join(indir, pdb_name, 'iteration1/start.pdb')
-            start_pkl = os.path.join(indir, pdb_name, 'iteration1/start.pkl')
-            os.system(f"cp {start_pdb} " + os.path.join(outdir, pdb_name + "_ori.pdb"))
-            os.system(f"cp {start_pkl} " + os.path.join(outdir, pdb_name + "_ori.pkl"))
+    # def select_v2(self, ranking_df, indir, outdir):
+    #     for i in range(5):
+    #         pdb_name = ranking_df.loc[i, 'model']
+    #         start_pdb = os.path.join(indir, pdb_name, 'iteration1/start.pdb')
+    #         start_pkl = os.path.join(indir, pdb_name, 'iteration1/start.pkl')
+    #         os.system(f"cp {start_pdb} " + os.path.join(outdir, pdb_name + "_ori.pdb"))
+    #         os.system(f"cp {start_pkl} " + os.path.join(outdir, pdb_name + "_ori.pkl"))
 
-            with open(start_pkl, 'rb') as f:
-                plddt_start = pickle.load(f)['confidence']
+    #         with open(start_pkl, 'rb') as f:
+    #             plddt_start = pickle.load(f)['confidence']
 
-            refine_pdb = os.path.join(indir, pdb_name, 'final/final.pdb')
-            refine_pkl = os.path.join(indir, pdb_name, 'final/final.pkl')
-            os.system(f"cp {refine_pdb} " + os.path.join(outdir, pdb_name + "_ref.pdb"))
-            os.system(f"cp {refine_pkl} " + os.path.join(outdir, pdb_name + "_ref.pkl"))
+    #         refine_pdb = os.path.join(indir, pdb_name, 'final/final.pdb')
+    #         refine_pkl = os.path.join(indir, pdb_name, 'final/final.pkl')
+    #         os.system(f"cp {refine_pdb} " + os.path.join(outdir, pdb_name + "_ref.pdb"))
+    #         os.system(f"cp {refine_pkl} " + os.path.join(outdir, pdb_name + "_ref.pkl"))
 
-            with open(refine_pkl, 'rb') as f:
-                plddt_ref = pickle.load(f)['confidence']
+    #         with open(refine_pkl, 'rb') as f:
+    #             plddt_ref = pickle.load(f)['confidence']
 
-            casp_pdb_name = f"casp{i+1}"
-            if plddt_start > plddt_ref:
-                os.system("cp " + os.path.join(outdir, pdb_name + "_ori.pdb") + " " + os.path.join(outdir, casp_pdb_name + ".pdb"))
-                os.system("cp " + os.path.join(outdir, pdb_name + "_ori.pkl") + " " + os.path.join(outdir, casp_pdb_name + ".pkl"))
-            else:
-                os.system("cp " + os.path.join(outdir, pdb_name + "_ref.pdb") + " " + os.path.join(outdir, casp_pdb_name + ".pdb"))
-                os.system("cp " + os.path.join(outdir, pdb_name + "_ref.pkl") + " " + os.path.join(outdir, casp_pdb_name + ".pkl"))
-        return outdir
+    #         casp_pdb_name = f"casp{i+1}"
+    #         if plddt_start > plddt_ref:
+    #             os.system("cp " + os.path.join(outdir, pdb_name + "_ori.pdb") + " " + os.path.join(outdir, casp_pdb_name + ".pdb"))
+    #             os.system("cp " + os.path.join(outdir, pdb_name + "_ori.pkl") + " " + os.path.join(outdir, casp_pdb_name + ".pkl"))
+    #         else:
+    #             os.system("cp " + os.path.join(outdir, pdb_name + "_ref.pdb") + " " + os.path.join(outdir, casp_pdb_name + ".pdb"))
+    #             os.system("cp " + os.path.join(outdir, pdb_name + "_ref.pkl") + " " + os.path.join(outdir, casp_pdb_name + ".pkl"))
+    #     return outdir
 
     def make_predictor_results(self, indir, outdir):
 
