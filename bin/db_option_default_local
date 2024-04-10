@@ -143,7 +143,7 @@ foldseek_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 
 foldseek_pdb_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/complex/complex
 
-foldseek_pdb_database_dir = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/atom
+foldseek_pdb_database_dir = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
 
 foldseek_af_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/af_db
 
@@ -204,16 +204,16 @@ pdb_sort90_hhsuite_database = /home/bml_casp15/update_complex_dbs_newest/databas
 
 pdb_sort90_hhsuite_cluster_tsv = /home/bml_casp15/update_complex_dbs_newest/databases/RCSB_PDB/fr_lib/sort90_clust
 
-pdb_sort90_atom_dir = /home/bml_casp15/update_complex_dbs_newest/databases/RCSB_PDB/atom
+pdb_sort90_atom_dir = /bmlfast/bml_casp16/update_complex_dbs_newest/databases/RCSB_PDB/atom
 
-pdb_sort90_hmm_dir = /home/bml_casp15/update_complex_dbs_newest/databases/RCSB_PDB/msa/hmm
+pdb_sort90_hmm_dir =/bmlfast/bml_casp16/update_complex_dbs_newest/databases/RCSB_PDB/msa/hmm
 
 complex_sort90_hhsuite_database = /home/bml_casp15/update_complex_dbs_newest/databases/hhsuite_complex/hhsuitedb3
 
 complex_sort90_hhsuite_cluster_tsv = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/fr_lib/sort90_clust
 
-complex_sort90_atom_dir = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/atom
+complex_sort90_atom_dir = /bmlfast/bml_casp16/update_complex_dbs_newest/databases/Complex/atom
 
-complex_sort90_hmm_dir = /home/bml_casp15/update_complex_dbs_newest/databases/Complex/msa/hmm
+complex_sort90_hmm_dir = /bmlfast/bml_casp16/update_complex_dbs_newest/databases/Complex/msa/hmm
 
 #######################End of Complex alignment generation option###################

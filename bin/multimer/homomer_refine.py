@@ -9,20 +9,23 @@ from multicom4.monomer_structure_refinement import iterative_refine_pipeline
 from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
-    run_multimer_structure_generation_homo_pipeline_v2, \
-    run_multimer_structure_generation_pipeline_foldseek, run_multimer_structure_generation_pipeline_foldseek_old, \
-    run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, \
-    foldseek_iterative_monomer_input, copy_same_sequence_msas
+    run_multimer_structure_generation_pipeline_v2, \
+    run_multimer_structure_generation_pipeline_foldseek, \
+    run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
+    copy_same_sequence_msas
 
 from absl import flags
 from absl import app
 import copy
 import pandas as pd
+import json 
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_string('config_name', None, 'config name')
+flags.DEFINE_string('config_name', None, 'Whether to use IMG alignment to generate models')
+flags.DEFINE_integer('idx', None, 'Whether to use IMG alignment to generate models')
+
 FLAGS = flags.FLAGS
 
 
@@ -63,19 +66,16 @@ def main(argv):
 
     with open(FLAGS.fasta_path) as f:
         input_fasta_str = f.read()
-    input_seqs, input_descs = parse_fasta(input_fasta_str)
+    input_seqs, input_descs = parse_fasta(fasta_string=input_fasta_str)
     chain_id_map, chain_id_seq_map = make_chain_id_map(sequences=input_seqs,
                                                        descriptions=input_descs)
-
-    print("#################################################################################################")
-
     print("#################################################################################################")
 
     print("#################################################################################################")
     print("4. Start to generate complex alignments")
 
     N4_outdir = os.path.join(FLAGS.output_dir, 'N4_monomer_alignments_concatenation')
-
+    
     print("#################################################################################################")
 
     print("#################################################################################################")
@@ -92,103 +92,39 @@ def main(argv):
 
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
-    if FLAGS.config_name == "def_mul_refine":
-        N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
-        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
-                                                                fasta_path=FLAGS.fasta_path,
-                                                                chain_id_map=chain_id_map,
-                                                                aln_dir=N1_outdir,
-                                                                complex_aln_dir=N4_outdir,
-                                                                template_dir=N5_outdir,
-                                                                monomer_model_dir=N3_outdir,
-                                                                output_dir=N6_outdir,
-                                                                run_methods=[FLAGS.config_name],
-                                                                run_script=True,
-                                                                run_deepmsa=False):
-            print("Program failed in step 6")
-            
-        print("Multimer structure generation has been finished!")
-    
-    else:
-        
-        print("Multimer structure generation has been finished!")
+    method_out_dir = os.path.join(N6_outdir, FLAGS.config_name) 
+    # refine default top-ranked models
+    refinement_inputs = []
+    default_workdir = os.path.join(N6_outdir, 'default_multimer')
+    ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
+    if not os.path.exists(ranking_json_file):
+        raise Exception(f"Haven't generated default_multimer models!")
 
-        print("#################################################################################################")
+    ranking_json = json.loads(open(ranking_json_file).read())
 
-        print("7. Start to evaluate monomer models")
+    i = FLAGS.idx
+    pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
+    model_name = list(ranking_json["order"])[i]
+    pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
+    msa_paths = {}
+    for chain_id in chain_id_map:
+        monomer_msa = os.path.join(default_workdir, 'msas', chain_id, "monomer_final.a3m")
+        paired_msa = os.path.join(default_workdir, 'msas', f"{chain_id}.paired.a3m")
+        msa_paths[chain_id] = dict(paired_msa=paired_msa,
+                                    monomer_msa=monomer_msa)
 
-        N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
+    refine_input = iterative_refine_pipeline_multimer.refinement_input_multimer(chain_id_map=chain_id_map,
+                                                                                fasta_path=FLAGS.fasta_path,
+                                                                                pdb_path=pdb_path,
+                                                                                pkl_path=pkl_path,
+                                                                                msa_paths=msa_paths)
+    refinement_inputs += [refine_input]
 
-        print("#################################################################################################")
+    refine_dir = os.path.join(method_out_dir, 'workdir')
+    makedir_if_not_exists(refine_dir)
 
-        print("8. Start to run multimer iterative generation pipeline using top-ranked monomer models")
-
-        qa_result_dir = N7_outdir
-
-        iterative_prepare_dir = os.path.join(qa_result_dir, 'iter_prepare')
-        makedir_if_not_exists(iterative_prepare_dir)
-
-        pipeline_inputs = []
-        for i in range(2):
-            monomer_pdb_dirs = {}
-            monomer_alphafold_a3ms = {}
-            pdb_name = None
-
-            first_monomer_id = ""
-            for chain_id in chain_id_map:
-                first_monomer_id = chain_id
-                ranking_file = os.path.join(N7_outdir, first_monomer_id, 'pairwise_ranking_monomer.csv')
-                monomer_ranking = pd.read_csv(ranking_file)
-                pdb_name = monomer_ranking.loc[i, 'model']
-                break
-
-            current_work_dir = os.path.join(iterative_prepare_dir, str(i))
-            makedir_if_not_exists(current_work_dir)
-
-            for chain_id in chain_id_map:
-                monomer_id = chain_id
-                chain_pdb_dir = os.path.join(current_work_dir, monomer_id)
-                makedir_if_not_exists(chain_pdb_dir)
-
-                first_monomer_id_dir = os.path.join(qa_result_dir, first_monomer_id)
-                os.system("cp " + os.path.join(first_monomer_id_dir, 'pdb', pdb_name) + " " + os.path.join(chain_pdb_dir, pdb_name))
-
-                new_contents = []
-                for idx, line in enumerate(open(os.path.join(qa_result_dir, first_monomer_id, 'msa', pdb_name.replace('.pdb', '.a3m'))).readlines()):
-                    if idx == 0:
-                        new_contents += [f">{monomer_id}\n"]
-                    else:
-                        new_contents += [line]
-
-                open(os.path.join(chain_pdb_dir, pdb_name.replace('.pdb', '.a3m')), 'w').writelines(new_contents)
-                monomer_pdb_dirs[chain_id] = os.path.join(chain_pdb_dir, pdb_name)
-                monomer_alphafold_a3ms[chain_id] = os.path.join(chain_pdb_dir, pdb_name.replace('.pdb', '.a3m'))
-
-            print(monomer_alphafold_a3ms)
-            pipeline_inputs += [foldseek_iterative_monomer_input(monomer_pdb_dirs=monomer_pdb_dirs,
-                                                                monomer_alphafold_a3ms=monomer_alphafold_a3ms)]
-
-        monomer_template_stos = []
-        for chain_id in chain_id_map:
-            monomer = chain_id
-            monomer_template_sto = os.path.join(N1_outdir, monomer, f"{monomer}_uniref90.sto")
-            if not os.path.exists(monomer_template_sto):
-                raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
-            monomer_template_stos += [monomer_template_sto]
-
-        if FLAGS.config_name.find('_o') > 0:
-            if not run_multimer_structure_generation_pipeline_foldseek_old(params=params, fasta_path=FLAGS.fasta_path,
-                                                                            chain_id_map=chain_id_map, config_name=FLAGS.config_name,
-                                                                            pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
-                                                                            is_homomers=True, monomer_template_stos=monomer_template_stos):
-                print(f"Program failed in step 6 {FLAGS.config_name}")
-        else:
-            if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
-                                                                        chain_id_map=chain_id_map, config_name=FLAGS.config_name,
-                                                                        pipeline_inputs=[pipeline_inputs[0]],
-                                                                        outdir=N6_outdir,
-                                                                        is_homomers=True, monomer_template_stos=monomer_template_stos):
-                print("Program failed in step 6 foldseek_iter")
+    pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=params, config_name=FLAGS.config_name)
+    pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="heteromer")
 
 
 if __name__ == '__main__':

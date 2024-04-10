@@ -159,6 +159,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
+            'predictions_per_model': 5,
         },
         'foldseek_refine_esm': {
             'number_of_input_models': 5,
@@ -172,6 +173,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'ptm_threshold': 0.0,
             'msa_source': 'foldseek',
             'template_source': 'default',
+            'predictions_per_model': 5,
         },
         'foldseek_refine_esm_h': {
             'number_of_input_models': 5,
@@ -185,6 +187,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'default',
             'plddt_threshold': 0.7,
             'ptm_threshold': 0.7,
+            'predictions_per_model': 5,
         },
     }
 })

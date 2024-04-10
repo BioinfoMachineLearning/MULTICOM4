@@ -89,66 +89,47 @@ def main(argv):
 
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
-    if FLAGS.config_name == "def_mul_refine":
-        N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
-        if not run_multimer_structure_generation_pipeline_v2(params=params,
-                                                            fasta_path=FLAGS.fasta_path,
-                                                            chain_id_map=chain_id_map,
-                                                            aln_dir=N1_outdir,
-                                                            complex_aln_dir=N4_outdir,
-                                                            template_dir=N5_outdir,
-                                                            monomer_model_dir=N3_outdir,
-                                                            output_dir=N6_outdir,
-                                                            run_methods=[FLAGS.config_name],
-                                                            run_script=True,
-                                                            run_deepmsa=False):
-            print("Program failed in step 6")
-            
-        print("Multimer structure generation has been finished!")
+    print("#################################################################################################")
 
-    else:
+    print("#################################################################################################")
 
-        print("#################################################################################################")
+    print("7. Start to evaluate monomer models")
 
-        print("#################################################################################################")
+    N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
 
-        print("7. Start to evaluate monomer models")
+    print("#################################################################################################")
 
-        N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_only_structure_evaluation')
+    print("#################################################################################################")
 
-        print("#################################################################################################")
+    print("8. Start to run multimer iterative generation pipeline using top-ranked monomer models")
 
-        print("#################################################################################################")
-
-        print("8. Start to run multimer iterative generation pipeline using top-ranked monomer models")
-
-        pipeline_inputs = []
-        for i in range(2):
-            monomer_pdb_dirs = {}
-            monomer_alphafold_a3ms = {}
-            for chain_id in chain_id_map:
-                monomer_id = chain_id
-                ranking_file = os.path.join(N7_outdir, monomer_id, 'pairwise_ranking_monomer.csv')
-                monomer_ranking = pd.read_csv(ranking_file)
-                pdb_name = monomer_ranking.loc[i, 'model']
-                monomer_pdb_dirs[chain_id] = os.path.join(N7_outdir, monomer_id, 'pdb', pdb_name)
-                monomer_alphafold_a3ms[chain_id] =  os.path.join(N7_outdir, monomer_id, 'msa', pdb_name.replace('.pdb', '.a3m'))
-            pipeline_inputs += [foldseek_iterative_monomer_input(monomer_pdb_dirs=monomer_pdb_dirs,
-                                                                monomer_alphafold_a3ms=monomer_alphafold_a3ms)]
-
-        monomer_template_stos = []
+    pipeline_inputs = []
+    for i in range(2):
+        monomer_pdb_dirs = {}
+        monomer_alphafold_a3ms = {}
         for chain_id in chain_id_map:
-            monomer = chain_id
-            monomer_template_sto = os.path.join(N1_outdir, monomer, f"{monomer}_uniref90.sto")
-            if not os.path.exists(monomer_template_sto):
-                raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
-            monomer_template_stos += [monomer_template_sto]
+            monomer_id = chain_id
+            ranking_file = os.path.join(N7_outdir, monomer_id, 'pairwise_ranking_monomer.csv')
+            monomer_ranking = pd.read_csv(ranking_file)
+            pdb_name = monomer_ranking.loc[i, 'model']
+            monomer_pdb_dirs[chain_id] = os.path.join(N7_outdir, monomer_id, 'pdb', pdb_name)
+            monomer_alphafold_a3ms[chain_id] =  os.path.join(N7_outdir, monomer_id, 'msa', pdb_name.replace('.pdb', '.a3m'))
+        pipeline_inputs += [foldseek_iterative_monomer_input(monomer_pdb_dirs=monomer_pdb_dirs,
+                                                            monomer_alphafold_a3ms=monomer_alphafold_a3ms)]
 
-        if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
-                                                                chain_id_map=chain_id_map, config_name=FLAGS.config_name,
-                                                                pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
-                                                                monomer_template_stos=monomer_template_stos):
-            print("Program failed in step 6 foldseek_iter")
+    monomer_template_stos = []
+    for chain_id in chain_id_map:
+        monomer = chain_id
+        monomer_template_sto = os.path.join(N1_outdir, monomer, f"{monomer}_uniref90.sto")
+        if not os.path.exists(monomer_template_sto):
+            raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
+        monomer_template_stos += [monomer_template_sto]
+
+    if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
+                                                            chain_id_map=chain_id_map, config_name=FLAGS.config_name,
+                                                            pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
+                                                            monomer_template_stos=monomer_template_stos):
+        print("Program failed in step 6 foldseek_iter")
 
 if __name__ == '__main__':
     flags.mark_flags_as_required([
