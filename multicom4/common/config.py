@@ -603,6 +603,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
+            'predictions_per_model': 5,
         },
     }
 })
