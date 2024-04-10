@@ -15,7 +15,7 @@ This is the installation note for the tools
      ```
      # Installation
 
-     conda create -n magafold python=3.7
+     conda create -n megafold python=3.7
 
      conda install -c anaconda cudnn 
 
