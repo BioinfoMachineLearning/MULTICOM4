@@ -513,7 +513,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                     elif msa_source == "colabfold":
                         colabfold_a3m = os.path.join(alndir, targetname + '_colabfold.a3m')
                         if not os.path.exists(colabfold_a3m):
-                            errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {colabfold_a3m}\n"
+                            errormsg = errormsg + f"Cannot find colabfold alignment for {targetname}: {colabfold_a3m}\n"
                         common_parameters += f"--custom_msa={colabfold_a3m} "
 
                     elif msa_source == "img":
@@ -525,7 +525,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                     elif msa_source == "dhr":
                         dhr_af_a3m = os.path.join(alndir, targetname + '_dhr_af.a3m')
                         if not os.path.exists(dhr_af_a3m):
-                            errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {dhr_af_a3m}\n"
+                            errormsg = errormsg + f"Cannot find dhr alignment for {targetname}: {dhr_af_a3m}\n"
                         common_parameters += f"--custom_msa={dhr_af_a3m} "
 
                     elif msa_source == "esm_msa":
@@ -544,12 +544,22 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         
                         common_parameters += f"--custom_msa={esm_msa_path} "
 
+                    elif msa_source in ['dom_hhsearch', 'dom_parser', 'dom_unidoc', 'dom_manual']:
+                        
+                        dom_combine_a3m = os.path.join(method_outdir, 'domain_alns', 'final.a3m')
+
+                        if not os.path.exists(dom_combine_a3m):
+
+                            errormsg = errormsg + f"Cannot find domain alignment for {targetname}: {dom_combine_a3m}\n"
+
+                        common_parameters += f"--custom_msa={dom_combine_a3m} "
+
                     elif run_method.find('deepmsa_') >= 0:
                         deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', msa_source + '.a3m')
                         if not os.path.exists(deepmsa_a3m):
                             errormsg = errormsg + f"Cannot find deepmsa alignment for {targetname}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
-                    
+
                     if template_source == "pdb70":
                         uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):

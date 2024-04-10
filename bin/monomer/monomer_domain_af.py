@@ -42,7 +42,8 @@ def main(argv):
     makedir_if_not_exists(outdir)
 
     N1_outdir = os.path.join(outdir, 'N1_monomer_alignments_generation')
-    makedir_if_not_exists(N1_outdir)
+    N1_outdir_img = os.path.join(outdir, 'N1_monomer_alignments_generation_img')
+    N2_outdir = os.path.join(outdir, 'N2_monomer_template_search')
 
     fasta_name = os.path.basename(FLAGS.fasta_path)
     diso_out_file = os.path.join(N1_outdir, fasta_name.replace('.fasta', '.diso'))
@@ -63,91 +64,83 @@ def main(argv):
     print(sequence)
     print(''.join(disorder_pred))
 
-    # 1. hhsearch
-    run_hhsearch_dom(disorder_pred=disorder_pred, 
-                     N1_outdir=N1_outdir,
-                     fasta_path=FLAGS.fasta_path,
-                     params=params)
+    domain_info_dict = {}
 
+    # 1. hhsearch
+    domain_info_dict['dom_hhsearch'] = run_hhsearch_dom(disorder_pred=disorder_pred, 
+                                                        N1_outdir=N1_outdir,
+                                                        fasta_path=FLAGS.fasta_path,
+                                                        params=params)
+    
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')    
     default_workdir = os.path.join(N3_outdir, 'default')
     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
     if not os.path.exists(ranking_json_file):
         raise Exception(f"Haven't generated default models!")
 
+    alphafold_def_a3m = os.path.join(N3_outdir, 'default', 'msas', 'monomer_final.a3m')
+
     ranked_0_pdb = os.path.join(N3_outdir, 'default', 'ranked_0.pdb')
     # 2. domain_parser, requires the predicted full-length model as input
-    run_dom_parser(disorder_pred=disorder_pred, 
-                   N1_outdir=N1_outdir,
-                   fasta_path=FLAGS.fasta_path,
-                   ranked_0_pdb=ranked_0_pdb,
-                   params=params)
-
+    dom_parser_domain_file = run_dom_parser(disorder_pred=disorder_pred, 
+                                            N1_outdir=N1_outdir,
+                                            fasta_path=FLAGS.fasta_path,
+                                            ranked_0_pdb=ranked_0_pdb,
+                                            params=params)
+    
+    if len(dom_parser_domain_file) > 0:
+        domain_info_dict['dom_parser'] = dom_parser_domain_file 
 
     # 3. Unidoc structure-based
-    run_unidoc(disorder_pred=disorder_pred, 
-               N1_outdir=N1_outdir,
-               fasta_path=FLAGS.fasta_path,
-               ranked_0_pdb=ranked_0_pdb,
-               params=params)
+    domain_info_dict['dom_unidoc'] = run_unidoc(disorder_pred=disorder_pred, 
+                                                N1_outdir=N1_outdir,
+                                                fasta_path=FLAGS.fasta_path,
+                                                ranked_0_pdb=ranked_0_pdb,
+                                                params=params)
 
+    if FLAGS.domain_info is not None:
+
+        domain_info_dict['dom_manual'] = FLAGS.domain_info
+
+    for run_method in domain_info_dict:
+
+        method_outdir = os.path.join(N3_outdir, run_method)
+        os.makedirs(method_outdir, exist_ok=True)
+
+        fastadir = os.path.join(method_outdir, 'domain_fastas')
+        os.makedirs(fastadir, exist_ok=True)
+
+        generate_domain_fastas(fasta_path=FLAGS.fasta_path, 
+                               domain_info=domain_info_dict[run_method], 
+                               output_dir=fastadir)
+        
+        alndir = os.path.join(method_outdir, 'domain_alns')
+        os.makedirs(alndir, exist_ok=True)
+
+        generate_domain_alignments(params=params, 
+                                   domain_fastas_dir=fastadir,
+                                   output_dir=alndir)
+        
+        paired_a3m = combine_domain_msas(sequence=sequence, 
+                                        domain_info=domain_info_dict[run_method], 
+                                        domaindir=alndir)
+        
+        combine_a3m = os.path.join(alndir, 'final.a3m')
+        with open(combine_a3m, 'w') as fw:
+            fw.write(open(alphafold_def_a3m).read())
+            fw.write(open(paired_a3m).read())
     
 
+    if not run_monomer_structure_generation_pipeline_v2(params=params,
+                                                        fasta_path=FLAGS.fasta_path,
+                                                        alndir=N1_outdir, 
+                                                        img_alndir=N1_outdir_img,
+                                                        templatedir=N2_outdir, 
+                                                        outdir=N3_outdir,
+                                                        run_methods=list(domain_info_dict.keys()),
+                                                        run_script=os.path.exists(params['slurm_script_template'])):
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    bash_script_dir = os.path.join(N3_outdir, 'post_def_bash_scripts')
-    if os.path.exists(params['slurm_script_template']):
-        bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
-    os.makedirs(bash_script_dir, exist_ok=True)
-
-    run_methods = ['default_tmsearch', 'def_esm_msa', 'foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
-
-    for run_method in run_methods:
-        cmd = f"python bin/monomer/monomer_single_predictor.py --option_file {FLAGS.option_file} " \
-              f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
-              f"--config_name {run_method}"
-        print(f"Generating bash scripts for {run_method}")
-
-        if os.path.exists(params['slurm_script_template']):
-            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-            print(f"Generating bash file for {run_method}: {bash_file}")
-            jobname = f"{targetname}_{run_method}"
-            with open(bash_file, 'w') as fw:
-                for line in open(params['slurm_script_template']):
-                    line = line.replace("JOBNAME", jobname)
-                    fw.write(line)
-                fw.write(cmd)
-            os.system(f"sbatch {bash_file}")
-        else:
-            bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-            print(bash_file)
-            with open(bash_file, 'w') as fw:
-                fw.write(cmd)
+        print("Program failed in step 3: monomer structure generation")
 
 
 if __name__ == '__main__':

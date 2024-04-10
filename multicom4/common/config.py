@@ -149,6 +149,18 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
         },
+        'dom_hhsearch':{
+            'msa_source': 'dom_hhsearch',
+        },
+        'dom_parser':{
+            'msa_source': 'dom_parser',
+        },
+        'dom_unidoc':{
+            'msa_source': 'dom_unidoc',
+        },
+        'dom_manual':{
+            'msa_source': 'dom_manual',
+        },
         'foldseek_refine': {
             'number_of_input_models': 5,
             'max_iteration': 5,
