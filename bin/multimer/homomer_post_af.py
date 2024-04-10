@@ -10,6 +10,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
 import pandas as pd
 from absl import flags
 from absl import app
+from multicom4.common.config import *
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
@@ -119,9 +120,9 @@ def main(argv):
 
         if run_method == "def_mul_refine":
             
-            for i in range(HETEROMULTIMER_CONFIG.predictors.def_mul_refine.number_of_input_models):
+            for i in range(HOMOMULTIMER_CONFIG.predictors.def_mul_refine.number_of_input_models):
 
-                cmd = f"python bin/multimer/heteromer_refine.py --option_file {FLAGS.option_file} " \
+                cmd = f"python bin/multimer/homomer_refine.py --option_file {FLAGS.option_file} " \
                 f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
                 f"--config_name {run_method} --idx {i}"
 
@@ -134,7 +135,7 @@ def main(argv):
                             line = line.replace("JOBNAME", jobname)
                             fw.write(line)
                         fw.write(cmd)
-                    #os.system(f"sbatch {bash_file}")
+                    os.system(f"sbatch {bash_file}")
                 else:
                     bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
                     print(bash_file)
@@ -156,7 +157,7 @@ def main(argv):
                         line = line.replace("JOBNAME", jobname)
                         fw.write(line)
                     fw.write(cmd)
-                os.system(f"sbatch {bash_file}")
+                #os.system(f"sbatch {bash_file}")
             else:
                 bash_file = os.path.join(bash_script_dir, run_method + '.sh')
                 print(bash_file)
