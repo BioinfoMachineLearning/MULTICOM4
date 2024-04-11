@@ -128,7 +128,7 @@ def main(argv):
     if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
                                                             chain_id_map=chain_id_map, config_name=FLAGS.config_name,
                                                             pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
-                                                            monomer_template_stos=monomer_template_stos):
+                                                            monomer_template_stos=monomer_template_stos, is_homomers=True):
         print("Program failed in step 6 foldseek_iter")
 
 if __name__ == '__main__':

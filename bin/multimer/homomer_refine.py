@@ -124,7 +124,7 @@ def main(argv):
     makedir_if_not_exists(refine_dir)
 
     pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=params, config_name=FLAGS.config_name)
-    pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="heteromer")
+    pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="homomer")
 
 
 if __name__ == '__main__':

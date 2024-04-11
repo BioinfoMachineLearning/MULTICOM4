@@ -117,7 +117,7 @@ def main(argv):
                    'def_mul_refine']
 
     for run_method in run_methods:
-
+        
         if run_method == "def_mul_refine":
             
             for i in range(HOMOMULTIMER_CONFIG.predictors.def_mul_refine.number_of_input_models):
