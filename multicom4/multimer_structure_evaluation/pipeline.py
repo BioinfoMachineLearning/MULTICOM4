@@ -157,15 +157,16 @@ class Multimer_structure_evaluation_pipeline:
             result_dict["pairwise_bfactor_avg"] = result_file
 
         if "gate" in self.run_methods:
-
-            gate_ranking_df_file = self.gate_qa.run_multimer_qa(fasta_path=fasta_path, 
-                                                            input_dir=pdbdir, 
-                                                            pkl_dir=pkldir,
-                                                            outputdir=os.path.join(output_dir, 'gate'))
-            gate_ranking_df = pd.read_csv(gate_ranking_df_file)
-            gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
-            gate_ranking_df.to_csv(os.path.join(output_dir, 'gate.csv'))
-            result_dict['gate'] = os.path.join(output_dir, 'gate.csv')
+            resultfile = os.path.join(output_dir, 'gate.csv')
+            if not os.path.exists(resultfile):
+                gate_ranking_df_file = self.gate_qa.run_multimer_qa(fasta_path=fasta_path, 
+                                                                input_dir=pdbdir, 
+                                                                pkl_dir=pkldir,
+                                                                outputdir=os.path.join(output_dir, 'gate'))
+                gate_ranking_df = pd.read_csv(gate_ranking_df_file)
+                gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
+                gate_ranking_df.to_csv(resultfile)
+            result_dict['gate'] = resultfile
             result_dict["gate_cluster"] = os.path.join(output_dir, 'gate', 'cluster.txt')
 
         if "gate" in self.run_methods and "alphafold" in self.run_methods:

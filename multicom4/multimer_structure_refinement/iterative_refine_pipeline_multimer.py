@@ -58,17 +58,17 @@ class Multimer_iterative_refinement_pipeline_server:
 
 class Multimer_refinement_model_selection(config.pipeline):
     
-    def __init__(self, params, stoichiometry):
+    def __init__(self, params, config_name, stoichiometry):
 
         super().__init__()
 
         self.params = params
 
-        self.predictor_config = self.heteromer_config.predictors.def_refine
+        self.predictor_config = self.heteromer_config.predictors[config_name]
 
         if stoichiometry == "heteromer":
 
-            self.predictor_config = self.homomer_config.predictors.def_refine
+            self.predictor_config = self.homomer_config.predictors[config_name]
         
 
     def select_v1(self, indir, outdir):

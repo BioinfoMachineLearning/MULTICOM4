@@ -139,13 +139,16 @@ class Monomer_structure_evaluation_pipeline:
                 pdbs_from_monomer, pdbs_from_multimer, pdbs_with_dist,
                 contact_map_file, dist_map_file):
 
+        print("111111111111111111111")
         result_dict = {}
         cwd = os.getcwd()
 
         pdb_count = len(os.listdir(pdbdir))
 
         if "alphafold" in self.run_methods:
+            
             alphafold_ranking = self.alphafold_qa.run(pkldir)
+
             ranking_file = os.path.join(output_dir_abs, 'alphafold_ranking.csv')
             alphafold_ranking.to_csv(ranking_file)
             result_dict["alphafold"] =ranking_file

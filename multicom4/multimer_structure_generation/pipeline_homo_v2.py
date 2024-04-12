@@ -425,7 +425,14 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
         deepmsa_complex_aln_dir = os.path.join(complex_aln_dir, 'deepmsa2')
 
         predictor_commands = {}
-        for index, concatenate_method in enumerate(sorted(os.listdir(deepmsa_complex_aln_dir))):
+
+        ranking_file = os.path.join(deepmsa_complex_aln_dir, 'deepmsa_paired_ranking.csv')
+        
+        ranking_df = pd.read_csv(ranking_file)
+
+        predictor_commands = {}
+
+        for index, concatenate_method in enumerate(ranking_df.name):
             
             if concatenate_method.find('.csv') > 0:
                 continue

@@ -432,7 +432,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                 break
 
         # model_iteration_scores += [max_lddt_score]
-        while len(model_iteration_scores) <= self.max_iteration:
+        while len(model_iteration_scores) <= self.predictor_config.max_iteration:
             model_iteration_scores += [0]
 
         print(model_iteration_scores)

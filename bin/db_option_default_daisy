@@ -2,6 +2,7 @@
 
 slurm_script_template = ""
 
+
 ################################tools option#########################################
 
 # hhblits program path
@@ -131,7 +132,7 @@ foldseek_pdb_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/c
 
 foldseek_pdb_database_dir = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
 
-foldseek_af_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/foldseek_database
+foldseek_af_database = /home/jl4mc/af_db
 
 foldseek_af_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/pdbs
 

@@ -91,12 +91,13 @@ def main(argv):
 
     run_methods = ['def_mul_refine']
 
-    stoichiometry = "homomers" if len(processed_seuqences) == 1 else 'heteromers'
+    stoichiometry = "homomers" if len(set(input_seqs)) == 1 else 'heteromers'
     for run_method in run_methods:
         if not complete_result(os.path.join(N6_outdir, run_method), 5):
             refine_dir = os.path.join(N6_outdir, run_method, 'workdir')
             final_dir = os.path.join(N6_outdir, run_method, 'finaldir')
-            pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection(params=params, stoichiometry=stoichiometry)
+            os.makedirs(final_dir, exist_ok=True)
+            pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection(params=params, config_name=run_method, stoichiometry=stoichiometry)
             pipeline.select_v1(indir=refine_dir, outdir=final_dir)
             pipeline.make_predictor_results(final_dir, os.path.join(N6_outdir, run_method))
 
@@ -111,6 +112,7 @@ def main(argv):
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_structure_evaluation')
     monomer_qas_res = {}
     processed_seuqences = {}
+    run_methods = ["alphafold", "apollo", "bfactor"]
     for chain_id_idx, chain_id in enumerate(chain_id_map):
         monomer_id = chain_id
         monomer_sequence = chain_id_map[chain_id].sequence
@@ -136,7 +138,7 @@ def main(argv):
                                                      input_multimer_dir=N6_outdir,
                                                      contact_map_file=contact_map_file,
                                                      dist_map_file=dist_map_file,
-                                                     outputdir=N7_monomer_outdir, generate_final_models=True, run_methods=run_methods)
+                                                     outputdir=N7_monomer_outdir, generate_final_models=True)
             if result is None:
                 raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
             monomer_qas_res[monomer_id] = result
