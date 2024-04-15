@@ -130,7 +130,7 @@ class Foldseek:
                 raise ValueError(f'Could not find Foldseek database {database_path}')
 
 
-    def query(self, pdb: str, outdir: str, progressive_threshold=1, tmscore_threshold=0.3, maxseq=2000, 
+    def query(self, pdb: str, outdir: str, progressive_threshold=1, tmscore_threshold=0.3, maxseq=1000, 
                     multiprocess=False) -> str:
         """Queries the database using Foldseek."""
         input_path = os.path.join(outdir, 'query.pdb')

@@ -133,6 +133,7 @@ class Complex_sequence_based_template_search_pipeline:
             curr_template_hits = []
             for j in range(len(prev_pd)):
                 hit1_name = prev_pd.loc[j, f'name{i}'].split()[0]
+                print(f"finding hits for {hit1_name}")
                 if template_count > 100:
                     break
                 for k in range(len(monomer_template_results[i])):

@@ -114,22 +114,22 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         if len(other_databases) >= 10:
             multiprocess = True
 
-        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000, multiprocess=multiprocess)
+        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=self.predictor_config.max_template_count, multiprocess=multiprocess)
 
     def check_and_rank_templates(self, template_result, outfile, query_sequence):
 
         evalue_keep_indices = []
         for i in range(len(template_result['local_alignment'])):
             hit = parsers.TemplateHit(index=i,
-                              name=template_result['local_alignment'].loc[i, 'target'].split('.')[0],
-                              aligned_cols=int(template_result['local_alignment'].loc[i, 'alnlen']),
-                              query=template_result['local_alignment'].loc[i, 'qaln'],
-                              hit_sequence=template_result['local_alignment'].loc[i, 'taln'],
-                              indices_query=build_alignment_indices(template_result['local_alignment'].loc[i, 'qaln'],
-                                                                    template_result['local_alignment'].loc[i, 'qstart']),
-                              indices_hit=build_alignment_indices(template_result['local_alignment'].loc[i, 'taln'],
-                                                                  template_result['local_alignment'].loc[i, 'tstart']),
-                              sum_probs=0.0)
+                                      name=template_result['local_alignment'].loc[i, 'target'].split('.')[0],
+                                      aligned_cols=int(template_result['local_alignment'].loc[i, 'alnlen']),
+                                      query=template_result['local_alignment'].loc[i, 'qaln'],
+                                      hit_sequence=template_result['local_alignment'].loc[i, 'taln'],
+                                      indices_query=build_alignment_indices(template_result['local_alignment'].loc[i, 'qaln'],
+                                                                            template_result['local_alignment'].loc[i, 'qstart']),
+                                      indices_hit=build_alignment_indices(template_result['local_alignment'].loc[i, 'taln'],
+                                                                          template_result['local_alignment'].loc[i, 'tstart']),
+                                      sum_probs=0.0)
             try:
                 assess_foldseek_hit(hit=hit, query_sequence=query_sequence)
             except PrefilterError as e:
@@ -165,8 +165,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
         tmscore_thresholds = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]
 
-        templates_sorted = pd.DataFrame(
-            columns=['query', 'target', 'qaln', 'taln', 'qstart', 'qend', 'tstart', 'tend', 'evalue', 'alnlen'])
+        templates_sorted = pd.DataFrame(columns=['query', 'target', 'qaln', 'taln', 'qstart', 'qend', 'tstart', 'tend', 'evalue', 'alnlen'])
 
         evalue_af_indices = []
         evalue_pdb_indices = []
@@ -200,12 +199,9 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                 break
 
         templates_sorted = copy.deepcopy(template_result['local_alignment'].iloc[evalue_pdb_indices])
-        templates_sorted = templates_sorted.append(
-            copy.deepcopy(template_result['global_alignment'].iloc[tmscore_pdb_indices]))
-        templates_sorted = templates_sorted.append(
-            copy.deepcopy(template_result['local_alignment'].iloc[evalue_af_indices]))
-        templates_sorted = templates_sorted.append(
-            copy.deepcopy(template_result['global_alignment'].iloc[tmscore_af_indices]))
+        templates_sorted = templates_sorted.append(copy.deepcopy(template_result['global_alignment'].iloc[tmscore_pdb_indices]))
+        templates_sorted = templates_sorted.append(copy.deepcopy(template_result['local_alignment'].iloc[evalue_af_indices]))
+        templates_sorted = templates_sorted.append(copy.deepcopy(template_result['global_alignment'].iloc[tmscore_af_indices]))
 
         templates_sorted.drop(templates_sorted.filter(regex="Unnamed"), axis=1, inplace=True)
         templates_sorted.reset_index(inplace=True, drop=True)
@@ -244,23 +240,27 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             if taln_full_seq in seen_seq:
                 continue
             alignments[target] = taln_full_seq
+            
             seen_seq += [taln_full_seq]
+
+            if len(seen_seq) >= self.predictor_config.max_template_count:
+                break
 
         fasta_chunks = (f">{k}\n{alignments[k]}" for k in alignments)
 
         with open(outfile + '.temp', 'w') as fw:
             fw.write('\n'.join(fasta_chunks) + '\n')
 
-        combine_a3ms([start_msa, f"{outfile}.temp"], f"{outfile}.comb")
+        cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.temp -o {outfile}.temp.filt -id 90"
 
-        cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.comb -o {outfile} -id 90"
+        combine_a3ms([start_msa, f"{outfile}.temp.filt"], f"{outfile}.comb")
 
         os.system(cmd)
 
     def copy_atoms_and_unzip(self, template_csv, outdir):
         os.chdir(outdir)
         templates = pd.read_csv(template_csv, sep='\t')
-        num_templates = min(len(templates), 50)
+        num_templates = min(len(templates), self.predictor_config.max_template_count)
         files_to_be_downloaded = []
         for i in range(num_templates):
             template_pdb = templates.loc[i, 'target']
@@ -333,12 +333,10 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             start_pdb = os.path.join(current_work_dir, "start.pdb")
             start_msa = os.path.join(current_work_dir, "start.a3m")
             start_pkl = os.path.join(current_work_dir, "start.pkl")
-            start_template = os.path.join(current_work_dir, "start.template")
+
             os.system(f"cp {ref_start_pdb} {start_pdb}")
             os.system(f"cp {ref_start_msa} {start_msa}")
             os.system(f"cp {ref_start_pkl} {start_pkl}")
-            if len(ref_start_template) > 0:
-                os.sytem(f"cp {ref_start_template} {start_template}")
 
             with open(ref_start_pkl, 'rb') as f:
                 ref_avg_lddt = np.mean(pickle.load(f)['plddt'])
@@ -417,6 +415,12 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                     model_name = list(new_ranking_json["order"])[0]
                     ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
                     ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
+
+                    if self.predictor_config.template_source == "foldseek":
+                        ref_start_template = os.path.join(current_work_dir, 'structure_templates.csv')
+                    else:
+                        ref_start_template = os.path.join(out_model_dir, 'msas', 'pdb_hits.hhr')
+
                     model_iteration_scores += [max_lddt_score]
                 break
 
@@ -435,7 +439,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         os.system("cp " + ref_start_pkl + " " + os.path.join(final_model_dir, "final.pkl"))
         os.system("cp " + ref_start_msa + " " + os.path.join(final_model_dir, "final.a3m"))
         os.system("cp " + ref_start_template + " " + os.path.join(final_model_dir, "final.template"))
-        
+
         os.chdir(cwd)
 
         return final_model_dir

@@ -259,6 +259,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
         ref_start_pdb = pdb_path
         ref_start_pkl = pkl_path
         ref_start_msa_paths = msa_paths
+        ref_start_templates = {}
 
         model_iteration_scores = []
 
@@ -400,6 +401,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                 for chain_id in chain_id_map:
                     ref_start_msa_paths[chain_id] = dict(paired_msa=os.path.join(out_model_dir, f"msas/{chain_id}.paired.a3m"),
                                                          monomer_msa=os.path.join(out_model_dir, "msas", chain_id, "monomer_final.a3m"))
+                    ref_start_templates[chain_id] = os.path.join(current_work_dir, f"{chain_id}.top{self.predictor_config.max_template_count}")
 
                 print('##################################################')
                 if num_iteration + 1 >= self.predictor_config.max_iteration:
@@ -415,6 +417,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                     for chain_id in chain_id_map:
                         ref_start_msa_paths[chain_id] = dict(paired_msa=os.path.join(out_model_dir, f"msas/{chain_id}.paired.a3m"),
                                                          monomer_msa=os.path.join(out_model_dir, "msas", chain_id, "monomer_final.a3m"))
+                        ref_start_templates[chain_id] = os.path.join(current_work_dir, f"{chain_id}.top{self.predictor_config.max_template_count}")
                     model_iteration_scores += [max_lddt_score]
                 break
 
@@ -436,6 +439,8 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                       os.path.join(final_model_dir, chain_id + ".paired.a3m"))
             os.system(f"cp {ref_start_msa_paths[chain_id]['monomer_msa']} " +
                       os.path.join(final_model_dir, chain_id + ".monomer.a3m"))
+            os.system(f"cp {ref_start_templates[chain_id]} " +
+                      os.path.join(final_model_dir, chain_id + ".templates"))
 
         os.chdir(cwd)
 
