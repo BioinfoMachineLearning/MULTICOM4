@@ -31,7 +31,7 @@ class IMG_Msa_runner:
     def query(self, input_fasta_path: str, outpath: str) -> Mapping[str, Any]:
         """Queries the database using HHblits."""
 
-        targetname = open(input_fasta_path).readlines()[0].rstrip('\n').lstrip('>')
+        targetname = os.path.basename(input_fasta_path).replace('.fasta', '')
 
         logfile = os.path.join(outpath, 'img.running')
         if not os.path.exists(logfile):

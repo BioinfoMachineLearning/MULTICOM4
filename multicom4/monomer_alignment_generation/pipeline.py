@@ -327,7 +327,7 @@ class Monomer_alignment_generation_pipeline_img:
     def process(self, input_fasta_path, msa_output_dir):
         """Runs alignment tools on the input sequence and creates features."""
 
-        targetname = open(input_fasta_path).readlines()[0].rstrip('\n').lstrip('>')
+        targetname = os.path.basename(input_fasta_path).replace('.fasta', '')
 
         img_out_path = os.path.join(msa_output_dir, f'{targetname}.a3m')
         print(img_out_path)

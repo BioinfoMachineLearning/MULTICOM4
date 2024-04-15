@@ -505,7 +505,10 @@ def parse_hhr(hhr_string: str) -> Sequence[TemplateHit]:
     if block_starts:
         block_starts.append(len(lines))  # Add the end of the final block.
         for i in range(len(block_starts) - 1):
-            hits.append(_parse_hhr_hit(lines[block_starts[i]:block_starts[i + 1]]))
+            try:
+                hits.append(_parse_hhr_hit(lines[block_starts[i]:block_starts[i + 1]]))
+            except Exception as e:
+                print(e)
     return hits
 
 

@@ -48,7 +48,7 @@ class Monomer_refinement_model_selection(config.pipeline):
 
         self.predictor_config = self.monomer_config.predictors.foldseek_refine
 
-    def select_v1(self, indir, outdir, prefix):
+    def select_v1(self, indir, outdir):
         if os.path.exists(outdir):
             os.system(f"rm -rf {outdir}")
         makedir_if_not_exists(outdir)
@@ -135,16 +135,16 @@ class Monomer_refinement_model_selection(config.pipeline):
         #     selected_df = pd.DataFrame({'selected_models': selected_models})
         #     selected_df.to_csv(os.path.join(outdir, f'{prefix}_selected.csv'))
 
-        selected_models = []
-        for i in range(self.predictor_config.number_of_output_models):
-            pdb_name = df.loc[i, 'model']
-            prefix_name = f"{prefix}{i+1}"
-            os.system("cp " + os.path.join(outdir, pdb_name) + " " + os.path.join(outdir, prefix_name+".pdb"))
-            os.system("cp " + os.path.join(outdir, pdb_name.replace('.pdb', '.pkl')) + " " + os.path.join(outdir, prefix_name+".pkl"))
-            os.system("cp " + os.path.join(outdir, pdb_name.replace('.pdb', '.a3m')) + " " + os.path.join(outdir, prefix_name+".a3m"))
-            selected_models += [pdb_name]
-        selected_df = pd.DataFrame({'selected_models': selected_models})
-        selected_df.to_csv(os.path.join(outdir, f'{prefix}_selected.csv'))
+        # selected_models = []
+        # for i in range(self.predictor_config.number_of_output_models):
+        #     pdb_name = df.loc[i, 'model']
+        #     prefix_name = f"{prefix}{i+1}"
+        #     os.system("cp " + os.path.join(outdir, pdb_name) + " " + os.path.join(outdir, prefix_name+".pdb"))
+        #     os.system("cp " + os.path.join(outdir, pdb_name.replace('.pdb', '.pkl')) + " " + os.path.join(outdir, prefix_name+".pkl"))
+        #     os.system("cp " + os.path.join(outdir, pdb_name.replace('.pdb', '.a3m')) + " " + os.path.join(outdir, prefix_name+".a3m"))
+        #     selected_models += [pdb_name]
+        # selected_df = pd.DataFrame({'selected_models': selected_models})
+        # selected_df.to_csv(os.path.join(outdir, f'{prefix}_selected.csv'))
 
         return outdir
 

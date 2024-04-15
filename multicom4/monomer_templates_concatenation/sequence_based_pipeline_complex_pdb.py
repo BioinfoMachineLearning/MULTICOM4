@@ -81,26 +81,32 @@ class Complex_sequence_based_template_search_pipeline:
         self._release_dates = dict(zip(release_date_df['pdbcode'], release_date_df['release_date']))
         self._max_template_date = datetime.datetime.strptime(params['max_template_date'], '%Y-%m-%d')
 
+        self.pdb_clusters = {}
+        for line in open(self.cluster_tsv):
+            line = line.rstrip('\n')
+            pdbcode1, pdbcode2 = line.split()
+            if pdbcode1 not in self.pdb_clusters:
+                self.pdb_clusters[pdbcode1] = []
+            self.pdb_clusters[pdbcode1] += [pdbcode2]
+
     def find_matches_between_pdbcodes(self, monomer_code1, monomer_code2):
+        cluster_members1 = set()
+        if monomer_code1 in self.pdb_clusters:
+            cluster_members1.update(set(self.pdb_clusters[monomer_code1]))
+        else:
+            cluster_ids = [cluster_id for cluster_id in self.pdb_clusters if monomer_code1 in self.pdb_clusters[cluster_id]]
+            cluster_members1.update(set(self.pdb_clusters[cluster_ids[0]]))
 
-        cluster_members = set()
-        cmd = f"grep {monomer_code2} {self.cluster_tsv}"
-        grep_results = os.popen(cmd).read().rstrip('\n').split('\n')
-        for grep_result in grep_results:
-            pdbcode1, pdbcode2 = grep_result.split('\t')
-            cluster_members.add(pdbcode1)
-            cluster_members.add(pdbcode2)
+        monomer1_pdbcodes = [pdbcode[0:4] for pdbcode in cluster_members1]
+        
+        cluster_members2 = set()
+        if monomer_code2 in self.pdb_clusters:
+            cluster_members2.update(set(self.pdb_clusters[monomer_code2]))
+        else:
+            cluster_ids = [cluster_id for cluster_id in self.pdb_clusters if monomer_code2 in self.pdb_clusters[cluster_id]]
+            cluster_members2.update(set(self.pdb_clusters[cluster_ids[0]]))
 
-        # monomer_code2 is a member in the cluster
-        if len(grep_results) == 1 and pdbcode1 != monomer_code2 and pdbcode2 == monomer_code2:
-            cmd = f"grep {pdbcode1} {self.cluster_tsv}"
-            grep_results = os.popen(cmd).read().rstrip('\n').split('\n')
-            for grep_result in grep_results:
-                pdbcode1, pdbcode2 = grep_result.split()
-                cluster_members.add(pdbcode1)
-                cluster_members.add(pdbcode2)
-
-        match_members = [pdbcode for pdbcode in cluster_members if pdbcode[0:4] == monomer_code1[0:4]]
+        match_members = [pdbcode for pdbcode in cluster_members2 if pdbcode[0:4] in monomer1_pdbcodes]
 
         if len(match_members) == 0:
             return ""

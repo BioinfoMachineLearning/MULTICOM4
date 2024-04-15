@@ -298,6 +298,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         ref_start_pdb = pdb_path
         ref_start_pkl = pkl_path
         ref_start_msa = msa_path
+        ref_start_template = ""
 
         model_iteration_scores = []
 
@@ -332,10 +333,12 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             start_pdb = os.path.join(current_work_dir, "start.pdb")
             start_msa = os.path.join(current_work_dir, "start.a3m")
             start_pkl = os.path.join(current_work_dir, "start.pkl")
-
+            start_template = os.path.join(current_work_dir, "start.template")
             os.system(f"cp {ref_start_pdb} {start_pdb}")
             os.system(f"cp {ref_start_msa} {start_msa}")
             os.system(f"cp {ref_start_pkl} {start_pkl}")
+            if len(ref_start_template) > 0:
+                os.sytem(f"cp {ref_start_template} {start_template}")
 
             with open(ref_start_pkl, 'rb') as f:
                 ref_avg_lddt = np.mean(pickle.load(f)['plddt'])
@@ -397,6 +400,12 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                 model_name = list(new_ranking_json["order"])[0]
                 ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
                 ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
+
+                if self.predictor_config.template_source == "foldseek":
+                    ref_start_template = os.path.join(current_work_dir, 'structure_templates.csv')
+                else:
+                    ref_start_template = os.path.join(out_model_dir, 'msas', 'pdb_hits.hhr')
+
                 print('##################################################')
                 if num_iteration + 1 >= self.predictor_config.max_iteration:
                     print("Reach maximum iteration")
@@ -425,6 +434,8 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         os.system("cp " + ref_start_pdb + " " + os.path.join(final_model_dir, "final.pdb"))
         os.system("cp " + ref_start_pkl + " " + os.path.join(final_model_dir, "final.pkl"))
         os.system("cp " + ref_start_msa + " " + os.path.join(final_model_dir, "final.a3m"))
+        os.system("cp " + ref_start_template + " " + os.path.join(final_model_dir, "final.template"))
+        
         os.chdir(cwd)
 
         return final_model_dir
