@@ -253,9 +253,9 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
 
         cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.temp -o {outfile}.temp.filt -id 90"
 
-        combine_a3ms([start_msa, f"{outfile}.temp.filt"], f"{outfile}.comb")
-
         os.system(cmd)
+
+        combine_a3ms([start_msa, f"{outfile}.temp.filt"], outfile)
 
     def copy_atoms_and_unzip(self, template_csv, outdir):
         os.chdir(outdir)
