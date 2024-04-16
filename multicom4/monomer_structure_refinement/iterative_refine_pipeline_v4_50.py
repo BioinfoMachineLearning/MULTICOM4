@@ -162,8 +162,11 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         if len(evalue_keep_indices) == 0 and len(tmscore_keep_indices) == 0:
             return False
 
-        evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
-        tmscore_thresholds = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]
+        #evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
+        #tmscore_thresholds = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]
+
+        evalue_thresholds = [1e-8, 1e-7, 1e-6]
+        tmscore_thresholds = [0.8, 0.7, 0.6, 0.5]
 
         templates_sorted = pd.DataFrame(columns=['query', 'target', 'qaln', 'taln', 'qstart', 'qend', 'tstart', 'tend', 'evalue', 'alnlen'])
 
@@ -220,8 +223,11 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
 
         templates = pd.read_csv(template_file, sep='\t')
 
-        alignments = {targetname: seq}
-        seen_seq = []
+        # alignments = {targetname: seq}
+        pdb_alignments = {}
+        afdb_alignments = {}
+        pdb_seen_seq = []
+        afdb_seen_seq = []
         for i in range(len(templates)):
             target = templates.loc[i, 'target']
             qaln = templates.loc[i, 'qaln']
@@ -237,25 +243,38 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             aln_full = ['-'] * len(seq)
             aln_full[qstart - 1:qend] = out_sequence
             taln_full_seq = ''.join(aln_full)
-            if taln_full_seq in seen_seq:
-                continue
-            alignments[target] = taln_full_seq
-            
-            seen_seq += [taln_full_seq]
 
-            if len(seen_seq) >= self.predictor_config.max_template_count:
-                break
+            if target.find('.atom.gz') > 0:    
+                if taln_full_seq in pdb_seen_seq:
+                    continue
+                pdb_alignments[target] = taln_full_seq
+                pdb_seen_seq += [taln_full_seq]
+            else:
+                if taln_full_seq in afdb_seen_seq:
+                    continue
+                afdb_alignments[target] = taln_full_seq
+                afdb_seen_seq += [taln_full_seq]
 
-        fasta_chunks = (f">{k}\n{alignments[k]}" for k in alignments)
+        a3ms_to_be_combined = [start_msa]
+        if len(pdb_alignments) > 0:
+            fasta_chunks = (f">{k}\n{pdb_alignments[k]}" for k in pdb_alignments)
+            with open(outfile + 'pdb.temp', 'w') as fw:
+                fw.write('\n'.join(fasta_chunks) + '\n')
+            a3ms_to_be_combined += [outfile + 'pdb.temp']
 
-        with open(outfile + '.temp', 'w') as fw:
-            fw.write('\n'.join(fasta_chunks) + '\n')
+        if len(afdb_alignments) > 0:
+            fasta_chunks = (f">{k}\n{afdb_alignments[k]}" for k in afdb_alignments)
+            with open(outfile + 'afdb.temp', 'w') as fw:
+                fw.write('\n'.join(fasta_chunks) + '\n')
 
-        cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.temp -o {outfile}.temp.filt -id 90"
+            cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.afdb.temp -o {outfile}.afdb.temp.filt -id 50"
+            os.system(cmd)
 
-        os.system(cmd)
+            cmd = f"head -n 10 {outfile}.afdb.temp.filt > {outfile}.afdb.temp.filt.top5"
+            os.system(cmd)
+            a3ms_to_be_combined += [outfile + '.afdb.temp.filt.top5']
 
-        combine_a3ms([start_msa, f"{outfile}.temp.filt"], outfile)
+        combine_a3ms(a3ms_to_be_combined, outfile)
 
     def copy_atoms_and_unzip(self, template_csv, outdir):
         os.chdir(outdir)
