@@ -42,9 +42,9 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
         else:
             self.run_methods = run_methods
 
-    def process_single(self, fasta_path, alndir, img_alndir, outdir, template_dir=None, run_script=False):
+    def process_single(self, targetname, fasta_path, alndir, img_alndir, outdir, template_dir=None, run_script=False):
         
-        targetname = pathlib.Path(fasta_path).stem
+        # targetname = pathlib.Path(fasta_path).stem
 
         cmd = ""
 
@@ -344,8 +344,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
                 print(f"Generating bash file for {predictor}: {bash_file}")
-                name = open(fasta_path).readlines()[0].rstrip('\n')[1:]
-                jobname = f"{name}_{predictor}"
+                jobname = f"{targetname}_{predictor}"
                 with open(bash_file, 'w') as fw:
                     for line in open(slurm_template_file):
                         line = line.replace("JOBNAME", jobname)

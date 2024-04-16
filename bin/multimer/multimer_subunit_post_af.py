@@ -35,6 +35,7 @@ def main(argv):
     
     FLAGS.fasta_path = os.path.abspath(FLAGS.fasta_path)
     FLAGS.output_dir = os.path.abspath(FLAGS.output_dir)
+    targetname = os.path.basename(FLAGS.fasta_path).replace('.fasta', '')
     
     check_file(FLAGS.option_file)
 
@@ -95,13 +96,15 @@ def main(argv):
             N3_monomer_outdir = os.path.join(N3_outdir, monomer_id)
             makedir_if_not_exists(N3_monomer_outdir)
             if not run_monomer_structure_generation_pipeline_v2(params=params,
+                                                                targetname=targetname,
                                                                 fasta_path=monomer_fasta,
                                                                 alndir=N1_monomer_outdir,
                                                                 img_alndir=N1_monomer_outdir_img,
                                                                 templatedir=N2_monomer_outdir,
                                                                 outdir=N3_monomer_outdir,
                                                                 run_methods=monomer_run_methods,
-                                                                run_script=os.path.exists(params['slurm_script_template'])):
+                                                                run_script=os.path.exists(params['slurm_script_template']),
+                                                                targetname=os.path.basename(FLAGS.fasta_path).replace('.fasta', '')):
                 print(f"Program failed in step 3: monomer {monomer_id} structure generation")
 
             processed_seuqences[monomer_sequence] = monomer_id

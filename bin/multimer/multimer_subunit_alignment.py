@@ -35,6 +35,7 @@ def main(argv):
     
     FLAGS.fasta_path = os.path.abspath(FLAGS.fasta_path)
     FLAGS.output_dir = os.path.abspath(FLAGS.output_dir)
+    targetname = os.path.basename(FLAGS.fasta_path).replace('.fasta', '')
     
     check_file(FLAGS.option_file)
 

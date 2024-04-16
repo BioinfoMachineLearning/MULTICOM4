@@ -165,7 +165,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         #evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
         #tmscore_thresholds = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]
 
-        evalue_thresholds = [1e-8, 1e-7, 1e-6]
+        evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5]
         tmscore_thresholds = [0.8, 0.7, 0.6, 0.5]
 
         templates_sorted = pd.DataFrame(columns=['query', 'target', 'qaln', 'taln', 'qstart', 'qend', 'tstart', 'tend', 'evalue', 'alnlen'])
@@ -175,6 +175,8 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         tmscore_af_indices = []
         tmscore_pdb_indices = []
         for evalue_threshold, tmscore_threshold in zip(evalue_thresholds, tmscore_thresholds):
+            print(f"evalue: {evalue_threshold}")
+            print(f"tmscore: {tmscore_threshold}")
             evalue_af_indices = []
             evalue_pdb_indices = []
             for i in evalue_keep_indices:
@@ -194,8 +196,10 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                 if evalue > tmscore_threshold:
                     if target.find('.atom.gz') > 0:
                         tmscore_pdb_indices += [i]
+                        print(target)
                     else:
                         tmscore_af_indices += [i]
+                        print(target)
 
             if len(evalue_af_indices) + len(evalue_pdb_indices) \
                     + len(tmscore_af_indices) + len(tmscore_pdb_indices) >= self.predictor_config.max_template_count:
@@ -209,6 +213,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         templates_sorted.drop(templates_sorted.filter(regex="Unnamed"), axis=1, inplace=True)
         templates_sorted.reset_index(inplace=True, drop=True)
         templates_sorted.to_csv(outfile, sep='\t')
+        print(templates_sorted)
         return True
 
     def generate_msa_from_templates(self, fasta_file, start_msa, template_file, outfile):
@@ -223,7 +228,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
 
         templates = pd.read_csv(template_file, sep='\t')
 
-        alignment_headers = [line.rstrip('\n')[1:] for line in open(start_a3m) if line[0] == ">"]
+        alignment_headers = [line.rstrip('\n')[1:] for line in open(start_msa) if line[0] == ">"]
         # alignments = {targetname: seq}
         pdb_alignments = {}
         afdb_alignments = {}
@@ -233,7 +238,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             target = templates.loc[i, 'target']
             if target in alignment_headers:
                 continue
-                
+
             qaln = templates.loc[i, 'qaln']
             qstart = int(templates.loc[i, 'qstart'])
             qend = int(templates.loc[i, 'qend'])
@@ -260,15 +265,15 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                 afdb_seen_seq += [taln_full_seq]
 
         a3ms_to_be_combined = [start_msa]
-        if len(pdb_alignments) > 0:
+        if len(pdb_seen_seq) > 0:
             fasta_chunks = (f">{k}\n{pdb_alignments[k]}" for k in pdb_alignments)
             with open(outfile + 'pdb.temp', 'w') as fw:
                 fw.write('\n'.join(fasta_chunks) + '\n')
             a3ms_to_be_combined += [outfile + 'pdb.temp']
 
-        if len(afdb_alignments) > 0:
+        if len(afdb_seen_seq) > 0:
             fasta_chunks = (f">{k}\n{afdb_alignments[k]}" for k in afdb_alignments)
-            with open(outfile + 'afdb.temp', 'w') as fw:
+            with open(outfile + '.afdb.temp', 'w') as fw:
                 fw.write('\n'.join(fasta_chunks) + '\n')
 
             cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.afdb.temp -o {outfile}.afdb.temp.filt -id 50"

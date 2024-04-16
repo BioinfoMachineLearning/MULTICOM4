@@ -35,7 +35,8 @@ def main(argv):
     
     FLAGS.fasta_path = os.path.abspath(FLAGS.fasta_path)
     FLAGS.output_dir = os.path.abspath(FLAGS.output_dir)
-    
+    targetname = os.path.basename(FLAGS.fasta_path).replace('.fasta', '')
+
     check_file(FLAGS.option_file)
 
     params = read_option_file(FLAGS.option_file)
@@ -111,6 +112,7 @@ def main(argv):
             N3_monomer_outdir = os.path.join(N3_outdir, monomer_id)
             makedir_if_not_exists(N3_monomer_outdir)
             if not run_monomer_structure_generation_pipeline_v2(params=params,
+                                                                targetname=targetname,
                                                                 fasta_path=monomer_fasta,
                                                                 alndir=N1_monomer_outdir,
                                                                 img_alndir=N1_monomer_outdir_img,
