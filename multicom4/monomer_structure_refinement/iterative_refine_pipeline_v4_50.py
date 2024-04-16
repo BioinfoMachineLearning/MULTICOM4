@@ -223,6 +223,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
 
         templates = pd.read_csv(template_file, sep='\t')
 
+        alignment_headers = [line.rstrip('\n')[1:] for line in open(start_a3m) if line[0] == ">"]
         # alignments = {targetname: seq}
         pdb_alignments = {}
         afdb_alignments = {}
@@ -230,6 +231,9 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         afdb_seen_seq = []
         for i in range(len(templates)):
             target = templates.loc[i, 'target']
+            if target in alignment_headers:
+                continue
+                
             qaln = templates.loc[i, 'qaln']
             qstart = int(templates.loc[i, 'qstart'])
             qend = int(templates.loc[i, 'qend'])
