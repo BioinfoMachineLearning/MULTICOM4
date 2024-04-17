@@ -44,7 +44,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
     def process_single(self, targetname, fasta_path, alndir, img_alndir, outdir, template_dir=None, run_script=False):
         
-        # targetname = pathlib.Path(fasta_path).stem
+        chain_name = pathlib.Path(fasta_path).stem
 
         cmd = ""
 
@@ -88,15 +88,15 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                 
                 if msa_source == "default" and template_source == "pdb70":
                     errormsg = ""
-                    bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
+                    bfd_uniref30_a3m = os.path.join(alndir, chain_name + '_uniref30_bfd.a3m')
                     if not os.path.exists(bfd_uniref30_a3m):
-                        errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
-                    mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                        errormsg = errormsg + f"Cannot find uniclust30 alignment for {chain_name}: {bfd_uniref30_a3m}\n"
+                    mgnify_sto = os.path.join(alndir, chain_name + '_mgnify.sto')
                     if not os.path.exists(mgnify_sto):
-                        errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-                    uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                        errormsg = errormsg + f"Cannot find mgnify alignment for {chain_name}: {mgnify_sto}\n"
+                    uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                     if not os.path.exists(uniref90_sto):
-                        errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                        errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
 
                     if not complete_result(method_out_dir, 5 * num_monomer_predictions_per_model): 
                         if len(errormsg) > 0:
@@ -117,53 +117,53 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
                     errormsg = ""
                     if msa_source == "default":
-                        bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
+                        bfd_uniref30_a3m = os.path.join(alndir, chain_name + '_uniref30_bfd.a3m')
                         if not os.path.exists(bfd_uniref30_a3m):
-                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
-                        mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {chain_name}: {bfd_uniref30_a3m}\n"
+                        mgnify_sto = os.path.join(alndir, chain_name + '_mgnify.sto')
                         if not os.path.exists(mgnify_sto):
-                            errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                            errormsg = errormsg + f"Cannot find mgnify alignment for {chain_name}: {mgnify_sto}\n"
+                        uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
-                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         common_parameters += f"--bfd_uniref_a3m={bfd_uniref30_a3m} " \
                                              f"--mgnify_sto={mgnify_sto} " \
                                              f"--uniref90_sto={uniref90_sto} " \
 
                     elif msa_source == "original":
-                        uniref30_a3m = os.path.join(alndir, targetname + '_uniref30.a3m')
+                        uniref30_a3m = os.path.join(alndir, chain_name + '_uniref30.a3m')
                         if not os.path.exists(uniref30_a3m):
-                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {uniref30_a3m}\n"
-                        bfd_a3m = os.path.join(alndir, targetname + '_bfd.a3m')
+                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {chain_name}: {uniref30_a3m}\n"
+                        bfd_a3m = os.path.join(alndir, chain_name + '_bfd.a3m')
                         if not os.path.exists(bfd_a3m):
-                            errormsg = errormsg + f"Cannot find bfd alignment for {targetname}: {bfd_a3m}\n"
-                        mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                            errormsg = errormsg + f"Cannot find bfd alignment for {chain_name}: {bfd_a3m}\n"
+                        mgnify_sto = os.path.join(alndir, chain_name + '_mgnify.sto')
                         if not os.path.exists(mgnify_sto):
-                            errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                            errormsg = errormsg + f"Cannot find mgnify alignment for {chain_name}: {mgnify_sto}\n"
+                        uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
-                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         common_parameters += f"--bfd_uniref_a3m={uniref30_a3m} " \
                                              f"--bfd_a3m={bfd_a3m} " \
                                              f"--mgnify_sto={mgnify_sto} " \
                                              f"--uniref90_sto={uniref90_sto} " \
 
                     elif msa_source == "colabfold":
-                        colabfold_a3m = os.path.join(alndir, targetname + '_colabfold.a3m')
+                        colabfold_a3m = os.path.join(alndir, chain_name + '_colabfold.a3m')
                         if not os.path.exists(colabfold_a3m):
-                            errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {colabfold_a3m}\n"
+                            errormsg = errormsg + f"Cannot find rosettafold alignment for {chain_name}: {colabfold_a3m}\n"
                         common_parameters += f"--custom_msa={colabfold_a3m} "
 
                     elif msa_source == "img":
-                        img_a3m = os.path.join(img_alndir, targetname + '.a3m')
+                        img_a3m = os.path.join(img_alndir, chain_name + '.a3m')
                         if not os.path.exists(img_a3m):
-                            errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
+                            errormsg = errormsg + f"Cannot find img alignment for {chain_name}: {img_a3m}\n"
                         common_parameters += f"--custom_msa={img_a3m} "
 
                     elif msa_source == "dhr":
-                        dhr_af_a3m = os.path.join(alndir, targetname + '_dhr_af.a3m')
+                        dhr_af_a3m = os.path.join(alndir, chain_name + '_dhr_af.a3m')
                         if not os.path.exists(dhr_af_a3m):
-                            errormsg = errormsg + f"Cannot find rosettafold alignment for {targetname}: {dhr_af_a3m}\n"
+                            errormsg = errormsg + f"Cannot find rosettafold alignment for {chain_name}: {dhr_af_a3m}\n"
                         common_parameters += f"--custom_msa={dhr_af_a3m} "
 
                     elif msa_source == "esm_msa":
@@ -185,24 +185,24 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                     elif run_method.find('deepmsa_') >= 0:
                         deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', msa_source + '.a3m')
                         if not os.path.exists(deepmsa_a3m):
-                            errormsg = errormsg + f"Cannot find deepmsa alignment for {targetname}: {deepmsa_a3m}\n"
+                            errormsg = errormsg + f"Cannot find deepmsa alignment for {chain_name}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
                     
                     if template_source == "pdb70":
-                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                        uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
-                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         if common_parameters.find('--uniref90_sto') < 0:
                             common_parameters += f"--uniref90_sto={uniref90_sto} "
 
                     elif template_source == "pdb_sort90":
                         temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
                         if not os.path.exists(temp_struct_csv):
-                            errormsg = errormsg + f"Cannot find template csv for {targetname}: {temp_struct_csv}\n"
+                            errormsg = errormsg + f"Cannot find template csv for {chain_name}: {temp_struct_csv}\n"
 
                         struct_atom_dir = os.path.join(template_dir, "templates")
                         if not os.path.exists(struct_atom_dir):
-                            errormsg = errormsg + f"Cannot find template directory for {targetname}: {struct_atom_dir}\n"
+                            errormsg = errormsg + f"Cannot find template directory for {chain_name}: {struct_atom_dir}\n"
                         common_parameters += f"--temp_struct_csv={temp_struct_csv} " \
                                              f"--struct_atom_dir={struct_atom_dir} " \
 
@@ -321,7 +321,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                 makedir_if_not_exists(refine_dir)
                 pipeline = iterative_refine_pipeline.Monomer_iterative_refinement_pipeline_server(params=self.params, config_name=run_method)
                 pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir,
-                                uniref90_sto=os.path.join(alndir, targetname + '_uniref90.sto'))
+                                uniref90_sto=os.path.join(alndir, chain_name + '_uniref90.sto'))
 
                 final_dir = os.path.join(method_out_dir, 'finaldir')
                 makedir_if_not_exists(final_dir)
@@ -405,7 +405,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
     def process_single_domain(self, fasta_path, alndir, outdir, run_script=False):
         
-        targetname = pathlib.Path(fasta_path).stem
+        chain_name = pathlib.Path(fasta_path).stem
 
         cmd = ""
 
@@ -449,15 +449,15 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                 
                 if msa_source == "default" and template_source == "pdb70":
                     errormsg = ""
-                    bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
+                    bfd_uniref30_a3m = os.path.join(alndir, chain_name + '_uniref30_bfd.a3m')
                     if not os.path.exists(bfd_uniref30_a3m):
-                        errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
-                    mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                        errormsg = errormsg + f"Cannot find uniclust30 alignment for {chain_name}: {bfd_uniref30_a3m}\n"
+                    mgnify_sto = os.path.join(alndir, chain_name + '_mgnify.sto')
                     if not os.path.exists(mgnify_sto):
-                        errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-                    uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                        errormsg = errormsg + f"Cannot find mgnify alignment for {chain_name}: {mgnify_sto}\n"
+                    uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                     if not os.path.exists(uniref90_sto):
-                        errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                        errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
 
                     if not complete_result(method_out_dir, 5 * num_monomer_predictions_per_model): 
                         if len(errormsg) > 0:
@@ -478,53 +478,53 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
                     errormsg = ""
                     if msa_source == "default":
-                        bfd_uniref30_a3m = os.path.join(alndir, targetname + '_uniref30_bfd.a3m')
+                        bfd_uniref30_a3m = os.path.join(alndir, chain_name + '_uniref30_bfd.a3m')
                         if not os.path.exists(bfd_uniref30_a3m):
-                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {bfd_uniref30_a3m}\n"
-                        mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {chain_name}: {bfd_uniref30_a3m}\n"
+                        mgnify_sto = os.path.join(alndir, chain_name + '_mgnify.sto')
                         if not os.path.exists(mgnify_sto):
-                            errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                            errormsg = errormsg + f"Cannot find mgnify alignment for {chain_name}: {mgnify_sto}\n"
+                        uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
-                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         common_parameters += f"--bfd_uniref_a3m={bfd_uniref30_a3m} " \
                                              f"--mgnify_sto={mgnify_sto} " \
                                              f"--uniref90_sto={uniref90_sto} " \
 
                     elif msa_source == "original":
-                        uniref30_a3m = os.path.join(alndir, targetname + '_uniref30.a3m')
+                        uniref30_a3m = os.path.join(alndir, chain_name + '_uniref30.a3m')
                         if not os.path.exists(uniref30_a3m):
-                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {targetname}: {uniref30_a3m}\n"
-                        bfd_a3m = os.path.join(alndir, targetname + '_bfd.a3m')
+                            errormsg = errormsg + f"Cannot find uniclust30 alignment for {chain_name}: {uniref30_a3m}\n"
+                        bfd_a3m = os.path.join(alndir, chain_name + '_bfd.a3m')
                         if not os.path.exists(bfd_a3m):
-                            errormsg = errormsg + f"Cannot find bfd alignment for {targetname}: {bfd_a3m}\n"
-                        mgnify_sto = os.path.join(alndir, targetname + '_mgnify.sto')
+                            errormsg = errormsg + f"Cannot find bfd alignment for {chain_name}: {bfd_a3m}\n"
+                        mgnify_sto = os.path.join(alndir, chain_name + '_mgnify.sto')
                         if not os.path.exists(mgnify_sto):
-                            errormsg = errormsg + f"Cannot find mgnify alignment for {targetname}: {mgnify_sto}\n"
-                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                            errormsg = errormsg + f"Cannot find mgnify alignment for {chain_name}: {mgnify_sto}\n"
+                        uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
-                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         common_parameters += f"--bfd_uniref_a3m={uniref30_a3m} " \
                                              f"--bfd_a3m={bfd_a3m} " \
                                              f"--mgnify_sto={mgnify_sto} " \
                                              f"--uniref90_sto={uniref90_sto} " \
 
                     elif msa_source == "colabfold":
-                        colabfold_a3m = os.path.join(alndir, targetname + '_colabfold.a3m')
+                        colabfold_a3m = os.path.join(alndir, chain_name + '_colabfold.a3m')
                         if not os.path.exists(colabfold_a3m):
-                            errormsg = errormsg + f"Cannot find colabfold alignment for {targetname}: {colabfold_a3m}\n"
+                            errormsg = errormsg + f"Cannot find colabfold alignment for {chain_name}: {colabfold_a3m}\n"
                         common_parameters += f"--custom_msa={colabfold_a3m} "
 
                     elif msa_source == "img":
-                        img_a3m = os.path.join(img_alndir, targetname + '.a3m')
+                        img_a3m = os.path.join(img_alndir, chain_name + '.a3m')
                         if not os.path.exists(img_a3m):
-                            errormsg = errormsg + f"Cannot find img alignment for {targetname}: {img_a3m}\n"
+                            errormsg = errormsg + f"Cannot find img alignment for {chain_name}: {img_a3m}\n"
                         common_parameters += f"--custom_msa={img_a3m} "
 
                     elif msa_source == "dhr":
-                        dhr_af_a3m = os.path.join(alndir, targetname + '_dhr_af.a3m')
+                        dhr_af_a3m = os.path.join(alndir, chain_name + '_dhr_af.a3m')
                         if not os.path.exists(dhr_af_a3m):
-                            errormsg = errormsg + f"Cannot find dhr alignment for {targetname}: {dhr_af_a3m}\n"
+                            errormsg = errormsg + f"Cannot find dhr alignment for {chain_name}: {dhr_af_a3m}\n"
                         common_parameters += f"--custom_msa={dhr_af_a3m} "
 
                     elif msa_source == "esm_msa":
@@ -549,31 +549,31 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
                         if not os.path.exists(dom_combine_a3m):
 
-                            errormsg = errormsg + f"Cannot find domain alignment for {targetname}: {dom_combine_a3m}\n"
+                            errormsg = errormsg + f"Cannot find domain alignment for {chain_name}: {dom_combine_a3m}\n"
 
                         common_parameters += f"--custom_msa={dom_combine_a3m} "
 
                     elif run_method.find('deepmsa_') >= 0:
                         deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', msa_source + '.a3m')
                         if not os.path.exists(deepmsa_a3m):
-                            errormsg = errormsg + f"Cannot find deepmsa alignment for {targetname}: {deepmsa_a3m}\n"
+                            errormsg = errormsg + f"Cannot find deepmsa alignment for {chain_name}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
 
                     if template_source == "pdb70":
-                        uniref90_sto = os.path.join(alndir, targetname + '_uniref90.sto')
+                        uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
-                            errormsg = errormsg + f"Cannot find uniref90 alignment for {targetname}: {uniref90_sto}\n"
+                            errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         if common_parameters.find('--uniref90_sto') < 0:
                             common_parameters += f"--uniref90_sto={uniref90_sto} "
 
                     elif template_source == "pdb_sort90":
                         temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
                         if not os.path.exists(temp_struct_csv):
-                            errormsg = errormsg + f"Cannot find template csv for {targetname}: {temp_struct_csv}\n"
+                            errormsg = errormsg + f"Cannot find template csv for {chain_name}: {temp_struct_csv}\n"
 
                         struct_atom_dir = os.path.join(template_dir, "templates")
                         if not os.path.exists(struct_atom_dir):
-                            errormsg = errormsg + f"Cannot find template directory for {targetname}: {struct_atom_dir}\n"
+                            errormsg = errormsg + f"Cannot find template directory for {chain_name}: {struct_atom_dir}\n"
                         common_parameters += f"--temp_struct_csv={temp_struct_csv} " \
                                              f"--struct_atom_dir={struct_atom_dir} " \
 
