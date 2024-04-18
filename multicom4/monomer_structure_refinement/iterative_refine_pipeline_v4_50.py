@@ -114,7 +114,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         if len(other_databases) >= 10:
             multiprocess = True
 
-        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=self.predictor_config.max_template_count, multiprocess=multiprocess)
+        return foldseek_runner.query(pdb=inpdb, outdir=outdir, progressive_threshold=2000, multiprocess=multiprocess)
 
     def check_and_rank_templates(self, template_result, outfile, query_sequence):
 
@@ -162,11 +162,8 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         if len(evalue_keep_indices) == 0 and len(tmscore_keep_indices) == 0:
             return False
 
-        #evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
-        #tmscore_thresholds = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]
-
-        evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5]
-        tmscore_thresholds = [0.8, 0.7, 0.6, 0.5]
+        evalue_thresholds = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
+        tmscore_thresholds = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]
 
         templates_sorted = pd.DataFrame(columns=['query', 'target', 'qaln', 'taln', 'qstart', 'qend', 'tstart', 'tend', 'evalue', 'alnlen'])
 
@@ -216,6 +213,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
         print(templates_sorted)
         return True
 
+
     def generate_msa_from_templates(self, fasta_file, start_msa, template_file, outfile):
         targetname = None
         seq = None
@@ -264,6 +262,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
                 afdb_alignments[target] = taln_full_seq
                 afdb_seen_seq += [taln_full_seq]
 
+
         a3ms_to_be_combined = [start_msa]
         if len(pdb_seen_seq) > 0:
             fasta_chunks = (f">{k}\n{pdb_alignments[k]}" for k in pdb_alignments)
@@ -275,15 +274,21 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             fasta_chunks = (f">{k}\n{afdb_alignments[k]}" for k in afdb_alignments)
             with open(outfile + '.afdb.temp', 'w') as fw:
                 fw.write('\n'.join(fasta_chunks) + '\n')
-
-            cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.afdb.temp -o {outfile}.afdb.temp.filt -id 50"
+                
+        if len(open(start_msa).readlines()) < 2 * 100:
+            if len(afdb_seen_seq) > 0:
+                cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.afdb.temp -o {outfile}.afdb.temp.filt -id 50"
+                os.system(cmd)
+                cmd = f"head -n 10 {outfile}.afdb.temp.filt > {outfile}.afdb.temp.filt.top5"
+                os.system(cmd)
+                a3ms_to_be_combined += [outfile + '.afdb.temp.filt.top5']
+            combine_a3ms(a3ms_to_be_combined, outfile)
+        else:
+            if len(afdb_seen_seq) > 0:
+                a3ms_to_be_combined += [outfile + '.afdb.temp']
+            combine_a3ms(a3ms_to_be_combined, outfile + '.comb')
+            cmd = f"{self.params['hhfilter_program']} -diff 50000 -i {outfile}.comb -o {outfile} -id 90"
             os.system(cmd)
-
-            cmd = f"head -n 10 {outfile}.afdb.temp.filt > {outfile}.afdb.temp.filt.top5"
-            os.system(cmd)
-            a3ms_to_be_combined += [outfile + '.afdb.temp.filt.top5']
-
-        combine_a3ms(a3ms_to_be_combined, outfile)
 
     def copy_atoms_and_unzip(self, template_csv, outdir):
         os.chdir(outdir)
@@ -420,10 +425,31 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             print(f'#########Iteration: {num_iteration + 1}#############')
             print(f"plddt before: {ref_avg_lddt}")
             print(f"plddt after: {max_lddt_score}")
+            
+            selected_model_ranked_idx = 0
             if max_lddt_score > ref_avg_lddt:
-                print("Continue to refine")
-                ref_start_pdb = os.path.join(out_model_dir, "ranked_0.pdb")
-                model_name = list(new_ranking_json["order"])[0]
+                if max_lddt_score - ref_avg_lddt > 5:
+                    print(f"The plddt score has increased more than 5!")
+                    print(f"Looking for other models....")
+
+                    ranked_order = list(new_ranking_json["order"])
+                    for i in range(len(ranked_order)):
+                        if new_ranking_json["plddts"][ranked_order[i]] - ref_avg_lddt < 5:
+                            selected_model_ranked_idx = i
+                            break
+                    
+                    if selected_model_ranked_idx == 0:
+                        print(f"Cannot find any models")
+                        selected_model_ranked_idx = len(refined_plddts)-1
+                    else:
+                        max_lddt_score = new_ranking_json["plddts"][ranked_order[selected_model_ranked_idx]]
+                        print(f"Found alternative model!")
+                        print(f"plddt after: {max_lddt_score}")
+
+            if max_lddt_score > ref_avg_lddt:
+                print(f"Continue to refine")
+                ref_start_pdb = os.path.join(out_model_dir, f"ranked_{selected_model_ranked_idx}.pdb")
+                model_name = list(new_ranking_json["order"])[selected_model_ranked_idx]
                 ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
                 ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
 

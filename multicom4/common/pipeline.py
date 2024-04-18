@@ -461,21 +461,21 @@ def run_monomer_templates_concatenation_pipeline(multimers, monomer_aln_dir, mon
     makedir_if_not_exists(pdb_seq_dir)
     if not os.path.exists(os.path.join(pdb_seq_dir, 'sequence_templates.csv')):
         pipeline = sequence_based_pipeline_pdb.Complex_sequence_based_template_search_pipeline(params)
-        pipeline.search(monomer_template_inputs, pdb_seq_dir)
+        pipeline.search(copy.deepcopy(monomer_template_inputs), pdb_seq_dir)
 
     print("searching complex sequence based template search pipeline: Complex")
     complex_pdb_seq_dir = os.path.join(outdir, 'complex_pdb_seq')
     makedir_if_not_exists(complex_pdb_seq_dir)
     if not os.path.exists(os.path.join(complex_pdb_seq_dir, 'sequence_templates.csv')):
         pipeline = sequence_based_pipeline_complex_pdb.Complex_sequence_based_template_search_pipeline(params)
-        pipeline.search(monomer_template_inputs, complex_pdb_seq_dir)
+        pipeline.search(copy.deepcopy(monomer_template_inputs), complex_pdb_seq_dir)
 
     print("searching complex sequence based template search pipeline: pdb70")
     pdb70_seq_dir = os.path.join(outdir, 'pdb70_seq')
     makedir_if_not_exists(pdb70_seq_dir)
     if not os.path.exists(os.path.join(pdb70_seq_dir, 'sequence_templates.csv')):
         pipeline = sequence_based_pipeline.Complex_sequence_based_template_search_pipeline(params)
-        pipeline.search(monomer_template_inputs, pdb70_seq_dir)
+        pipeline.search(copy.deepcopy(monomer_template_inputs), pdb70_seq_dir)
 
     print("searching complex structure based template search pipeline")
     struct_temp_dir = os.path.join(outdir, 'struct_temp')

@@ -263,7 +263,7 @@ class Complex_sequence_based_template_search_pipeline:
 
             pdb_hits_out_path = os.path.join(monomer_outdir, 'output.hhr')
             if os.path.exists(pdb_hits_out_path):
-                pdb_templates_result = open(pdb_hits_out_path).read()
+                pdb_templates_result = open(pdb_hits_out_path, encoding='ISO-8859-1').read()
                 monomer_input.msa_path = os.path.join(outdir, monomer_input.name + '.a3m')
                 monomer_input.hmm_path = os.path.join(outdir, monomer_input.name + '.hmm')
             else:

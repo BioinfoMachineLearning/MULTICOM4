@@ -73,7 +73,7 @@ class monomer_sequence_based_template_search_pipeline:
         # pdb_hits_out_path = os.path.join(outdir, f'pdb_hits.{self.template_searcher.output_format}')
         pdb_hits_out_path = os.path.join(outdir, f'output.hhr')
         if os.path.exists(pdb_hits_out_path):
-            pdb_templates_result = open(pdb_hits_out_path).read()
+            pdb_templates_result = open(pdb_hits_out_path, encoding='ISO-8859-1').read()
         else:
             trg_a3m = os.path.join(outdir, targetname + '.a3m')
             trg_hmm = os.path.join(outdir, targetname + '.hmm')

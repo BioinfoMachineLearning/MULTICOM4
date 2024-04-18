@@ -91,7 +91,7 @@ def main(argv):
             
             contact_map_file = os.path.join(N1_monomer_outdir, 'dncon4', f'{monomer_id}.dncon2.rr')
             if not os.path.exists(contact_map_file):
-                raise Exception("The contact map file hasn't been generated!")
+                raise Exception(f"The contact map file hasn't been generated!: {contact_map_file}")
 
             dist_map_file = os.path.join(N1_monomer_outdir, 'deepdist', f'{monomer_id}.txt')
             if not os.path.exists(dist_map_file):
