@@ -50,11 +50,11 @@ def main(argv):
 
     contact_map_file = os.path.join(N1_outdir, 'dncon4', f'{targetname}.dncon2.rr')
     if not os.path.exists(contact_map_file):
-        raise Exception("The contact map file hasn't been generated!")
+        raise Exception(f"The contact map file hasn't been generated: {contact_map_file}")
 
     dist_map_file = os.path.join(N1_outdir, 'deepdist', f'{targetname}.txt')
     if not os.path.exists(dist_map_file):
-        raise Exception("The distance map file hasn't been generated!")
+        raise Exception(f"The distance map file hasn't been generated: {dist_map_file}")
 
     print("#################################################################################################")
     print(f"1. Start to generate alignments for monomers")
@@ -74,8 +74,8 @@ def main(argv):
 
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
 
-    run_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
-
+    # run_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
+    run_methods = []
     for run_method in run_methods:
         if not complete_result(os.path.join(N3_outdir, run_method), 5):
             refine_dir = os.path.join(N3_outdir, run_method, 'workdir')

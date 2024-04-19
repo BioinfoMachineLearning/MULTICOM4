@@ -86,10 +86,10 @@ def extract_monomer_pdbs(complex_pdb, sequence, output_prefix):
     result_dict = {}
     for chain_id in chain_contents:
         if chain_contents[chain_id]['sequence'] == sequence:
-            with open(f"{output_prefix}_{chain_id}.pdb", 'w') as fw:
+            with open(f"{output_prefix}{chain_id}.pdb", 'w') as fw:
                 fw.writelines(chain_contents[chain_id]['content'])
-            result_dict[chain_id] = dict(pdb=f"{output_prefix}_{chain_id}.pdb",
-                                         pdbname=pathlib.Path(f"{output_prefix}_{chain_id}.pdb").name,
+            result_dict[chain_id] = dict(pdb=f"{output_prefix}{chain_id}.pdb",
+                                         pdbname=pathlib.Path(f"{output_prefix}{chain_id}.pdb").name,
                                          chain_start=chain_contents[chain_id]['res_start'] - 1,
                                          chain_end=chain_contents[chain_id]['res_end'] - 1)
     return result_dict
@@ -276,8 +276,7 @@ class Monomer_structure_evaluation_pipeline:
             ranking_file = os.path.join(output_dir_abs, 'gate_multimer.csv')
             gate_ranking_multimer.to_csv(ranking_file)
             result_dict["gate_multimer"] = ranking_file
-
-            result_dict["gate_cluster"] = os.path.join(output_dir_abs, 'gate', 'cluster.txt')
+            result_dict["gate_cluster"] = os.path.join(output_dir_abs, 'gate', 'feature', 'tmscore_pairwise', 'pairwise_tmscore.csv')
 
         if "gate" in self.run_methods and "alphafold" in self.run_methods:
             gate_df = pd.read_csv(result_dict['gate'])
@@ -400,7 +399,7 @@ class Monomer_structure_evaluation_pipeline:
                     if os.path.exists(complex_pdb):
                         chain_pdb_dict = extract_monomer_pdbs(complex_pdb=complex_pdb,
                                                               sequence=query_sequence,
-                                                              output_prefix=os.path.join(pdbdir_multimer, f"{method}_{i}"))
+                                                              output_prefix=os.path.join(pdbdir_multimer, f"{method}_{i}_"))
                         # print(chain_pdb_dict)
                         for chain_id in chain_pdb_dict:
                             pdbname = chain_pdb_dict[chain_id]['pdbname']

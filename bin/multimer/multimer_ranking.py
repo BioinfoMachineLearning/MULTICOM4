@@ -12,7 +12,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_multimer_structure_generation_pipeline_v2, \
     run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
-    copy_same_sequence_msas
+    copy_same_sequence_msas, select_final_monomer_models_from_complex
 
 from absl import flags
 from absl import app
@@ -109,13 +109,19 @@ def main(argv):
 
     print("9. Start to evaluate multimer models")
 
-    N8_outdir = os.path.join(FLAGS.output_dir, 'N8_multimer_structure_evaluation')
+    N7_outdir = os.path.join(FLAGS.output_dir, 'N7_multimer_structure_evaluation')
     multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
                                                           params=params,
                                                           chain_id_map=chain_id_map,
-                                                          indir=N6_outdir, outdir=N8_outdir)
+                                                          indir=N6_outdir, outdir=N7_outdir)
 
     print("#################################################################################################")
+
+    N8_outdir = os.path.join(FLAGS.output_dir, 'N8_monomer_structure_evaluation')
+    
+    select_final_monomer_models_from_complex(chain_id_map=chain_id_map, 
+                                             multimer_qa_result_dir=N7_outdir, 
+                                             outputdir=N8_outdir)
 
     print("#################################################################################################")
 

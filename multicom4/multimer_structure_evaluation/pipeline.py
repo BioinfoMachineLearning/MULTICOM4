@@ -33,8 +33,8 @@ class Multimer_structure_evaluation_pipeline:
         pkldir = os.path.join(output_dir, 'pkl')
         makedir_if_not_exists(pkldir)
 
-        msadir = os.path.join(output_dir, 'msa')
-        makedir_if_not_exists(msadir)
+        # msadir = os.path.join(output_dir, 'msa')
+        # makedir_if_not_exists(msadir)
 
         for method in os.listdir(model_dir):
             print(method)
@@ -52,16 +52,16 @@ class Multimer_structure_evaluation_pipeline:
                 ranked_pkl = os.path.join(model_dir, method, f"result_{model_name}.pkl")
                 trg_pkl = os.path.join(pkldir, f"{method}_{i}.pkl")
                 os.system(f"cp {ranked_pkl} {trg_pkl}")
-                for chain_id in chain_id_map:
-                    msa_chain_outdir = os.path.join(msadir, chain_id)
-                    makedir_if_not_exists(msa_chain_outdir)
-                    src_monomer_a3m = os.path.join(model_dir, method, 'msas', chain_id, "monomer_final.a3m")
-                    trg_monomer_a3m = os.path.join(msa_chain_outdir, f"{method}_{i}.monomer.a3m")
-                    os.system(f"cp {src_monomer_a3m} {trg_monomer_a3m}")
-                    if not is_homomer:
-                        src_paired_a3m = os.path.join(model_dir, method, 'msas', chain_id + ".paired.a3m")
-                        trg_paried_a3m = os.path.join(msa_chain_outdir, f"{method}_{i}.paired.a3m")
-                        os.system(f"cp {src_paired_a3m} {trg_paried_a3m}")
+                # for chain_id in chain_id_map:
+                #     msa_chain_outdir = os.path.join(msadir, chain_id)
+                #     makedir_if_not_exists(msa_chain_outdir)
+                #     src_monomer_a3m = os.path.join(model_dir, method, 'msas', chain_id, "monomer_final.a3m")
+                #     trg_monomer_a3m = os.path.join(msa_chain_outdir, f"{method}_{i}.monomer.a3m")
+                #     os.system(f"cp {src_monomer_a3m} {trg_monomer_a3m}")
+                #     if not is_homomer:
+                #         src_paired_a3m = os.path.join(model_dir, method, 'msas', chain_id + ".paired.a3m")
+                #         trg_paried_a3m = os.path.join(msa_chain_outdir, f"{method}_{i}.paired.a3m")
+                #         os.system(f"cp {src_paired_a3m} {trg_paried_a3m}")
 
         result_dict = {}
 
@@ -167,7 +167,7 @@ class Multimer_structure_evaluation_pipeline:
                 gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
                 gate_ranking_df.to_csv(resultfile)
             result_dict['gate'] = resultfile
-            result_dict["gate_cluster"] = os.path.join(output_dir, 'gate', 'cluster.txt')
+            result_dict["gate_cluster"] = os.path.join(output_dir, 'gate', 'feature', 'usalign_pairwise', 'pairwise_usalign.csv')
 
         if "gate" in self.run_methods and "alphafold" in self.run_methods:
             gate_df = pd.read_csv(result_dict["gate"])

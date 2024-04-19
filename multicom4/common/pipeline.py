@@ -27,6 +27,7 @@ import numpy as np
 from multicom4.monomer_structure_refinement.util import cal_tmscore
 from multicom4.monomer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
 from multicom4.common import config
+from sklearn.cluster import KMeans
 
 NUM_FINAL_MODELS = 10
 
@@ -214,22 +215,22 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
     selected_models = []
     selected_models_path = []
     ranking_df = pd.read_csv(ranking_df_file)
-    for i in range(30):
+    for i in range(len(ranking_df)):
         model = ranking_df.loc[i, 'model']
         tmscores = cal_tmscores(tmscore_program, selected_models_path, os.path.join(outputdir, 'pdb', model), outputdir)
         if len(tmscores) == 0 or np.max(np.array(tmscores)) < tmscore_threshold:
             selected_models += [model]
             selected_models_path += [os.path.join(outputdir, 'pdb', model)]
 
-    for i in range(30):
+    for i in range(len(ranking_df)):
+        if len(selected_models) >= NUM_FINAL_MODELS:
+            break
         model = ranking_df.loc[i, 'model']
         if model in selected_models:
             continue
         selected_models += [model]
         selected_models_path += [os.path.join(outputdir, 'pdb', model)]
-        if len(selected_models) >= NUM_FINAL_MODELS:
-            break
-
+        
     for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
         os.system("cp " + selected_models_path[i] + " " + final_pdb)
@@ -239,28 +240,51 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
 
 def select_models_by_cluster(ranking_df_file, cluster_result_file, outputdir, prefix):
 
-    clusters = {}
-    for line in open(cluster_result_file):
-        modelname, cluster_idx = line.rstrip('\n').split()
-        clusters[modelname + '.pdb'] = cluster_idx
-    
     selected_models = []
     selected_clusters = []
     ranking_df = pd.read_csv(ranking_df_file)
-    for i in range(30):
-        model = ranking_df.loc[i, 'model']
-        if clusters[model] not in selected_clusters:
-            selected_models += [model]
-            selected_clusters += [clusters[model]]
 
-    for i in range(30):
+    cluster_txt = os.path.join(outputdir, 'cluster.txt')
+
+    clusters = {}
+
+    if os.path.exists(cluster_txt):
+        rerun = False
+        for line in open(cluster_txt):
+            modelname, cluster_idx = line.rstrip('\n').split()
+            clusters[modelname] = cluster_idx
+        for i in range(len(ranking_df)):
+            model = ranking_df.loc[i, 'model']
+            if model not in clusters:
+                rerun = True
+                break
+        if rerun:
+            os.system(f"rm {cluster_txt}")
+
+    if not os.path.exists(cluster_txt):
+        pairwise_tmscore_graph = pd.read_csv(cluster_result_file, index_col=[0])
+        pairwise_tmscore_graph_np = np.array(pairwise_tmscore_graph).T
+        kmeans =  KMeans(n_clusters=5, random_state=0, n_init="auto").fit(pairwise_tmscore_graph_np)
+        clusters = {pairwise_tmscore_graph.columns[i]: kmeans.labels_[i] for i in range(len(pairwise_tmscore_graph.columns))}
+        with open(cluster_txt, 'w') as fw:
+            for modelname in clusters:
+                fw.write(f"{modelname}\t{clusters[modelname]}\n")
+
+
+    for i in range(len(ranking_df)):
+        model = ranking_df.loc[i, 'model']
+        if clusters[model.replace('.pdb', '')] not in selected_clusters:
+            selected_models += [model]
+            selected_clusters += [clusters[model.replace('.pdb', '')]]
+
+    for i in range(len(ranking_df)):
+        if len(selected_models) >= NUM_FINAL_MODELS:
+            break
         model = ranking_df.loc[i, 'model']
         if model in selected_models:
             continue
         selected_models += [model]
-        if len(selected_models) >= NUM_FINAL_MODELS:
-            break
-
+        
     for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
         os.system("cp " + os.path.join(outputdir, 'pdb', selected_models[i]) + " " + final_pdb)
@@ -276,9 +300,6 @@ def select_models_monomer_only(qa_result, outputdir, params):
                              outputdir=outputdir,
                              prefix="ai",
                              tmscore_threshold=0.8)
-    
-    if "gate" not in qa_result:
-        return
 
     select_models_by_cluster(ranking_df_file=qa_result["gate"],
                              cluster_result_file=qa_result["gate_cluster"],
@@ -298,9 +319,6 @@ def select_models_with_multimer(qa_result, outputdir, params):
                              outputdir=outputdir,
                              prefix="ai",
                              tmscore_threshold=0.8)
-
-    if "gate" not in qa_result:
-        return
 
     select_models_by_cluster(ranking_df_file=qa_result["gate_multimer"],
                              cluster_result_file=qa_result["gate_cluster"],
@@ -335,8 +353,8 @@ def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monome
     if generate_final_models:
         if input_multimer_dir == "" or not os.path.exists(input_multimer_dir):
             select_models_monomer_only(qa_result=qa_result, outputdir=outputdir, params=params)
-        else:
-            select_models_with_multimer(qa_result=qa_result, outputdir=outputdir, params=params)
+        # else:
+            # select_models_with_multimer(qa_result=qa_result, outputdir=outputdir, params=params)
 
     return qa_result
 
@@ -677,47 +695,6 @@ def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, 
     return True
 
 
-def extract_monomer_models_from_complex(complex_pdb, complex_pkl, chain_id_map, workdir):
-    makedir_if_not_exists(workdir)
-
-    chain_group = {}
-    for chain_id in chain_id_map:
-        find = False
-        for chain_id_seq in chain_group:
-            if chain_id_map[chain_id_seq].sequence == chain_id_map[chain_id].sequence:
-                chain_group[chain_id_seq] += [chain_id]
-                find = True
-        if not find:
-            chain_group[chain_id] = [chain_id]
-
-    pkldir = os.path.join(workdir, 'pkl')
-    makedir_if_not_exists(pkldir)
-
-    alphafold_qa = Alphafold_pkl_qa(ranking_methods=['plddt_avg'])
-    for chain_id in chain_group:
-
-        chain_pdb_dict = extract_monomer_pdbs(complex_pdb=complex_pdb,
-                                              sequence=chain_id_map[chain_id].sequence,
-                                              output_prefix=os.path.join(workdir, 'chain'))
-        print(chain_pdb_dict)
-
-        same_seq_chains = chain_group[chain_id]
-        same_seq_pkldir = os.path.join(pkldir, chain_id)
-        makedir_if_not_exists(same_seq_pkldir)
-        for same_seq_chain in same_seq_chains:
-            pdbname = chain_pdb_dict[same_seq_chain]['pdbname']
-            extract_pkl(src_pkl=complex_pkl,
-                        residue_start=chain_pdb_dict[same_seq_chain]['chain_start'],
-                        residue_end=chain_pdb_dict[same_seq_chain]['chain_end'],
-                        output_pkl=os.path.join(same_seq_pkldir, pdbname.replace('.pdb', '.pkl')))
-        alphafold_ranking = alphafold_qa.run(same_seq_pkldir)
-        alphafold_ranking.to_csv(same_seq_pkldir + '_alphafold_ranking.csv')
-        chain_top1_pdb = os.path.join(workdir, chain_id + "_top1.pdb")
-        os.system("cp " + os.path.join(workdir, alphafold_ranking.loc[0, 'model']) + " " + chain_top1_pdb)
-
-    return chain_group
-
-
 def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, outdir, is_homomer=False):
     makedir_if_not_exists(outdir)
     pipeline = Multimer_structure_evaluation_pipeline(params=params)
@@ -743,22 +720,22 @@ def select_models_by_usalign(usalign_program, ranking_df_file, outputdir, prefix
     selected_models = []
     selected_model_paths = []
     ranking_df = pd.read_csv(ranking_df_file)
-    for i in range(30):
+    for i in range(len(ranking_df)):
         model = ranking_df.loc[i, 'model']
         tmscores = cal_tmscores_usalign(usalign_program, selected_model_paths, os.path.join(outputdir, 'pdb', model), outputdir)
         if len(tmscores) == 0 or np.max(np.array(tmscores)) < tmscore_threshold:
             selected_models += [model]
             selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
 
-    for i in range(30):
+    for i in range(len(ranking_df)):
+        if len(selected_models) >= NUM_FINAL_MODELS:
+            break
         model = ranking_df.loc[i, 'model']
         if model in selected_models:
             continue
         selected_models += [model]
         selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
-        if len(selected_models) >= NUM_FINAL_MODELS:
-            break
-
+       
     for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
         os.system("cp " + selected_model_paths[i] + " " + final_pdb)
@@ -787,20 +764,20 @@ def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
 
     return multimer_qa_result
 
-def extract_final_monomer_models_from_complex(chain_id_map, selected_models, outputdir, prefix, is_homomer):
-    for i in range(NUM_FINAL_MODELS):
-        final_pdb = os.path.join(outputdir, f"{prefix}{i + 1}.pdb")
-        if not is_homomer:
-            chain_group = extract_monomer_models_from_complex(complex_pdb=final_pdb,
-                                                              complex_pkl=os.path.join(outputdir, 'pkl', selected_models[i].replace('.pdb', '.pkl')),
-                                                              chain_id_map=chain_id_map, 
-                                                              workdir=os.path.join(outputdir, f"{prefix}{i + 1}"))
-            for chain_id in chain_group:
-                chain_outdir = os.path.join(outputdir, f"{prefix}_{chain_id}")
-                makedir_if_not_exists(chain_outdir)
-                srcpdb = os.path.join(outputdir, f"{prefix}{i + 1}", f"{chain_id}_top1.pdb")
-                trgpdb = os.path.join(chain_outdir, f'{prefix}{i+1}.pdb')
-                os.system(f"cp {srcpdb} {trgpdb}")
+# def extract_final_monomer_models_from_complex(chain_id_map, selected_models, outputdir, prefix, is_homomer):
+#     for i in range(NUM_FINAL_MODELS):
+#         final_pdb = os.path.join(outputdir, f"{prefix}{i + 1}.pdb")
+#         if not is_homomer:
+#             chain_group = extract_monomer_models_from_complex(complex_pdb=final_pdb,
+#                                                               complex_pkl=os.path.join(outputdir, 'pkl', selected_models[i].replace('.pdb', '.pkl')),
+#                                                               chain_id_map=chain_id_map, 
+#                                                               workdir=os.path.join(outputdir, f"{prefix}{i + 1}"))
+#             for chain_id in chain_group:
+#                 chain_outdir = os.path.join(outputdir, f"{prefix}_{chain_id}")
+#                 makedir_if_not_exists(chain_outdir)
+#                 srcpdb = os.path.join(outputdir, f"{prefix}{i + 1}", f"{chain_id}_top1.pdb")
+#                 trgpdb = os.path.join(chain_outdir, f'{prefix}{i+1}.pdb')
+#                 os.system(f"cp {srcpdb} {trgpdb}")
 
 def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homomer):
     
@@ -810,11 +787,11 @@ def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homome
                                                 prefix="ai",
                                                 tmscore_threshold=0.6)
 
-    extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
-                                              selected_models=ai_selected_models, 
-                                              outputdir=outputdir, 
-                                              prefix="ai", 
-                                              is_homomer=is_homomer)
+    # extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
+    #                                           selected_models=ai_selected_models, 
+    #                                           outputdir=outputdir, 
+    #                                           prefix="ai", 
+    #                                           is_homomer=is_homomer)
 
     gate_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate"],
                              cluster_result_file=qa_result["gate_cluster"],
@@ -822,19 +799,125 @@ def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homome
                              prefix="gate")
     
 
-    extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
-                                              selected_models=gate_selected_models, 
-                                              outputdir=outputdir, 
-                                              prefix="gate", 
-                                              is_homomer=is_homomer)
+    # extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
+    #                                           selected_models=gate_selected_models, 
+    #                                           outputdir=outputdir, 
+    #                                           prefix="gate", 
+    #                                           is_homomer=is_homomer)
 
     llm_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
                              cluster_result_file=qa_result["gate_cluster"],
                              outputdir=outputdir,
                              prefix="llm")
 
-    extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
-                                              selected_models=llm_selected_models, 
-                                              outputdir=outputdir, 
-                                              prefix="llm", 
-                                              is_homomer=is_homomer)
+    # extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
+    #                                           selected_models=llm_selected_models, 
+    #                                           outputdir=outputdir, 
+    #                                           prefix="llm", 
+    #                                           is_homomer=is_homomer)
+
+
+def extract_monomer_models_from_complex(complex_pdb, complex_pkl, chain_id_map, chain_group, workdir):
+
+    makedir_if_not_exists(workdir)
+
+    alphafold_qa = Alphafold_pkl_qa(ranking_methods=['plddt_avg'])
+
+    for chain_id in chain_group:
+
+        chain_pdb_dict = extract_monomer_pdbs(complex_pdb=complex_pdb,
+                                              sequence=chain_id_map[chain_id].sequence,
+                                              output_prefix=workdir + '/')
+        print(chain_pdb_dict)
+        
+        same_seq_chains = chain_group[chain_id]
+
+        same_seq_pkldir = os.path.join(workdir, chain_id + '_pkl')
+        makedir_if_not_exists(same_seq_pkldir)
+        for same_seq_chain in same_seq_chains:
+            pdbname = chain_pdb_dict[same_seq_chain]['pdbname']
+            extract_pkl(src_pkl=complex_pkl,
+                        residue_start=chain_pdb_dict[same_seq_chain]['chain_start'],
+                        residue_end=chain_pdb_dict[same_seq_chain]['chain_end'],
+                        output_pkl=os.path.join(same_seq_pkldir, pdbname.replace('.pdb', '.pkl')))
+
+        alphafold_ranking = alphafold_qa.run(same_seq_pkldir)
+        
+        alphafold_ranking.to_csv(os.path.join(workdir, chain_id + '_alphafold_ranking.csv'))
+
+
+def select_final_monomer_models_from_complex(chain_id_map, multimer_qa_result_dir, outputdir):
+
+    chain_group = {}
+    for chain_id in chain_id_map:
+        find = False
+        for chain_id_seq in chain_group:
+            if chain_id_map[chain_id_seq].sequence == chain_id_map[chain_id].sequence:
+                chain_group[chain_id_seq] += [chain_id]
+                find = True
+        if not find:
+            chain_group[chain_id] = [chain_id]
+
+    chain_pdbs_dir = os.path.join(outputdir, 'chain_pdbs')
+    multimer_pdbdir = os.path.join(multimer_qa_result_dir, 'pdb')
+    multimer_pkldir = os.path.join(multimer_qa_result_dir, 'pkl')
+    os.makedirs(chain_pdbs_dir, exist_ok=True)
+
+    for pdb_path in os.listdir(multimer_pdbdir):
+        pdbname = os.path.basename(pdb_path).replace('.pdb', '')
+        extract_monomer_models_from_complex(complex_pdb=os.path.join(multimer_pdbdir, pdb_path),
+                                            complex_pkl=os.path.join(multimer_pkldir, pdbname + '.pkl'),
+                                            chain_group=chain_group,
+                                            chain_id_map=chain_id_map, 
+                                            workdir=os.path.join(chain_pdbs_dir, pdbname))
+
+    ranking_df_files = ['alphafold_ranking.csv', 'gate.csv', 'gate_af_avg.ranking']
+    fields = ['confidence', 'score', 'avg_score']
+    # non-identical chain ids
+    for chain_id in chain_group:
+        chain_out_dir = os.path.join(outputdir, chain_id)
+        os.makedirs(chain_out_dir, exist_ok=True)
+        for ranking_df_file, field in zip(ranking_df_files, fields):
+            ranking_df = pd.read_csv(os.path.join(multimer_qa_result_dir, ranking_df_file))
+            models, scores, plddts = [], [], []
+            for i in range(len(ranking_df)):
+                multimer_model_name = ranking_df.loc[i, 'model'].replace('.pdb', '')
+                score = ranking_df.loc[i, field]
+
+                multimer_model_workdir = os.path.join(chain_pdbs_dir, multimer_model_name)
+                chain_plddt_ranking = os.path.join(multimer_model_workdir, chain_id + '_alphafold_ranking.csv')
+                chain_plddt_ranking_df = pd.read_csv(chain_plddt_ranking)
+                chain_model = chain_plddt_ranking_df.loc[0, 'model']
+                chain_model_name = f"{multimer_model_name}_{chain_model}"
+                models += [chain_model_name]
+                scores += [score]
+                plddts += [chain_plddt_ranking_df.loc[0, 'plddt_avg']]
+            
+            out_ranking_df = pd.DataFrame({'model': models, 'score': scores, 'plddt': plddts})
+            out_ranking_df.to_csv(os.path.join(chain_out_dir, ranking_df_file))
+
+    final_ranking_df_files = ['ai_selected.csv', 'gate_selected.csv', 'llm_selected.csv']
+    prefixs = ['ai', 'gate', 'llm']
+    # non-identical chain ids
+    for chain_id in chain_group:
+        chain_out_dir = os.path.join(outputdir, chain_id)
+        os.makedirs(chain_out_dir, exist_ok=True)
+        for ranking_df_file, prefix in zip(final_ranking_df_files, prefixs):
+            ranking_df = pd.read_csv(os.path.join(multimer_qa_result_dir, ranking_df_file))
+            models, plddts = [], []
+            for i in range(len(ranking_df)):
+                multimer_model_name = ranking_df.loc[i, 'selected_models'].replace('.pdb', '')
+                
+                multimer_model_workdir = os.path.join(chain_pdbs_dir, multimer_model_name)
+                chain_plddt_ranking = os.path.join(multimer_model_workdir, chain_id + '_alphafold_ranking.csv')
+                chain_plddt_ranking_df = pd.read_csv(chain_plddt_ranking)
+                chain_model = chain_plddt_ranking_df.loc[0, 'model']
+                chain_model_name = f"{multimer_model_name}_{chain_model}"
+                models += [chain_model_name]
+                plddts += [chain_plddt_ranking_df.loc[0, 'plddt_avg']]
+
+                trgpdb = os.path.join(chain_out_dir, f"{prefix}{i}.pdb")
+                os.system(f"cp {os.path.join(multimer_model_workdir, chain_model)} {trgpdb}")
+            
+            out_ranking_df = pd.DataFrame({'selected_models': models, 'plddt': plddts})
+            out_ranking_df.to_csv(os.path.join(chain_out_dir, ranking_df_file))

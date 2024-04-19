@@ -393,7 +393,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'AFProfile': 
         {
             'confidence_threshold': 0.95,
-            'max_iteration': 5 * 5,
+            'max_iteration': 100,
             'learning_rate': 0.0001,
         },
         'def_mul_refine': {

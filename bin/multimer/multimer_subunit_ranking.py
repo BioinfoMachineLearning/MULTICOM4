@@ -113,7 +113,6 @@ def main(argv):
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_monomer_structure_evaluation')
     monomer_qas_res = {}
     processed_seuqences = {}
-    run_methods = ["alphafold", "apollo", "bfactor"]
     for chain_id_idx, chain_id in enumerate(chain_id_map):
         monomer_id = chain_id
         monomer_sequence = chain_id_map[chain_id].sequence
@@ -144,13 +143,13 @@ def main(argv):
                 raise RuntimeError(f"Program failed in step 7: monomer {monomer_id} model evaluation")
             monomer_qas_res[monomer_id] = result
             processed_seuqences[monomer_sequence] = monomer_id
-        else:
+        # else:
             # make a copy
-            N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
-            os.system("cp -r " + os.path.join(N7_outdir, processed_seuqences[monomer_sequence]) + " " + N7_monomer_outdir)
-            for msa in os.listdir(os.path.join(N7_monomer_outdir, 'msa')):
-                os.system(f"sed -i 's/>{processed_seuqences[monomer_sequence]}/>{monomer_id}/g' " + os.path.join(N7_monomer_outdir, 'msa', msa))
-            monomer_qas_res[monomer_id] = copy.deepcopy(monomer_qas_res[processed_seuqences[monomer_sequence]])
+            # N7_monomer_outdir = os.path.join(N7_outdir, monomer_id)
+            # os.system("cp -r " + os.path.join(N7_outdir, processed_seuqences[monomer_sequence]) + " " + N7_monomer_outdir)
+            # for msa in os.listdir(os.path.join(N7_monomer_outdir, 'msa')):
+            #     os.system(f"sed -i 's/>{processed_seuqences[monomer_sequence]}/>{monomer_id}/g' " + os.path.join(N7_monomer_outdir, 'msa', msa))
+            # monomer_qas_res[monomer_id] = copy.deepcopy(monomer_qas_res[processed_seuqences[monomer_sequence]])
 
     print("#################################################################################################")
 
