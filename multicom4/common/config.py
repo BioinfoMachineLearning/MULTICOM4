@@ -7,11 +7,11 @@ class pipeline():
 
     def __init__(self, is_human=False):
 
-        self.monomer_config = MONOMER_CONFIG if is_human else MONOMER_HUMAN_CONFIG
+        self.monomer_config = MONOMER_HUMAN_CONFIG if is_human else MONOMER_CONFIG
 
-        self.heteromer_config = HETEROMULTIMER_CONFIG if is_human else HETEROMULTIMER_HUMAN_CONFIG
+        self.heteromer_config = HETEROMULTIMER_HUMAN_CONFIG if is_human else HETEROMULTIMER_CONFIG
 
-        self.homomer_config = HOMOMULTIMER_CONFIG if is_human else HOMOMULTIMER_HUMAN_CONFIG
+        self.homomer_config = HOMOMULTIMER_HUMAN_CONFIG if is_human else HOMOMULTIMER_CONFIG
 
     def get_monomer_config(self, predictor_config, config_name):
         if config_name in predictor_config:
