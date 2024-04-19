@@ -42,7 +42,9 @@ class Monomer_refinement_model_selection(config.pipeline):
 
     def __init__(self, params, config_name):
 
-        super().__init__()
+        is_human = True if params['is_human'] == "1" else False
+
+        super().__init__(is_human=is_human)
 
         self.params = params
 

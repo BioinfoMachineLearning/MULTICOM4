@@ -20,10 +20,11 @@ class refinement_input_multimer:
         self.msa_paths = msa_paths
 
 
-class Multimer_iterative_refinement_pipeline_server:
+class Multimer_iterative_refinement_pipeline_server(config.pipeline):
 
     def __init__(self, params, config_name):
-        super().__init__()
+        is_human = True if params['is_human'] == "1" else False
+        super().__init__(is_human=is_human)
         self.params = params
         self.config_name = config_name
 
@@ -60,7 +61,9 @@ class Multimer_refinement_model_selection(config.pipeline):
     
     def __init__(self, params, config_name, stoichiometry):
 
-        super().__init__()
+        is_human = True if params['is_human'] == "1" else False
+
+        super().__init__(is_human=is_human)
 
         self.params = params
 

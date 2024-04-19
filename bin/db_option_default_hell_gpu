@@ -4,6 +4,8 @@ slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/he
 
 slurm_nonaf_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_A100.bash
 
+is_human = 0
+
 ################################tools option#########################################
 
 # hhblits program path

@@ -17,7 +17,9 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
     def __init__(self, params, run_methods=None):
         
-        super().__init__()
+        is_human = True if params['is_human'] == "1" else False
+
+        super().__init__(is_human=is_human)
 
         self.params = params
 
@@ -240,7 +242,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
             elif run_method ==  "esmfold":
                 os.makedirs(method_out_dir, exist_ok=True)
-                for num_recycle in [4, 10, 50]:
+                for num_recycle in [4, 10, 50, 80, 100]:
                     outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
                     if not os.path.exists(outpdb):
                         cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"

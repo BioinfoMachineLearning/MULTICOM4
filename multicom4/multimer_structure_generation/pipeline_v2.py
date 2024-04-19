@@ -41,7 +41,9 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
 
     def __init__(self, params, run_methods=None):
 
-        super().__init__()
+        is_human = True if params['is_human'] == "1" else False
+
+        super().__init__(is_human=is_human)
 
         self.params = params
 
@@ -451,8 +453,8 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
             method_outdir = os.path.join(output_dir, f"deepmsa2_{index}")
 
             msa_pair_file = os.path.join(deepmsa_complex_aln_dir, concatenate_method, concatenate_method + "_interact.csv")
-            if len(pd.read_csv(msa_pair_file)) <= 1:
-                continue
+            # if len(pd.read_csv(msa_pair_file)) <= 1:
+            #     continue
 
             paired_a3m_paths = [os.path.join(deepmsa_complex_aln_dir, concatenate_method, monomer + "_con.a3m") for monomer in monomers]
             monomer_a3m_paths = []
