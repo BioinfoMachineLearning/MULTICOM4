@@ -85,7 +85,7 @@ class Multimer_structure_evaluation_pipeline:
                 workdir = os.path.join(output_dir, 'multieva')
                 makedir_if_not_exists(workdir)
         
-                multieva_pd = self.multieva_qa.run(input_dir=pdbdir)
+                multieva_pd = self.multieva_qa.run(input_dir=pdbdir, workdir=workdir)
                 multieva_pd.to_csv(result_file)
 
             result_dict["multieva"] = result_file

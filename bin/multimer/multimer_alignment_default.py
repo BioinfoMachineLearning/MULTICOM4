@@ -78,7 +78,7 @@ def main(argv):
                             'deepmsa_qMSA_jac', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hms',
                             'deepmsa_DeepJGI_hms', 'deepmsa_DeepJGI', 'deepmsa_q3JGI', 
                             'deepmsa_q4JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI_hms',
-                            'paddle-helix', 'esmfold', 'deepfold', 'megafold', 'default_tmsearch']
+                            'paddle-helix', 'esmfold', 'deepfold', 'megafold', 'def_esm_msa']
 
     for chain_id in chain_id_map:
         monomer_id = chain_id

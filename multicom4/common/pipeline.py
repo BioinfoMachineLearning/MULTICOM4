@@ -223,6 +223,8 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
             selected_models_path += [os.path.join(outputdir, 'pdb', model)]
             if len(selected_models) >= NUM_FINAL_MODELS:
                 break
+    
+    print(selected_models)
 
     for i in range(len(ranking_df)):
         if len(selected_models) >= NUM_FINAL_MODELS:
@@ -232,7 +234,9 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
             continue
         selected_models += [model]
         selected_models_path += [os.path.join(outputdir, 'pdb', model)]
-        
+    
+    print(selected_models)
+    
     for i in range(NUM_FINAL_MODELS):
         final_pdb = os.path.join(outputdir, f'{prefix}{i+1}.pdb')
         os.system("cp " + selected_models_path[i] + " " + final_pdb)
@@ -647,50 +651,50 @@ class foldseek_iterative_monomer_input:
         self.monomer_alphafold_a3ms = monomer_alphafold_a3ms
 
 
-def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chain_id_map, pipeline_inputs, 
-                                                        outdir, config_name, monomer_template_stos=[], start=0, is_homomers=False):
+def run_multimer_structure_generation_pipeline_foldseek(params, fasta_path, chain_id_map, pipeline_input, 
+                                                        outdir, config_name, index, monomer_template_stos=[], is_homomers=False):
     pipeline = Multimer_iterative_generation_pipeline_monomer(params=params, config_name=config_name, is_homomers=is_homomers)
     try:
-        for i, pipeline_input in enumerate(pipeline_inputs):
-            if is_homomers:
-                pipeline.search_single_homo(fasta_file=fasta_path,
-                                            chain_id_map=chain_id_map,
-                                            monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
-                                            monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                            monomer_template_stos=monomer_template_stos,
-                                            outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
-            else:
-                pipeline.search_single(fasta_file=fasta_path,
-                                       chain_id_map=chain_id_map,
-                                       monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
-                                       monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                       monomer_template_stos=monomer_template_stos,
-                                       outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
+        # for i, pipeline_input in enumerate(pipeline_inputs):
+        if is_homomers:
+            pipeline.search_single_homo(fasta_file=fasta_path,
+                                        chain_id_map=chain_id_map,
+                                        monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
+                                        monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                        monomer_template_stos=monomer_template_stos,
+                                        outdir=os.path.join(outdir, f"{config_name}_{index}"))
+        else:
+            pipeline.search_single(fasta_file=fasta_path,
+                                    chain_id_map=chain_id_map,
+                                    monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
+                                    monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                    monomer_template_stos=monomer_template_stos,
+                                    outdir=os.path.join(outdir, f"{config_name}_{index}"))
     except Exception as e:
         print(e)
         return False
     return True
 
 
-def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, chain_id_map, pipeline_inputs, outdir,
-                                                            config_name, monomer_template_stos=[], start=0, is_homomers=False):
+def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, chain_id_map, pipeline_input, outdir,
+                                                            config_name, index, monomer_template_stos=[], is_homomers=False):
     pipeline = Multimer_iterative_generation_pipeline_monomer_old(params=params, config_name=config_name, is_homomers=is_homomers)
     try:
-        for i, pipeline_input in enumerate(pipeline_inputs):
-            if is_homomers:
-                pipeline.search_single_homo(fasta_file=fasta_path,
-                                            chain_id_map=chain_id_map,
-                                            monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
-                                            monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                            monomer_template_stos=monomer_template_stos,
-                                            outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
-            else:
-                pipeline.search_single(fasta_file=fasta_path,
-                                       chain_id_map=chain_id_map,
-                                       monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
-                                       monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
-                                       monomer_template_stos=monomer_template_stos,
-                                       outdir=os.path.join(outdir, f"{config_name}_{i + 1 + start}"))
+        # for i, pipeline_input in enumerate(pipeline_inputs):
+        if is_homomers:
+            pipeline.search_single_homo(fasta_file=fasta_path,
+                                        chain_id_map=chain_id_map,
+                                        monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
+                                        monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                        monomer_template_stos=monomer_template_stos,
+                                        outdir=os.path.join(outdir, f"{config_name}_{index}"))
+        else:
+            pipeline.search_single(fasta_file=fasta_path,
+                                    chain_id_map=chain_id_map,
+                                    monomer_pdb_dirs=pipeline_input.monomer_pdb_dirs,
+                                    monomer_alphafold_a3ms=pipeline_input.monomer_alphafold_a3ms,
+                                    monomer_template_stos=monomer_template_stos,
+                                    outdir=os.path.join(outdir, f"{config_name}_{index}"))
     except Exception as e:
         print(e)
         return False

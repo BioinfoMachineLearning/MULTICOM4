@@ -59,8 +59,8 @@ def main(argv):
     
     default_workdir = os.path.join(N6_outdir, 'default_multimer')
     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-    if not os.path.exists(ranking_json_file):
-        raise Exception(f"Haven't generated default_multimer models!")
+    #if not os.path.exists(ranking_json_file):
+    #    raise Exception(f"Haven't generated default_multimer models!")
 
     run_methods = ["alphafold", "apollo", "bfactor"]
 
@@ -143,26 +143,27 @@ def main(argv):
                         fw.write(cmd)
 
         else:
+            for i in range(2):
+                index = i + 1
+                cmd = f"python bin/multimer/homomer_foldseek.py --option_file {FLAGS.option_file} " \
+                      f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
+                      f"--config_name {run_method} --index {index}"
 
-            cmd = f"python bin/multimer/homomer_foldseek.py --option_file {FLAGS.option_file} " \
-                f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
-                f"--config_name {run_method}"
-
-            if os.path.exists(params['slurm_script_template']):
-                bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-                print(f"Generating bash file for {run_method}: {bash_file}")
-                jobname = f"{targetname}_{run_method}"
-                with open(bash_file, 'w') as fw:
-                    for line in open(params['slurm_script_template']):
-                        line = line.replace("JOBNAME", jobname)
-                        fw.write(line)
-                    fw.write(cmd)
-                #os.system(f"sbatch {bash_file}")
-            else:
-                bash_file = os.path.join(bash_script_dir, run_method + '.sh')
-                print(bash_file)
-                with open(bash_file, 'w') as fw:
-                    fw.write(cmd)
+                if os.path.exists(params['slurm_script_template']):
+                    bash_file = os.path.join(bash_script_dir, f"{run_method}_{index}.sh")
+                    print(f"Generating bash file for {run_method}: {bash_file}")
+                    jobname = f"{targetname}_{run_method}"
+                    with open(bash_file, 'w') as fw:
+                        for line in open(params['slurm_script_template']):
+                            line = line.replace("JOBNAME", jobname)
+                            fw.write(line)
+                        fw.write(cmd)
+                    #os.system(f"sbatch {bash_file}")
+                else:
+                    bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+                    print(bash_file)
+                    with open(bash_file, 'w') as fw:
+                        fw.write(cmd)
     
 
 if __name__ == '__main__':

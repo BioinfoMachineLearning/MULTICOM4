@@ -6,12 +6,23 @@ import pandas as pd
 
 
 def run_command(inparams):
-    mmalign_program, input_dir, pdb1, pdb2 = inparams
-    cmd = mmalign_program + ' ' + os.path.join(input_dir, pdb1) + ' ' + os.path.join(input_dir, pdb2) + " | grep TM-score | awk '{print $2}' "
+    mmalign_program, input_dir, pdb1, pdb2, scorefile = inparams
+    # cmd = mmalign_program + ' ' + os.path.join(input_dir, pdb1) + ' ' + os.path.join(input_dir, pdb2) + " | grep TM-score | awk '{print $2}' "
     # print(cmd)
-    tmscore_contents = os.popen(cmd).read().split('\n')
-    tmscore = float(tmscore_contents[1].rstrip('\n'))
-    return pdb1, pdb2, tmscore
+    # tmscore_contents = os.popen(cmd).read().split('\n')
+    # tmscore = float(tmscore_contents[1].rstrip('\n'))
+    cmd = f"{mmalign_program} {input_dir}/{pdb1} {input_dir}/{pdb2} > {scorefile}"
+    os.system(cmd)
+
+
+def read_mmalign(infile):
+    for line in open(infile):
+        line = line.rstrip('\n')
+        if len(line) > 0:
+            if line.split()[0] == 'TM-score=' and line.find('Structure_2') > 0:
+                tmscore = float(line.split()[1])
+                return tmscore
+    return 0
 
 
 class Pairwise_MMalign_qa:
@@ -20,11 +31,11 @@ class Pairwise_MMalign_qa:
 
         self.mmalign_program = mmalign_program
 
-    def run(self, input_dir):
+    def run(self, input_dir, workdir):
 
         ranking_pd = pd.DataFrame(columns=['Name', 'MMalign score'])
 
-        pdbs = os.listdir(input_dir)
+        pdbs = sorted(os.listdir(input_dir))
 
         process_list = []
         for i in range(len(pdbs)):
@@ -33,7 +44,9 @@ class Pairwise_MMalign_qa:
                 pdb2 = pdbs[j]
                 if pdb1 == pdb2:
                     continue
-                process_list.append([self.mmalign_program, input_dir, pdb1, pdb2])
+                scorefile = os.path.join(workdir, f"{pdb1}_{pdb2}.mmalign")
+                if not os.path.exists(scorefile) or len(open(scorefile).readlines()) < 5:
+                    process_list.append([self.mmalign_program, input_dir, pdb1, pdb2, scorefile])
 
         pool = Pool(processes=40)
         results = pool.map(run_command, process_list)
@@ -41,9 +54,16 @@ class Pairwise_MMalign_qa:
         pool.join()
 
         scores_dict = {}
-        for result in results:
-            pdb1, pdb2, score = result
-            scores_dict[f"{pdb1}_{pdb2}"] = score
+        for i in range(len(pdbs)):
+            for j in range(len(pdbs)):
+                pdb1 = pdbs[i]
+                pdb2 = pdbs[j]
+                if pdb1 == pdb2:
+                    continue
+                scorefile = os.path.join(workdir, f"{pdb1}_{pdb2}.mmalign")
+                if not os.path.exists(scorefile):
+                    raise Exception(f"cannot find {scorefile}")
+                scores_dict[f"{pdb1}_{pdb2}"] = read_mmalign(scorefile)
 
         for i in range(len(pdbs)):
             pdb1 = pdbs[i]

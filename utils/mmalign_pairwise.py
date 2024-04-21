@@ -4,16 +4,17 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
-from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
-from multicom_dev.quaternary_structure_evaluation.pairwise_mmalign import *
+from multicom4.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
+from multicom4.multimer_structure_evaluation.pairwise_mmalign import *
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--indir', type=is_dir, required=True)
+    parser.add_argument('--workdir', type=is_dir, required=True)
     parser.add_argument('--mmalign_program', type=is_file, required=True)
 
     args = parser.parse_args()
 
-    pairwise_ranking = Pairwise_MMalign_qa(args.mmalign_program).run(args.indir)
+    pairwise_ranking = Pairwise_MMalign_qa(args.mmalign_program).run(args.indir, args.workdir)
     pairwise_ranking.to_csv('pairwise_ranking.csv')

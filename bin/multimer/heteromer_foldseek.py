@@ -23,6 +23,7 @@ flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
 flags.DEFINE_string('config_name', None, 'Whether to use IMG alignment to generate models')
+flags.DEFINE_integer('index', None, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -103,19 +104,17 @@ def main(argv):
 
     print("8. Start to run multimer iterative generation pipeline using top-ranked monomer models")
 
-    pipeline_inputs = []
-    for i in range(2):
-        monomer_pdb_dirs = {}
-        monomer_alphafold_a3ms = {}
-        for chain_id in chain_id_map:
-            monomer_id = chain_id
-            ranking_file = os.path.join(N7_outdir, monomer_id, 'pairwise_ranking_monomer.csv')
-            monomer_ranking = pd.read_csv(ranking_file)
-            pdb_name = monomer_ranking.loc[i, 'model']
-            monomer_pdb_dirs[chain_id] = os.path.join(N7_outdir, monomer_id, 'pdb', pdb_name)
-            monomer_alphafold_a3ms[chain_id] =  os.path.join(N7_outdir, monomer_id, 'msa', pdb_name.replace('.pdb', '.a3m'))
-        pipeline_inputs += [foldseek_iterative_monomer_input(monomer_pdb_dirs=monomer_pdb_dirs,
-                                                            monomer_alphafold_a3ms=monomer_alphafold_a3ms)]
+    monomer_pdb_dirs = {}
+    monomer_alphafold_a3ms = {}
+    for chain_id in chain_id_map:
+        monomer_id = chain_id
+        ranking_file = os.path.join(N7_outdir, monomer_id, 'pairwise_ranking_monomer.csv')
+        monomer_ranking = pd.read_csv(ranking_file)
+        pdb_name = monomer_ranking.loc[FLAGS.index, 'model']
+        monomer_pdb_dirs[chain_id] = os.path.join(N7_outdir, monomer_id, 'pdb', pdb_name)
+        monomer_alphafold_a3ms[chain_id] =  os.path.join(N7_outdir, monomer_id, 'msa', pdb_name.replace('.pdb', '.a3m'))
+    pipeline_input = foldseek_iterative_monomer_input(monomer_pdb_dirs=monomer_pdb_dirs,
+                                                        monomer_alphafold_a3ms=monomer_alphafold_a3ms)
 
     monomer_template_stos = []
     for chain_id in chain_id_map:
@@ -126,9 +125,9 @@ def main(argv):
         monomer_template_stos += [monomer_template_sto]
 
     if not run_multimer_structure_generation_pipeline_foldseek(params=params, fasta_path=FLAGS.fasta_path,
-                                                            chain_id_map=chain_id_map, config_name=FLAGS.config_name,
-                                                            pipeline_inputs=pipeline_inputs, outdir=N6_outdir,
-                                                            monomer_template_stos=monomer_template_stos):
+                                                                chain_id_map=chain_id_map, config_name=FLAGS.config_name,
+                                                                pipeline_input=pipeline_input, outdir=N6_outdir, index=FLAGS.index,
+                                                                monomer_template_stos=monomer_template_stos):
         print("Program failed in step 6 foldseek_iter")
 
 if __name__ == '__main__':
