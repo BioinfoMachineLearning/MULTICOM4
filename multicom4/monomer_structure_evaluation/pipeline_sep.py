@@ -369,23 +369,26 @@ class Monomer_structure_evaluation_pipeline:
                     ranked_pdb = os.path.join(monomer_model_dir, method, f"ranked_{i}.pdb")
                     trg_pdb = os.path.join(pdbdir_monomer, f"{pdbname}.pdb")
                     os.system(f"cp {ranked_pdb} {trg_pdb}")
+                    os.system("ln -s " + os.path.join(pdbdir_monomer, pdbname+".pdb") + " " + os.path.join(pdbdir, pdbname+".pdb"))
 
                     model_name = list(ranking_json["order"])[i]
+
                     src_pkl = os.path.join(monomer_model_dir, method, f"result_{model_name}.pkl")
-                    output_pkl = os.path.join(pkldir_monomer, f"{pdbname}.pkl")
-                    has_distogram = extract_pkl(src_pkl=src_pkl, output_pkl=output_pkl)
+                    if os.path.exists(src_pkl):
+                        output_pkl = os.path.join(pkldir_monomer, f"{pdbname}.pkl")
+                        has_distogram = extract_pkl(src_pkl=src_pkl, output_pkl=output_pkl)
+                        os.system("ln -s " + os.path.join(pkldir_monomer, pdbname+".pkl") + " " + os.path.join(pkldir, pdbname+".pkl"))
 
                     src_msa = os.path.join(monomer_model_dir, method, 'msas', "monomer_final.a3m")
-                    trg_msa = os.path.join(msadir_monomer, f"{pdbname}.a3m")
-                    os.system(f"cp {src_msa} {trg_msa}")
-                    pdbs_from_monomer += [f"{pdbname}.pdb"]
-
-                    os.system("ln -s " + os.path.join(pdbdir_monomer, pdbname+".pdb") + " " + os.path.join(pdbdir, pdbname+".pdb"))
-                    os.system("ln -s " + os.path.join(pkldir_monomer, pdbname+".pkl") + " " + os.path.join(pkldir, pdbname+".pkl"))
-                    os.system("ln -s " + os.path.join(msadir_monomer, pdbname+".a3m") + " " + os.path.join(msadir, pdbname+".a3m"))
+                    if os.path.exists(src_msa):
+                        trg_msa = os.path.join(msadir_monomer, f"{pdbname}.a3m")
+                        os.system(f"cp {src_msa} {trg_msa}")
+                        os.system("ln -s " + os.path.join(msadir_monomer, pdbname+".a3m") + " " + os.path.join(msadir, pdbname+".a3m"))
 
                     if has_distogram:
                         pdbs_with_dist += [f"{pdbname}.pdb"]
+
+                    pdbs_from_monomer += [f"{pdbname}.pdb"]
 
         pdbs_from_multimer = []
         if os.path.exists(multimer_model_dir):

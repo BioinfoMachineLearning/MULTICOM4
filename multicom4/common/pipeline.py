@@ -221,6 +221,8 @@ def select_models_by_tmscore(tmscore_program, ranking_df_file, outputdir, prefix
         if len(tmscores) == 0 or np.max(np.array(tmscores)) < tmscore_threshold:
             selected_models += [model]
             selected_models_path += [os.path.join(outputdir, 'pdb', model)]
+            if len(selected_models) >= NUM_FINAL_MODELS:
+                break
 
     for i in range(len(ranking_df)):
         if len(selected_models) >= NUM_FINAL_MODELS:

@@ -72,15 +72,7 @@ class Complex_sequence_based_template_search_pipeline:
             self.pdb_clusters[pdbcode1] += [pdbcode2]
 
     def find_matches_between_pdbcodes(self, monomer_code1, monomer_code2):
-        cluster_members1 = set()
-        if monomer_code1 in self.pdb_clusters:
-            cluster_members1.update(set(self.pdb_clusters[monomer_code1]))
-        else:
-            cluster_ids = [cluster_id for cluster_id in self.pdb_clusters if monomer_code1 in self.pdb_clusters[cluster_id]]
-            cluster_members1.update(set(self.pdb_clusters[cluster_ids[0]]))
 
-        monomer1_pdbcodes = [pdbcode[0:4] for pdbcode in cluster_members1]
-        
         cluster_members2 = set()
         if monomer_code2 in self.pdb_clusters:
             cluster_members2.update(set(self.pdb_clusters[monomer_code2]))
@@ -88,7 +80,7 @@ class Complex_sequence_based_template_search_pipeline:
             cluster_ids = [cluster_id for cluster_id in self.pdb_clusters if monomer_code2 in self.pdb_clusters[cluster_id]]
             cluster_members2.update(set(self.pdb_clusters[cluster_ids[0]]))
 
-        match_members = [pdbcode for pdbcode in cluster_members2 if pdbcode[0:4] in monomer1_pdbcodes]
+        match_members = [pdbcode for pdbcode in cluster_members2 if pdbcode[0:4] == monomer_code1]
 
         if len(match_members) == 0:
             return ""

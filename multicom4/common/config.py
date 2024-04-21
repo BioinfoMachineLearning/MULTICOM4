@@ -34,7 +34,7 @@ class pipeline():
 MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 8,
-        'num_recycle': 8,
+        'num_recycle': 12,
         'predictions_per_model': 20,
         'model_preset': 'monomer',
         'relax_topn_predictions': 5,
@@ -625,7 +625,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
 MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 8,
-        'num_recycle': 8,
+        'num_recycle': 12,
         'predictions_per_model': 200,
         'model_preset': 'monomer',
         'relax_topn_predictions': 5,
@@ -649,17 +649,21 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         },
         'colabfold': {
             'msa_source': 'colabfold',
+            'predictions_per_model': 20,
         },
         'colab_seq_temp': {
             'msa_source': 'colabfold',
-            'template_source': 'pdb_sort90'
+            'template_source': 'pdb_sort90',
+            'predictions_per_model': 20,
         },
         'img': {
             'msa_source': 'img',
+            'predictions_per_model': 20,
         },
         'img_seq_temp': {
             'msa_source': 'img',
-            'template_source': 'pdb_sort90'
+            'template_source': 'pdb_sort90',
+            'predictions_per_model': 20,
         },
         'dhr': {
             'msa_source': 'dhr',
