@@ -851,7 +851,7 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
 
 HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     'common_config': {
-        'num_ensemble': 3,
+        'num_ensemble': 1,
         'num_recycle': 20,
         'predictions_per_model': 200,
         'model_preset': 'multimer',
@@ -1052,6 +1052,56 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
+        },
+        'afsample_v1': {
+            'model_preset': "multimer_v1",
+            'dropout': True,
+            'num_ensemble': 1,
+            'num_recycle': 3,
+            'predictions_per_model': 200,
+        },
+        'afsample_v1_not': {
+            'model_preset': "multimer_v1",
+            'dropout': True,
+            'dropout_structure_module': False,
+            'template_source': 'notemplate',
+            'num_ensemble': 1,
+            'num_recycle': 3,
+            'predictions_per_model': 200,
+        },
+        'afsample_v1_r21_not': {
+            'model_preset': "multimer_v1",
+            'dropout': True,
+            'dropout_structure_module': False,
+            'template_source': 'notemplate',
+            'num_ensemble': 1,
+            'num_recycle': 21,
+            'predictions_per_model': 200,
+        },
+        'afsample_v2': {
+            'model_preset': "multimer_v2",
+            'dropout': True,
+            'num_ensemble': 1,
+            'num_recycle': 3,
+            'predictions_per_model': 200,
+        },
+        'afsample_v2_not': {
+            'model_preset': "multimer_v2",
+            'dropout': True,
+            'dropout_structure_module': False,
+            'template_source': 'notemplate',
+            'num_ensemble': 1,
+            'num_recycle': 3,
+            'predictions_per_model': 200,
+        },
+        'afsample_v2_r21_not': {
+            'model_preset': "multimer_v2",
+            'dropout': True,
+            'dropout_structure_module': False,
+            'template_source': 'notemplate',
+            'num_ensemble': 1,
+            'num_recycle': 21,
+            'predictions_per_model': 200,
         },
     }
 })
