@@ -159,6 +159,47 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                                    f"--output_dir={outdir} " + common_parameters
                             cmds += [cmd]
 
+                elif method.find('afsample') >= 0:
+                    if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
+                        bfd_uniref_a3ms = []
+                        mgnify_stos = []
+                        uniref90_stos = []
+                        uniprot_stos = []
+                        for chain_id in chain_id_map:
+                            monomer = chain_id
+                            monomer_bfd_uniref_a3m = os.path.join(aln_dir, monomer, f"{monomer}_uniref30_bfd.a3m")
+                            if not os.path.exists(monomer_bfd_uniref_a3m):
+                                raise Exception(f"Cannot find bfd and uniref30 a3m for {monomer}: {monomer_bfd_uniref_a3m}")
+                            bfd_uniref_a3ms += [monomer_bfd_uniref_a3m]
+
+                            monomer_mgnify_sto = os.path.join(aln_dir, monomer, f"{monomer}_mgnify.sto")
+                            if not os.path.exists(monomer_mgnify_sto):
+                                raise Exception(f"Cannot find mgnify sto for {monomer}: {monomer_mgnify_sto}")
+                            mgnify_stos += [monomer_mgnify_sto]
+
+                            monomer_uniref90_sto = os.path.join(aln_dir, monomer, f"{monomer}_uniref90.sto")
+                            if not os.path.exists(monomer_uniref90_sto):
+                                raise Exception(f"Cannot find uniref90 sto for {monomer}: {monomer_uniref90_sto}")
+                            uniref90_stos += [monomer_uniref90_sto]
+
+                            monomer_uniprot_sto = os.path.join(aln_dir, monomer, f"{monomer}_uniprot.sto")
+                            if not os.path.exists(monomer_uniprot_sto):
+                                raise Exception(f"Cannot find uniprot sto for {monomer}: {monomer_uniprot_sto}")
+                            uniprot_stos += [monomer_uniprot_sto]
+
+                        if template_source == "template_source":
+                            common_parameters += "--no_templates "
+                            
+                        if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
+                            cmd =  f"cd {self.params['afsample_program_dir']} && " \
+                                   f"python {self.params['afsample_program']} " \
+                                   f"--bfd_uniref_a3ms={','.join(bfd_uniref_a3ms)} " \
+                                   f"--mgnify_stos={','.join(mgnify_stos)} " \
+                                   f"--uniref90_stos={','.join(uniref90_stos)} " \
+                                   f"--uniprot_stos={','.join(uniprot_stos)} " \
+                                   f"--output_dir={outdir} " + common_parameters
+                            cmds += [cmd]
+
                 elif method == "AFProfile": 
                     
                     os.makedirs(outdir, exist_ok=True)

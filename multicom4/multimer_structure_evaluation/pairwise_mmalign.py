@@ -48,7 +48,7 @@ class Pairwise_MMalign_qa:
                 if not os.path.exists(scorefile) or len(open(scorefile).readlines()) < 5:
                     process_list.append([self.mmalign_program, input_dir, pdb1, pdb2, scorefile])
 
-        pool = Pool(processes=40)
+        pool = Pool(processes=20)
         results = pool.map(run_command, process_list)
         pool.close()
         pool.join()
