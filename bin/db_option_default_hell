@@ -95,7 +95,7 @@ afprofile_program = run_AFP.py
 afsample_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/alphafoldv2.2.0
 
 # alphafold tertiary structure prediction script
-afsample_program = run_alphafold.py
+afsample_program = run_alphafold_custom.py
 
 # Common parameters
 alphafold_benchmark = False
