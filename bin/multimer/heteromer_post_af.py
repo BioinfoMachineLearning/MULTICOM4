@@ -66,8 +66,8 @@ def main(argv):
     
     default_workdir = os.path.join(N6_outdir, 'default_multimer')
     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-    if not os.path.exists(ranking_json_file):
-        raise Exception(f"Haven't generated default_multimer models!")
+    #if not os.path.exists(ranking_json_file):
+    #    raise Exception(f"Haven't generated default_multimer models!")
 
     print("#################################################################################################")
 
@@ -169,7 +169,7 @@ def main(argv):
                             line = line.replace("JOBNAME", jobname)
                             fw.write(line)
                         fw.write(cmd)
-                    #os.system(f"sbatch {bash_file}")
+                    os.system(f"sbatch {bash_file}")
                 else:
                     bash_file = os.path.join(bash_script_dir, run_method + '.sh')
                     print(bash_file)

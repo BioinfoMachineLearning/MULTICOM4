@@ -699,21 +699,21 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         },
         'colabfold': {
             'msa_source': 'colabfold',
-            'predictions_per_model': 20,
+            #'predictions_per_model': 20,
         },
         'colab_seq_temp': {
             'msa_source': 'colabfold',
             'template_source': 'pdb_sort90',
-            'predictions_per_model': 20,
+            #'predictions_per_model': 20,
         },
         'img': {
             'msa_source': 'img',
-            'predictions_per_model': 20,
+            #'predictions_per_model': 20,
         },
         'img_seq_temp': {
             'msa_source': 'img',
             'template_source': 'pdb_sort90',
-            'predictions_per_model': 20,
+            #'predictions_per_model': 20,
         },
         'dhr': {
             'msa_source': 'dhr',

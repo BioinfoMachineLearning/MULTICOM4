@@ -135,7 +135,7 @@ def main(argv):
                             line = line.replace("JOBNAME", jobname)
                             fw.write(line)
                         fw.write(cmd)
-                    os.system(f"sbatch {bash_file}")
+                    # os.system(f"sbatch {bash_file}")
                 else:
                     bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
                     print(bash_file)
@@ -158,7 +158,7 @@ def main(argv):
                             line = line.replace("JOBNAME", jobname)
                             fw.write(line)
                         fw.write(cmd)
-                    #os.system(f"sbatch {bash_file}")
+                    os.system(f"sbatch {bash_file}")
                 else:
                     bash_file = os.path.join(bash_script_dir, run_method + '.sh')
                     print(bash_file)
