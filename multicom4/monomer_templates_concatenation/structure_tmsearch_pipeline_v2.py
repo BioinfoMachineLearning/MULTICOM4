@@ -11,6 +11,7 @@ from multicom4.tool.foldseek import *
 from multicom4.monomer_structure_refinement.iterative_refine_pipeline_v4_50 import assess_foldseek_hit, PrefilterError
 from multicom4.monomer_templates_concatenation.parsers import TemplateHit
 from multicom4.monomer_structure_refinement.util import build_alignment_indices
+from multicom4.monomer_templates_search.structure_tmsearch_pipeline import monomer_tmsearch_based_template_search_pipeline
 import datetime
 from multicom4.tool import tmsearch
 

@@ -101,6 +101,8 @@ alphafold_default_program = run_alphafold_pre.py
 # alphafold tertiary structure prediction script
 afprofile_program = run_AFP.py
 
+afsample_env_dir = /bmlfast/bml_casp16/anaconda3/envs/afsample/bin/
+
 # alphafold program path
 afsample_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/alphafoldv2.2.0
 

@@ -83,8 +83,11 @@ def main(argv):
     makedir_if_not_exists(N3_outdir)
     run_methods = ['default', 'default_seq_temp','def_drop_s','def_drop_nos',
                    'def_notemp', 'def_notemp_drop_s', 'def_notemp_drop_nos',
-                   'original', 'ori_seq_temp', 'colabfold', 'colab_seq_temp',
-                   'img', 'img_seq_temp', 'dhr', 
+                   'default_ptm', 'def_ptm_drop_s', 'def_ptm_drop_nos', 'def_ptm_notemp',
+                   'def_pt_not_drop_s', 'def_ptm_not_drop_nos',
+                   'original', 'ori_seq_temp', #'colabfold', 'colab_seq_temp',
+                   #'img', 'img_seq_temp', 
+                   'dhr', 
                    'deepmsa_dMSA_hhb', 'deepmsa_dMSA_jac', 'deepmsa_dMSA_hms',
                    'deepmsa_dMSA', 'deepmsa_qMSA', 'deepmsa_aMSA', 'deepmsa_qMSA_hhb',
                    'deepmsa_qMSA_jac', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hms',

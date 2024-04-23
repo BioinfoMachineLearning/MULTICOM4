@@ -242,11 +242,9 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
             elif run_method ==  "esmfold":
                 os.makedirs(method_out_dir, exist_ok=True)
-                for num_recycle in [4, 10, 50, 80, 100]:
-                    outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
-                    if not os.path.exists(outpdb):
-                        cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
-                        cmds += [cmd]
+                if not complete_result(method_out_dir, 5):
+                    cmd = f"sh {self.params['esmfold_program']} {fasta_path} {method_out_dir}"
+                    cmds += [cmd]
 
             elif run_method == "deepfold":
                 os.makedirs(method_out_dir, exist_ok=True)

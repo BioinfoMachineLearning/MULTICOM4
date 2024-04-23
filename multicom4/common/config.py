@@ -56,20 +56,20 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'msa_source': 'original',
             'template_source': 'pdb_sort90'
         },
-        'colabfold': {
-            'msa_source': 'colabfold',
-        },
-        'colab_seq_temp': {
-            'msa_source': 'colabfold',
-            'template_source': 'pdb_sort90'
-        },
-        'img': {
-            'msa_source': 'img',
-        },
-        'img_seq_temp': {
-            'msa_source': 'img',
-            'template_source': 'pdb_sort90'
-        },
+        # 'colabfold': {
+        #     'msa_source': 'colabfold',
+        # },
+        # 'colab_seq_temp': {
+        #     'msa_source': 'colabfold',
+        #     'template_source': 'pdb_sort90'
+        # },
+        # 'img': {
+        #     'msa_source': 'img',
+        # },
+        # 'img_seq_temp': {
+        #     'msa_source': 'img',
+        #     'template_source': 'pdb_sort90'
+        # },
         'dhr': {
             'msa_source': 'dhr',
         },
@@ -94,6 +94,37 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'dropout': True,
             'dropout_structure_module': False,
         },
+
+        'default_ptm': {
+            'model_preset': 'monomer_ptm',
+        },
+        'def_ptm_drop_s': {
+            'model_preset': 'monomer_ptm',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_ptm_drop_nos': {
+            'model_preset': 'monomer_ptm',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+        'def_ptm_notemp': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+        },
+        'def_pt_not_drop_s': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_ptm_not_drop_nos': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+
         'deepmsa_dMSA_hhb':{
             'msa_source': 'dMSA.hhb',
         },
@@ -369,6 +400,13 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': "pdb+afdb",
             'number_of_input': 2,
         },
+        'folds_iter_notp': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'None',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'foldseek_database': "pdb+afdb",
+            'number_of_input': 2,
+        },
         'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'msa_unpaired_source': 'foldseek',
@@ -390,12 +428,19 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
-        'AFProfile': 
-        {
-            'confidence_threshold': 0.95,
-            'max_iteration': 100,
-            'learning_rate': 0.0001,
+        'folds_iter_esm_notp': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'None',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'foldseek_database': "esm_atlas",
+            'number_of_input': 2,
         },
+        # 'AFProfile': 
+        # {
+        #     'confidence_threshold': 0.95,
+        #     'max_iteration': 100,
+        #     'learning_rate': 0.0001,
+        # },
         'def_mul_refine': {
             'number_of_input_models': 5,
             'max_iteration': 5,
@@ -601,12 +646,12 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'input_msa_source': 'default',
             'msa_paired_source': 'esm_msa',
         },
-        'AFProfile': 
-        {
-            'confidence_threshold': 0.95,
-            'max_iteration': 100,
-            'learning_rate': 0.0001,
-        },
+        # 'AFProfile': 
+        # {
+        #     'confidence_threshold': 0.95,
+        #     'max_iteration': 100,
+        #     'learning_rate': 0.0001,
+        # },
         'folds_iter': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'foldseek',
@@ -747,24 +792,24 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'msa_source': 'original',
             'template_source': 'pdb_sort90'
         },
-        'colabfold': {
-            'msa_source': 'colabfold',
-            #'predictions_per_model': 20,
-        },
-        'colab_seq_temp': {
-            'msa_source': 'colabfold',
-            'template_source': 'pdb_sort90',
-            #'predictions_per_model': 20,
-        },
-        'img': {
-            'msa_source': 'img',
-            #'predictions_per_model': 20,
-        },
-        'img_seq_temp': {
-            'msa_source': 'img',
-            'template_source': 'pdb_sort90',
-            #'predictions_per_model': 20,
-        },
+        # 'colabfold': {
+        #     'msa_source': 'colabfold',
+        #     #'predictions_per_model': 20,
+        # },
+        # 'colab_seq_temp': {
+        #     'msa_source': 'colabfold',
+        #     'template_source': 'pdb_sort90',
+        #     #'predictions_per_model': 20,
+        # },
+        # 'img': {
+        #     'msa_source': 'img',
+        #     #'predictions_per_model': 20,
+        # },
+        # 'img_seq_temp': {
+        #     'msa_source': 'img',
+        #     'template_source': 'pdb_sort90',
+        #     #'predictions_per_model': 20,
+        # },
         'dhr': {
             'msa_source': 'dhr',
         },
@@ -789,6 +834,37 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'dropout': True,
             'dropout_structure_module': False,
         },
+
+        'default_ptm': {
+            'model_preset': 'monomer_ptm',
+        },
+        'def_ptm_drop_s': {
+            'model_preset': 'monomer_ptm',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_ptm_drop_nos': {
+            'model_preset': 'monomer_ptm',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+        'def_ptm_notemp': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+        },
+        'def_pt_not_drop_s': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_ptm_not_drop_nos': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+        
         'deepmsa_dMSA_hhb':{
             'msa_source': 'dMSA.hhb',
         },
@@ -1064,6 +1140,13 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': "pdb+afdb",
             'number_of_input': 2,
         },
+        'folds_iter_notp': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'None',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'foldseek_database': "pdb+afdb",
+            'number_of_input': 2,
+        },
         'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'msa_unpaired_source': 'foldseek',
@@ -1085,12 +1168,19 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
-        'AFProfile': 
-        {
-            'confidence_threshold': 0.95,
-            'max_iteration': 1000,
-            'learning_rate': 0.0001,
+        'folds_iter_esm_notp': {   # common parameters for all deepmsa2 predictors
+            'msa_paired_source': 'None',
+            'msa_unpaired_source': 'foldseek',
+            'template_source': 'notemplate',
+            'foldseek_database': "esm_atlas",
+            'number_of_input': 2,
         },
+        # 'AFProfile': 
+        # {
+        #     'confidence_threshold': 0.95,
+        #     'max_iteration': 1000,
+        #     'learning_rate': 0.0001,
+        # },
         'def_mul_refine': {
             'number_of_input_models': 5,
             'max_iteration': 5,

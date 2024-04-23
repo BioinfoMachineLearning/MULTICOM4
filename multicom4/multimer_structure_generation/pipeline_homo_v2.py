@@ -64,7 +64,8 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                                 'spec_inter_ref_sto', 'spec_inter_prot_sto', 
                                 #'string_interact_uniref_a3m', 'string_interact_uniref_sto', 'str_struct',
                                 #'str_pdb70', 'str_pdb', 'str_comp', 'str_af', 'string_interact_uniprot_sto'
-                                'AFProfile', 'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not',
+                                #'AFProfile',
+                                'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not',
                                 'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not']
 
             self.run_methods += ['esmfold']
@@ -192,10 +193,10 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                         if template_source == "template_source":
                             common_parameters += "--no_templates "
-                            
+                        
                         if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
                             cmd =  f"cd {self.params['afsample_program_dir']} && " \
-                                   f"python {self.params['afsample_program']} " \
+                                   f"{self.params['afsample_env_dir']}/python {self.params['afsample_program']} " \
                                    f"--bfd_uniref_a3ms={','.join(bfd_uniref_a3ms)} " \
                                    f"--mgnify_stos={','.join(mgnify_stos)} " \
                                    f"--uniref90_stos={','.join(uniref90_stos)} " \
