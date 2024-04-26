@@ -33,7 +33,7 @@ class pipeline():
 
 MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
-        'num_ensemble': 8,
+        'num_ensemble': 1, #8,
         'num_recycle': 12,
         'predictions_per_model': 20,
         'model_preset': 'monomer',
@@ -179,6 +179,16 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
         'def_esm_msa': {
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
+            'num_ensemble': 1,
+            'num_recycle': 3,
+        },
+        'def_esm_msa_ckpt5': {
+            'input_msa_source': 'default',
+            'msa_source': 'esm_msa',
+            'model_ckpt': 'model_5',
+            'predictions_per_model': 20 * 5,
+            'num_ensemble': 1,
+            'num_recycle': 3,
         },
         'dom_hhsearch':{
             'msa_source': 'dom_hhsearch',
@@ -919,6 +929,16 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         'def_esm_msa': {
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
+            'num_ensemble': 1,
+            'num_recycle': 3,
+        },
+        'def_esm_msa_ckpt5': {
+            'input_msa_source': 'default',
+            'msa_source': 'esm_msa',
+            'model_ckpt': 'model_5',
+            'predictions_per_model': 200 * 5,
+            'num_ensemble': 1,
+            'num_recycle': 3,
         },
         'dom_hhsearch':{
             'msa_source': 'dom_hhsearch',

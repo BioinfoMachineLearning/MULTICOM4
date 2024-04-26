@@ -71,6 +71,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                 relax_topn_predictions = self.get_monomer_config(predictor_config, 'relax_topn_predictions')
                 dropout = self.get_monomer_config(predictor_config, 'dropout')
                 dropout_structure_module = self.get_monomer_config(predictor_config, 'dropout_structure_module')
+                ckpt_name = self.get_monomer_config(predictor_config, 'model_ckpt')
 
                 common_parameters =  f"--fasta_path={fasta_path} " \
                                      f"--env_dir={self.params['alphafold_env_dir']} " \
@@ -82,6 +83,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                                      f"--monomer_num_recycle={monomer_num_recycle} " \
                                      f"--num_monomer_predictions_per_model {num_monomer_predictions_per_model} " \
                                      f"--model_preset={model_preset} " \
+                                     f"--model_ckpt={ckpt_name} " \
                                      f"--relax_topn_predictions={relax_topn_predictions} " \
                                      f"--models_to_relax=TOPN "
 
@@ -218,9 +220,10 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         else:
                             workdir = os.path.join(method_out_dir, 'tmsearch')
                             makedir_if_not_exists(workdir)
-                        
+
+                            sequence = open(fasta_path).readlines()[1].rstrip('\n').lstrip('>')
                             pipeline = monomer_tmsearch_based_template_search_pipeline(self.params)
-                            template_file, template_dir = pipeline.search(fasta_path=fasta_path, inpdb=default_ranked_0_pdb, outdir=workdir)
+                            template_file, template_dir = pipeline.search(sequence=sequence, inpdb=default_ranked_0_pdb, outdir=workdir)
 
                             common_parameters += f"--temp_struct_csv={template_file} " \
                                                  f"--struct_atom_dir={template_dir} " 

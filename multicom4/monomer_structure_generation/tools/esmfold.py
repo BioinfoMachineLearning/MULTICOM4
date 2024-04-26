@@ -1,6 +1,8 @@
 import os, sys, argparse, time
 import torch
 import esm
+import numpy as np
+import pickle, json
 
 def get_bfactors(infile):
     bfactors = []
@@ -43,6 +45,10 @@ if __name__ == '__main__':
     
     try:
         for num_recycle in range(4, 104, 2):
+            
+            outpdb = os.path.join(args.outdir, f"{num_recycle}.pdb")
+            if os.path.exists(outpdb):
+                continue
 
             model = esm.pretrained.esmfold_v1()
             model = model.eval().cuda()
@@ -51,7 +57,7 @@ if __name__ == '__main__':
             with torch.no_grad():
                 output = model.infer_pdb(sequence, num_recycles=num_recycle)
 
-            outpdb = os.path.join(args.outdir, f"{num_recycle}.pdb")
+            
             with open(outpdb, "w") as f:
                 f.write(output)
 

@@ -167,7 +167,7 @@ bfd_database = /home/bml_casp15/tools/alphafold_databases_multicom3/bfd/bfd_meta
 
 mgnify_database = /home/bml_casp15/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
 
-metaclust_database = /home/bml_casp15/tools/multicom3_db/Metaclust_2018_06/metaclust_50
+metaclust_database = /home/bml_casp15/tools/multicom3_db/Metaclust_2018_06/metaclust.fasta
 
 img_database = /home/bml_casp15/tools/multicom3_db/img/img_new.fasta
 

@@ -38,8 +38,8 @@ if __name__ == '__main__':
 
     sequence = a3m_contents[1]
 
-    tokenizer = AutoTokenizer.from_pretrained("facebook/esm2_t48_15B_UR50D")
-    model = EsmForMaskedLM.from_pretrained("facebook/esm2_t48_15B_UR50D")
+    tokenizer = AutoTokenizer.from_pretrained("facebook/esm2_t36_3B_UR50D")
+    model = EsmForMaskedLM.from_pretrained("facebook/esm2_t36_3B_UR50D")
     pipe = pipeline("fill-mask", model=model, tokenizer=tokenizer, device=0)
 
     dataset = MyDataset(sequence)

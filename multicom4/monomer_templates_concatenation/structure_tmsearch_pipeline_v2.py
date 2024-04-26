@@ -109,7 +109,7 @@ class Complex_structure_tmsearch_based_template_search_pipeline:
                 os.system(f"cp -r {template_dir} {monomer_work_dir}")
             else:
                 pipeline = monomer_tmsearch_based_template_search_pipeline(self.params)
-                template_file, template_dir = pipeline.search(fasta_path=fasta_path, inpdb=monomers_pdbs[i], outdir=monomer_work_dir)
+                template_file, template_dir = pipeline.search(sequence=monomer_sequences[i], inpdb=monomers_pdbs[i], outdir=monomer_work_dir)
 
             template_file = os.path.join(monomer_work_dir, 'tmsearch_templates.csv')
             template_df = pd.read_csv(template_file, sep='\t')

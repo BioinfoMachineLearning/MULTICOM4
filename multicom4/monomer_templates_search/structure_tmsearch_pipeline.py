@@ -81,9 +81,9 @@ class monomer_tmsearch_based_template_search_pipeline:
 
         return pd.DataFrame(row_list)
 
-    def search(self, fasta_path, inpdb, outdir, max_template_count = 50):
+    def search(self, sequence, inpdb, outdir, max_template_count = 50):
         
-        sequence = open(fasta_path).readlines()[1].rstrip('\n').lstrip('>')
+        # sequence = open(fasta_path).readlines()[1].rstrip('\n').lstrip('>')
 
         makedir_if_not_exists(outdir)
         outfile = os.path.join(outdir, 'tmsearch_templates.csv')

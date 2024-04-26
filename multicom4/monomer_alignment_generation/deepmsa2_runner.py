@@ -106,7 +106,9 @@ class DeepMSA2_runner:
 
         JGIdir = os.path.join(outpath, 'JGI')
         os.makedirs(JGIdir, exist_ok=True)
-        if os.path.isfile(f"{MSAdir}/qMSA.jaca3m") and not os.path.isfile(f"{MSAdir}/dMSA.jaca3m"):
+        if not os.path.isfile(f"{MSAdir}/qMSA.jaca3m") and not os.path.isfile(f"{MSAdir}/dMSA.jaca3m"):
+            print(f"{targetname} does not need additional JGI search due to no jack result. skip")
+        else:
             recorddir = f"{outpath}/record"
             os.makedirs(recorddir, exist_ok=True)
 
@@ -197,8 +199,6 @@ class DeepMSA2_runner:
             a3m_out = os.path.join(JGIdir, 'DeepJGI.a3m')
             if not os.path.exists(a3m_out):
                 print(f"Cannot find the generated a3m file for {targetname} by DeepMS2: {a3m_out}")  
-        else:
-            print(f"{targetname} does not need additional JGI search due to no jack result. skip")
 
         deepmsa_noimg_tags = ['dMSA.hhb', 'dMSA.jac', 'dMSA.hms', 'dMSA', 'qMSA', 'aMSA', 'qMSA.hhb', 'qMSA.jac', 'qMSA.hh3', 'qMSA.hms']
         deepmsa_deepjgi_tags = ['DeepJGI.hms', 'DeepJGI']
