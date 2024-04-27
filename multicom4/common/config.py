@@ -42,6 +42,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
         'dropout_structure_module': True,
         'msa_source': 'default',
         'template_source': 'pdb70',
+        'model_ckpt': None,
     },
     'predictors':{
         'default': {
@@ -779,7 +780,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
 
 MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     'common_config': {
-        'num_ensemble': 8,
+        'num_ensemble': 1,
         'num_recycle': 12,
         'predictions_per_model': 200,
         'model_preset': 'monomer',
@@ -788,6 +789,7 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         'dropout_structure_module': True,
         'msa_source': 'default',
         'template_source': 'pdb70',
+        'model_ckpt': None,
     },
     'predictors':{
         'default': {

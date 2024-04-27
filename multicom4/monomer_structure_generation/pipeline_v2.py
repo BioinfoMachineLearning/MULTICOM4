@@ -83,9 +83,11 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                                      f"--monomer_num_recycle={monomer_num_recycle} " \
                                      f"--num_monomer_predictions_per_model {num_monomer_predictions_per_model} " \
                                      f"--model_preset={model_preset} " \
-                                     f"--model_ckpt={ckpt_name} " \
                                      f"--relax_topn_predictions={relax_topn_predictions} " \
                                      f"--models_to_relax=TOPN "
+                
+                if ckpt_name is not None:
+                    common_parameters += f"--model_ckpt={ckpt_name} "
 
                 msa_source = self.get_monomer_config(predictor_config, 'msa_source')
                 template_source = self.get_monomer_config(predictor_config, 'template_source')
