@@ -275,7 +275,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                     base_cmd += f"--monomer_a3ms={','.join(multimer_a3ms)} "
 
                     # template_source
-                    if template_source == "pdb_seqres" or template_source == "pdb_seqres_new":
+                    if template_source == "pdb70" or template_source == "pdb70_newest":
                         template_stos = []
                         for chain_id in chain_id_map:
                             monomer = chain_id
@@ -285,8 +285,8 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                             template_stos += [monomer_template_sto]
                         base_cmd += f"--template_stos {','.join(template_stos)} "
 
-                        if template_source == "pdb_seqres_new":
-                            base_cmd += f"--pdb70_database=pdb70_new "
+                        if template_source == "pdb70_newest":
+                            base_cmd += f"--pdb70_database=pdb70_newest "
 
                     elif template_source == "foldseek_structure_based_template":
                         template_file = os.path.join(template_dir, "struct_temp", "structure_templates.csv")

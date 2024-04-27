@@ -48,7 +48,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
         'default': {
         },
         'default_pdb70_new': {
-            'template_source': 'pdb70_new',
+            'template_source': 'pdb70_newest',
         },
         'default_seq_temp': {
             'template_source': 'pdb_sort90'
@@ -260,13 +260,13 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'dropout_structure_module': True,
         'msa_unpaired_source': 'default',
         'msa_paired_source': 'default',
-        'template_source': 'pdb_seqres',
+        'template_source': 'pdb70',
     },
     'predictors':{
         'default_multimer': {
         },
         'default_mul_pdb70_n': {
-            'template_source': 'pdb_seqres_new',
+            'template_source': 'pdb70_newest',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -427,14 +427,14 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'msa_unpaired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
         'folds_iter_esm_nop': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'None',
             'msa_unpaired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
@@ -533,13 +533,13 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         'dropout': False,
         'dropout_structure_module': True,
         'msa_paired_source': 'default',
-        'template_source': 'pdb_seqres',
+        'template_source': 'pdb70',
     },
     'predictors':{
         'default_multimer': {
         },
         'default_mul_pdb70_n': {
-            'template_source': 'pdb_seqres_new',
+            'template_source': 'pdb70_newest',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -698,7 +698,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         },
         'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
@@ -710,7 +710,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         },
         'folds_iter_esm_o': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
@@ -804,7 +804,7 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         'default': {
         },
         'default_pdb70_new': {
-            'template_source': 'pdb70_new',
+            'template_source': 'pdb70_newest',
         },
         'default_seq_temp': {
             'template_source': 'pdb_sort90'
@@ -1020,13 +1020,13 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         'dropout_structure_module': True,
         'msa_unpaired_source': 'default',
         'msa_paired_source': 'default',
-        'template_source': 'pdb_seqres',
+        'template_source': 'pdb70',
     },
     'predictors':{
         'default_multimer': {
         },
         'default_mul_pdb70_n': {
-            'template_source': 'pdb_seqres_new',
+            'template_source': 'pdb70_newest',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -1187,14 +1187,14 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'msa_unpaired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
         'folds_iter_esm_nop': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'None',
             'msa_unpaired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
@@ -1293,13 +1293,13 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         'dropout': False,
         'dropout_structure_module': True,
         'msa_paired_source': 'default',
-        'template_source': 'pdb_seqres',
+        'template_source': 'pdb70',
     },
     'predictors':{
         'default_multimer': {
         },
         'default_mul_pdb70_n': {
-            'template_source': 'pdb_seqres_new',
+            'template_source': 'pdb70_newest',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -1458,7 +1458,7 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         },
         'folds_iter_esm': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
@@ -1470,7 +1470,7 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         },
         'folds_iter_esm_o': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
-            'template_source': 'pdb_seqres',
+            'template_source': 'pdb70',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },

@@ -566,7 +566,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
 
             if self.predictor_config.template_source == "notemplate":
                 cmd += "--notemplate=true "
-            elif self.predictor_config.template_source == "pdb_seqres":
+            elif self.predictor_config.template_source == "pdb70":
                 cmd += f"--template_stos {','.join(template_stos)} "
             elif self.predictor_config.template_source == "foldseek":
                 cmd +=  f"--monomer_temp_csvs={','.join(template_files)} " \
