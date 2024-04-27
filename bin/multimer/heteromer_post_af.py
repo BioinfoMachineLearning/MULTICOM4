@@ -124,8 +124,8 @@ def main(argv):
         bash_script_dir = os.path.join(N6_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
-    run_methods = ['folds_iter', 'folds_iter_nop', 'folds_iter_not', 'folds_iter_esm', 'folds_iter_esm_nop',
-                   'folds_iter_esm_not', 'def_mul_refine']
+    run_methods = ['folds_iter', 'folds_iter_nop', 'folds_iter_not', 'folds_iter_notp', 'folds_iter_esm', 'folds_iter_esm_nop',
+                   'folds_iter_esm_not', 'folds_iter_esm_notp', 'def_mul_refine']
 
     for run_method in run_methods:
 

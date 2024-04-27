@@ -1,6 +1,6 @@
 ###########################This is an option file####################################
 
-slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_all.bash
+slurm_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_gpu.bash
 
 slurm_nonaf_script_template = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/bin/hellbender_A100.bash
 

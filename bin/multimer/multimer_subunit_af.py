@@ -69,16 +69,16 @@ def main(argv):
                                                        descriptions=input_descs)
 
     processed_seuqences = {}
-    monomer_run_methods = ['default', 'default_seq_temp','def_drop_s','def_drop_nos',
+    monomer_run_methods = ['default', 'default_pdb70_new', 'default_seq_temp','def_drop_s','def_drop_nos',
                             'def_notemp', 'def_notemp_drop_s', 'def_notemp_drop_nos',
-                            'original', 'ori_seq_temp', 'colabfold', 'colab_seq_temp',
-                            'img', 'img_seq_temp', 'dhr', 
+                            'original', 'ori_seq_temp', #'colabfold', 'colab_seq_temp', 'img', 'img_seq_temp', 
+                            'dhr', 
                             'deepmsa_dMSA_hhb', 'deepmsa_dMSA_jac', 'deepmsa_dMSA_hms',
                             'deepmsa_dMSA', 'deepmsa_qMSA', 'deepmsa_aMSA', 'deepmsa_qMSA_hhb',
                             'deepmsa_qMSA_jac', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hms',
                             'deepmsa_DeepJGI_hms', 'deepmsa_DeepJGI', 'deepmsa_q3JGI', 
                             'deepmsa_q4JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI_hms',
-                            'def_esm_msa']
+                            'def_esm_msa', 'def_esm_msa_ckpt5']
                             # 'default_tmsearch', 'def_esm_msa']
 
     for chain_id in chain_id_map:
