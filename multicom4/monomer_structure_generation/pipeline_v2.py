@@ -194,15 +194,15 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                             errormsg = errormsg + f"Cannot find deepmsa alignment for {chain_name}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
                     
-                    if template_source == "pdb70" or template_source == "pdb70_new":
+                    if template_source == "pdb70" or template_source == "pdb70_newest":
                         uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
                             errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         if common_parameters.find('--uniref90_sto') < 0:
                             common_parameters += f"--uniref90_sto={uniref90_sto} "
                         
-                        if template_source == "pdb70_new":
-                            common_parameters += f"--pdb70_database=pdb70_new "
+                        if template_source == "pdb70_newest":
+                            common_parameters += f"--pdb70_database=pdb70_newest "
 
                     elif template_source == "pdb_sort90":
                         temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
