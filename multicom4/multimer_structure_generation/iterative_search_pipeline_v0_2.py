@@ -335,7 +335,7 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
             if self.predictor_config.template_source == "notemplate":
                 cmd += "--notemplate=true "
-            elif self.predictor_config.template_source == "pdb70":
+            elif self.predictor_config.template_source == "pdb_seqres":
                 cmd += f"--template_stos {','.join(monomer_template_stos)} "
             elif self.predictor_config.template_source == "foldseek":
                 cmd +=  f"--monomer_temp_csvs={','.join(template_files)} " \
@@ -614,7 +614,7 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
             if self.predictor_config.template_source == "notemplate":
                 cmd += "--notemplate=true "
-            elif self.predictor_config.template_source == "pdb70":
+            elif self.predictor_config.template_source == "pdb_seqres":
                 cmd += f"--template_stos {','.join(monomer_template_stos)} "
             elif self.predictor_config.template_source == "foldseek":
                 cmd +=  f"--monomer_temp_csvs={','.join(template_files)} " \

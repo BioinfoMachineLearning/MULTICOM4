@@ -192,7 +192,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                             
                         if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
                             cmd =  f"cd {self.params['afsample_program_dir']} && " \
-                                   f"{self.params['afsample_env_dir']}/python {self.params['afsample_program']} " \
+                                   f"python {self.params['afsample_program']} " \
                                    f"--bfd_uniref_a3ms={','.join(bfd_uniref_a3ms)} " \
                                    f"--mgnify_stos={','.join(mgnify_stos)} " \
                                    f"--uniref90_stos={','.join(uniref90_stos)} " \
@@ -323,7 +323,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                                     f"--msa_pair_file={msa_pair_file} " \
 
                     # template_source
-                    if template_source == "pdb70" or template_source == "pdb70_newest":
+                    if template_source == "pdb_seqres":
                         template_stos = []
                         for chain_id in chain_id_map:
                             monomer = chain_id
@@ -332,9 +332,6 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                                 raise Exception(f"Cannot find template stos for {monomer}: {monomer_template_sto}")
                             template_stos += [monomer_template_sto]
                         base_cmd += f"--template_stos {','.join(template_stos)} "
-
-                        if template_source == "pdb70_newest":
-                            base_cmd += f"--pdb70_database=pdb70_newest "
 
                     elif template_source == "foldseek_structure_based_template":
                         template_file = os.path.join(template_dir, "struct_temp", "structure_templates.csv")
