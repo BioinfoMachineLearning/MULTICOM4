@@ -72,7 +72,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                 dropout = self.get_monomer_config(predictor_config, 'dropout')
                 dropout_structure_module = self.get_monomer_config(predictor_config, 'dropout_structure_module')
                 ckpt_name = self.get_monomer_config(predictor_config, 'model_ckpt')
-
+                
                 common_parameters =  f"--fasta_path={fasta_path} " \
                                      f"--env_dir={self.params['alphafold_env_dir']} " \
                                      f"--database_dir={self.params['alphafold_database_dir']} " \
@@ -194,12 +194,15 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                             errormsg = errormsg + f"Cannot find deepmsa alignment for {chain_name}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
                     
-                    if template_source == "pdb70":
+                    if template_source == "pdb70" or template_source == "pdb70_new":
                         uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
                             errormsg = errormsg + f"Cannot find uniref90 alignment for {chain_name}: {uniref90_sto}\n"
                         if common_parameters.find('--uniref90_sto') < 0:
                             common_parameters += f"--uniref90_sto={uniref90_sto} "
+                        
+                        if template_source == "pdb70_new":
+                            common_parameters += f"--pdb70_database=pdb70_new "
 
                     elif template_source == "pdb_sort90":
                         temp_struct_csv = os.path.join(template_dir, "sequence_templates.csv")
