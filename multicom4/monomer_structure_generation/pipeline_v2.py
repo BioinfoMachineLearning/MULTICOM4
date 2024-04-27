@@ -233,7 +233,11 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                             common_parameters += f"--temp_struct_csv={template_file} " \
                                                  f"--struct_atom_dir={template_dir} " 
 
-                    if not complete_result(method_out_dir, 5 * num_monomer_predictions_per_model): 
+                    check_model_num = 5 * num_monomer_predictions_per_model
+                    if ckpt_name is not None:
+                        check_model_num = num_monomer_predictions_per_model
+
+                    if not complete_result(method_out_dir, check_model_num): 
                         if len(errormsg) > 0:
                             print(errormsg)
                         else:
