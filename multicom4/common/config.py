@@ -46,6 +46,9 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
     'predictors':{
         'default': {
         },
+        'default_pdb70_new': {
+            'template_source': 'pdb70_new',
+        },
         'default_seq_temp': {
             'template_source': 'pdb_sort90'
         },
@@ -260,6 +263,9 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     },
     'predictors':{
         'default_multimer': {
+        },
+        'default_mul_pdb70_n': {
+            'template_source': 'pdb_seqres_new',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -531,6 +537,9 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'predictors':{
         'default_multimer': {
         },
+        'default_mul_pdb70_n': {
+            'template_source': 'pdb_seqres_new',
+        },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
         },
@@ -792,6 +801,9 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     'predictors':{
         'default': {
         },
+        'default_pdb70_new': {
+            'template_source': 'pdb70_new',
+        },
         'default_seq_temp': {
             'template_source': 'pdb_sort90'
         },
@@ -1010,6 +1022,9 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     },
     'predictors':{
         'default_multimer': {
+        },
+        'default_mul_pdb70_n': {
+            'template_source': 'pdb_seqres_new',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -1280,6 +1295,9 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     },
     'predictors':{
         'default_multimer': {
+        },
+        'default_mul_pdb70_n': {
+            'template_source': 'pdb_seqres_new',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
