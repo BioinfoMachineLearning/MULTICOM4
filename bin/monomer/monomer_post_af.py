@@ -58,7 +58,7 @@ def main(argv):
         bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
     os.makedirs(bash_script_dir, exist_ok=True)
 
-    run_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
+    run_methods = ['foldseek_refine'] #, 'foldseek_refine_esm', 'foldseek_refine_esm_h']
 
     for run_method in run_methods:
 

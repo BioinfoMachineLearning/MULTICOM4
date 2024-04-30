@@ -41,6 +41,8 @@ qscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/pairwiseQA/q_score
 # tmscore program
 tmscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/tmscore/TMscore
 
+usalign_program = /bmlfast/bml_casp16/MULTICOM4/tools/USalign
+
 calNf_program = /bmlfast/bml_casp16/MULTICOM4/tools/calNf
 
 ################################MSA generation tool###########################

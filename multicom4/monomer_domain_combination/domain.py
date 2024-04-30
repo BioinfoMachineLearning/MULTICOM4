@@ -10,7 +10,36 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline
 mgnify_max_hits = 501
 uniref_max_hits = 10000
 
+def correct_domain(domain_info_file, disorder_pred):
+    contents = open(domain_info_file).readlines()
 
+    domain_num = len(contents)
+    print(f"Total {domain_num} domains")
+
+    domain_disorder_info, domain_range_info = [],[]
+
+    for line in contents:
+        line = line.rstrip('\n')
+        domain_range_str = line.split(':')[1].split()[0]
+
+        domain_ranges = domain_range_str.split(',')
+        disorder_region = []
+        for domain_range in domain_ranges:
+            start, end = domain_range.split('-')
+            start, end = int(start), int(end)
+            disorder_region += disorder_pred[start-1:end]
+
+        disorder_num = len([char for char in disorder_region if char == "T"])
+        ratio = disorder_num / float(len(disorder_region))
+        if ratio > 0.7:
+            domain_disorder_info += ['Disorder']
+        else:
+            domain_disorder_info += ['Normal']
+
+        domain_range_info += [f"{start}-{end}"]
+
+    return domain_disorder_info, domain_range_info
+    
 def retrieve_sequence_ids_domain(ids, regex=None):
     if regex is None:
         regex = ID_EXTRACTION_REGEX
@@ -258,17 +287,14 @@ def run_dom_parser(disorder_pred, N1_outdir, fasta_path, ranked_0_pdb, params):
     dom_parse_out = os.path.join(N1_outdir, 'Dom_by_domain_parser')
     domain_info_file = os.path.join(dom_parse_out, 'domain_info')
     print(f"Found input pdb, using domain parser to predict domain boundries")
-    if len(sequence) < 3000:     
-        os.makedirs(dom_parse_out, exist_ok=True)
-        if os.path.exists(domain_info_file):
-            print(f"Found {domain_info_file}!!")
-        else:
-            cmd = f"perl {params['dom_parser_script']} {fasta_path} {ranked_0_pdb} {dom_parse_out}"
-            print(cmd)
-            os.system(cmd)
+
+    os.makedirs(dom_parse_out, exist_ok=True)
+    if os.path.exists(domain_info_file):
+        print(f"Found {domain_info_file}!!")
     else:
-        print(f"Domain parser cannot deal with sequence longer than 3000, skip!")
-        return None
+        cmd = f"perl {params['dom_parser_script']} {fasta_path} {ranked_0_pdb} {dom_parse_out}"
+        print(cmd)
+        os.system(cmd)
 
     domain_disorder_info, domain_range_info = correct_domain(domain_info_file, disorder_pred)
     domain_def = os.path.join(dom_parse_out, 'domain_info_final')
@@ -319,7 +345,7 @@ def run_unidoc(disorder_pred, N1_outdir, fasta_path, ranked_0_pdb, params):
 
 def generate_domain_fastas(fasta_path, domain_info, output_dir):
 
-    os.makedirs(outputdir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     sequence = open(fasta_path).readlines()[1].rstrip('\n')
     for line in open(domain_info):
@@ -341,13 +367,13 @@ def generate_domain_fastas(fasta_path, domain_info, output_dir):
         for start, end in zip(starts, ends):
             domain_sequence += sequence[start:end]
 
-        with open(os.path.join(outputdir, domain_name + '.fasta'), 'w') as fw:
+        with open(os.path.join(output_dir, domain_name + '.fasta'), 'w') as fw:
             fw.write(f">{domain_name}\n{domain_sequence}")
 
 
 def generate_domain_alignments(params, domain_fastas_dir, output_dir):
 
-    makedir_if_not_exists(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
 
     for fasta_path in os.listdir(domain_fastas_dir):
 
@@ -367,36 +393,18 @@ def generate_domain_alignments(params, domain_fastas_dir, output_dir):
 
         outdir = os.path.join(output_dir, targetname)
 
-        makedir_if_not_exists(outdir)
+        os.makedirs(outdir, exist_ok=True)
 
         print("#################################################################################################")
         print(f"1. Start to generate alignments for monomers")
 
-        uniref30 = params['uniref_db']
-        uniclust30 = ''
-        uniref90_fasta = params['uniref90_fasta']
+        params['uniclust_db'] = []
+        params['colabfold_databases'] = []
+        params['JGIclust_database'] = []
+        params['DHR_database_path'] = []
 
-        smallbfd = ""  # params['smallbfd_database']
-        bfd = params['bfd_database']
-        mgnify = params['mgnify_database']
-
-        hhblits_binary = params['hhblits_program']
-        hhfilter_binary = params['hhfilter_program']
-        jackhmmer_binary = params['jackhmmer_program']
-
-        colabfold_search_binary = '' #params['colabfold_search_program']
-        colabfold_split_msas_binary = '' #params['colabfold_split_msas_program']
-        colabfold_databases = '' #params['colabfold_databases']
-        mmseq_binary = '' #params['mmseq_program']
-
-        deepmsa2_path = '' #params['deepmsa2_path']
-        JGIclust_database_path = '' #params['JGIclust_database']
-        metaclust_database_path = '' #params['metaclust_database']
-        
-        dhr_program_path = '' #params['DHR_program_path']
-        dhr_database_path = '' #params['DHR_database_path']
-
-        result = run_monomer_msa_pipeline(fasta=fasta_path, outdir=outdir, params=params, only_monomer=True)
+        result = run_monomer_msa_pipeline(fasta=fasta_path, outdir=outdir, params=params, 
+                                          only_monomer=True, run_auxi_output=False)
 
         if result is None:
             raise RuntimeError('The monomer alignment generation has failed!')
@@ -500,7 +508,7 @@ def combine_domain_msas(sequence, domain_info, domaindir):
 
     # print(paired_rows)
 
-    outfile = os.path.join(outdir, 'paired.a3m')
+    outfile = os.path.join(domaindir, 'paired.a3m')
     write_paired_a3ms(sequence=sequence, domain_alignments=domain_alignments, 
                       domain_ranges=all_domain_ranges, paired_rows=paired_rows, outfile=outfile)
 

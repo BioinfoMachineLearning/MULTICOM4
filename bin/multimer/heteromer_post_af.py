@@ -171,7 +171,7 @@ def main(argv):
                         fw.write(cmd)
                     os.system(f"sbatch {bash_file}")
                 else:
-                    bash_file = os.path.join(bash_script_dir, run_method + '.sh')
+                    bash_file = os.path.join(bash_script_dir, f"{run_method}_{index}.sh")
                     print(bash_file)
                     with open(bash_file, 'w') as fw:
                         fw.write(cmd)

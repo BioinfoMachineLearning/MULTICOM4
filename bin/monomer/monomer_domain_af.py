@@ -2,7 +2,7 @@ import os, sys, argparse, time, copy, pathlib
 from multiprocessing import Pool
 from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file
-from multicom4.monomer_domain_combination.domaim import run_hhsearch_dom, run_dom_parser, run_unidoc
+from multicom4.monomer_domain_combination.domain import *
 import pandas as pd
 from absl import flags
 from absl import app
@@ -83,14 +83,18 @@ def main(argv):
 
     ranked_0_pdb = os.path.join(N3_outdir, 'default', 'ranked_0.pdb')
     # 2. domain_parser, requires the predicted full-length model as input
-    dom_parser_domain_file = run_dom_parser(disorder_pred=disorder_pred, 
-                                            N1_outdir=N1_outdir,
-                                            fasta_path=FLAGS.fasta_path,
-                                            ranked_0_pdb=ranked_0_pdb,
-                                            params=params)
-    
-    if len(dom_parser_domain_file) > 0:
-        domain_info_dict['dom_parser'] = dom_parser_domain_file 
+
+    if len(sequence) >= 3000:
+        print(f"Domain parser cannot deal with sequence longer than 3000, skip!")
+    else:
+        dom_parser_domain_file = run_dom_parser(disorder_pred=disorder_pred, 
+                                                N1_outdir=N1_outdir,
+                                                fasta_path=FLAGS.fasta_path,
+                                                ranked_0_pdb=ranked_0_pdb,
+                                                params=params)
+        
+        if len(dom_parser_domain_file) > 0:
+            domain_info_dict['dom_parser'] = dom_parser_domain_file 
 
     # 3. Unidoc structure-based
     domain_info_dict['dom_unidoc'] = run_unidoc(disorder_pred=disorder_pred, 

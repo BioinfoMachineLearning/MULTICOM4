@@ -371,7 +371,8 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-                print(f"Generating bash file for {predictor}: {bash_file}")
+                #print(f"Generating bash file for {predictor}: {bash_file}")
+                print(f"{bash_file}")
                 with open(bash_file, 'w') as fw:
                     fw.write('\n'.join(predictor_commands[predictor]))
                 bash_files += [bash_file]

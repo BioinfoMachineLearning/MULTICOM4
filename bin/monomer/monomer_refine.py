@@ -60,28 +60,25 @@ def main(argv):
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
     makedir_if_not_exists(N3_outdir)
     
+    N4_outdir = os.path.join(outdir, 'N4_monomer_structure_evaluation')
     #run_method == "foldseek_refine" or run_method == "foldseek_refine_esm" or run_method == "foldseek_refine_esm_h":
-                
+    
+    i = FLAGS.idx
     # refine default top-ranked models
     refinement_inputs = []
-    default_workdir = os.path.join(N3_outdir, 'default')
-    ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-    if not os.path.exists(ranking_json_file):
-        raise Exception(f"Haven't generated default models!")
-
-    ranking_json = json.loads(open(ranking_json_file).read())
-    i = FLAGS.idx
-    pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
-    model_name = list(ranking_json["order"])[i]
-    pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
-    msa_path = os.path.join(default_workdir, 'msas', "monomer_final.a3m")
+    avg_ranking_file = os.path.join(N4_outdir, 'gate_af_avg_monomer.ranking')
+    avg_ranking_df = pd.read_csv(avg_ranking_file)
+    pdb_name = avg_ranking_df.loc[i, 'model']
     refine_input = iterative_refine_pipeline.refinement_input(fasta_path=FLAGS.fasta_path,
-                                                                pdb_path=pdb_path,
-                                                                pkl_path=pkl_path,
-                                                                msa_path=msa_path)
+                                                              pdb_path=os.path.join(N4_outdir, 'pdb', pdb_name),
+                                                              pkl_path=os.path.join(N4_outdir, 'pkl', pdb_name.replace('.pdb', '.pkl')),
+                                                              msa_path=os.path.join(N4_outdir, 'msa', pdb_name.replace('.pdb', '.a3m')))
     refinement_inputs += [refine_input]
 
-    refine_dir = os.path.join(N3_outdir, FLAGS.config_name, 'workdir')
+    N5_outdir = os.path.join(outdir, 'N5_monomer_structure_refinement')
+    makedir_if_not_exists(N5_outdir)
+
+    refine_dir = os.path.join(N5_outdir, FLAGS.config_name, 'workdir')
     makedir_if_not_exists(refine_dir)
     pipeline = iterative_refine_pipeline.Monomer_iterative_refinement_pipeline_server(params=params, config_name=FLAGS.config_name)
     pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir,

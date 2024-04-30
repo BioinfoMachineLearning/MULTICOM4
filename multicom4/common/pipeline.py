@@ -31,7 +31,7 @@ from sklearn.cluster import KMeans
 
 NUM_FINAL_MODELS = 10
 
-def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
+def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, run_auxi_output=True):
     uniref30 = params['uniref_db']
     uniclust30 = params['uniclust_db']
     uniref90_fasta = params['uniref90_fasta']
@@ -85,6 +85,9 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False):
         result = pipeline.process(fasta, outdir)
     except Exception as e:
         print(e)
+        return result
+
+    if not run_auxi_output:
         return result
 
     # Run disorder prediction in the background
