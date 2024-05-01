@@ -770,6 +770,13 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'num_ensemble': 1,
             'num_recycle': 21,
         },
+        'colabfold_casp16_web': {
+            'msa_paired_source': 'colabfold',
+        },
+        'colabfold_casp16_web_not': {
+            'msa_paired_source': 'colabfold',
+            'template_source': 'notemplate',
+        },
     }
 })
 
