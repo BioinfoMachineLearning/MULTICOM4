@@ -189,7 +189,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                             
                         if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
                             cmd =  f"cd {self.params['afsample_program_dir']} && " \
-                                   f"python {self.params['afsample_program']} " \
+                                   f"{self.params['afsample_env_dir']}/python {self.params['afsample_program']} " \
                                    f"--bfd_uniref_a3ms={','.join(bfd_uniref_a3ms)} " \
                                    f"--mgnify_stos={','.join(mgnify_stos)} " \
                                    f"--uniref90_stos={','.join(uniref90_stos)} " \
