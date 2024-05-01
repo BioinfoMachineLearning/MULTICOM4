@@ -5,9 +5,15 @@ import ml_collections
 
 class pipeline():
 
-    def __init__(self, is_human=False):
+    def __init__(self, is_human=False, is_subunit=False):
 
-        self.monomer_config = MONOMER_HUMAN_CONFIG if is_human else MONOMER_CONFIG
+        self.monomer_config = MONOMER_CONFIG
+        
+        if is_human:
+            self.monomer_config = MONOMER_HUMAN_CONFIG 
+            
+        if is_subunit:
+            self.monomer_config = MONOMER_SUBUNIT_CONFIG
 
         self.heteromer_config = HETEROMULTIMER_HUMAN_CONFIG if is_human else HETEROMULTIMER_CONFIG
 
@@ -767,8 +773,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     }
 })
 
-
-
 MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
@@ -1505,6 +1509,172 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
+        },
+    }
+})
+
+MONOMER_SUBUNIT_CONFIG = ml_collections.ConfigDict({
+    'common_config': {
+        'num_ensemble': 1,
+        'num_recycle': 12,
+        'predictions_per_model': 20,
+        'model_preset': 'monomer',
+        'relax_topn_predictions': 5,
+        'dropout': False,
+        'dropout_structure_module': True,
+        'msa_source': 'default',
+        'template_source': 'pdb70',
+        'model_ckpt': None,
+    },
+    'predictors':{
+        'default': {
+        },
+        'default_pdb70_new': {
+            'template_source': 'pdb70_newest',
+        },
+        'default_seq_temp': {
+            'template_source': 'pdb_sort90'
+        },
+        'original': {
+            'msa_source': 'original',
+        },
+        'ori_seq_temp': {
+            'msa_source': 'original',
+            'template_source': 'pdb_sort90'
+        },
+        # 'colabfold': {
+        #     'msa_source': 'colabfold',
+        # },
+        # 'colab_seq_temp': {
+        #     'msa_source': 'colabfold',
+        #     'template_source': 'pdb_sort90'
+        # },
+        # 'img': {
+        #     'msa_source': 'img',
+        # },
+        # 'img_seq_temp': {
+        #     'msa_source': 'img',
+        #     'template_source': 'pdb_sort90'
+        # },
+        'dhr': {
+            'msa_source': 'dhr',
+        },
+        'def_drop_s': {
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_drop_nos': {
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+        'def_notemp': {
+            'template_source': 'notemplate',
+        },
+        'def_notemp_drop_s': {
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_notemp_drop_nos': {
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+
+        'default_ptm': {
+            'model_preset': 'monomer_ptm',
+        },
+        'def_ptm_drop_s': {
+            'model_preset': 'monomer_ptm',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_ptm_drop_nos': {
+            'model_preset': 'monomer_ptm',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+        'def_ptm_notemp': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+        },
+        'def_ptm_not_drop_s': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': True,
+        },
+        'def_ptm_not_drop_nos': {
+            'model_preset': 'monomer_ptm',
+            'template_source': 'notemplate',
+            'dropout': True,
+            'dropout_structure_module': False,
+        },
+
+        'deepmsa_dMSA_hhb':{
+            'msa_source': 'dMSA.hhb',
+        },
+        'deepmsa_dMSA_jac':{
+            'msa_source': 'dMSA.jac',
+        },
+        'deepmsa_dMSA_hms':{
+            'msa_source': 'dMSA.hms',
+        },
+        'deepmsa_dMSA':{
+            'msa_source': 'dMSA',
+        },
+        'deepmsa_qMSA':{
+            'msa_source': 'qMSA',
+        },
+        'deepmsa_aMSA':{
+            'msa_source': 'aMSA',
+        },
+        'deepmsa_qMSA_hhb':{
+            'msa_source': 'qMSA.hhb',
+        },
+        'deepmsa_qMSA_jac':{
+            'msa_source': 'qMSA.jac',
+        },
+        'deepmsa_qMSA_hh3':{
+            'msa_source': 'qMSA.hh3',
+        },
+        'deepmsa_qMSA_hms':{
+            'msa_source': 'qMSA.hms',
+        },
+        'deepmsa_DeepJGI_hms':{
+            'msa_source': 'DeepJGI.hms',
+        },
+        'deepmsa_DeepJGI':{
+            'msa_source': 'DeepJGI',
+        },
+        'deepmsa_q3JGI':{
+            'msa_source': 'q3JGI',
+        },
+        'deepmsa_q4JGI':{
+            'msa_source': 'q4JGI',
+        },
+        'deepmsa_q3JGI_hms':{
+            'msa_source': 'q3JGI.hms',
+        },
+        'deepmsa_q4JGI_hms':{
+            'msa_source': 'q4JGI.hms',
+        },
+        # 'default_tmsearch': {
+        #     'template_source': 'tmsearch',
+        # },
+        'def_esm_msa': {
+            'input_msa_source': 'default',
+            'msa_source': 'esm_msa',
+            'num_ensemble': 1,
+            'num_recycle': 3,
+        },
+        'def_esm_msa_ckpt5': {
+            'input_msa_source': 'default',
+            'msa_source': 'esm_msa',
+            'model_ckpt': 'model_5',
+            'predictions_per_model': 40 * 5,
+            'num_ensemble': 1,
+            'num_recycle': 3,
         },
     }
 })
