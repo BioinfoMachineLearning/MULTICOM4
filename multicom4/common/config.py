@@ -1679,7 +1679,7 @@ MONOMER_SUBUNIT_CONFIG = ml_collections.ConfigDict({
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
             'model_ckpt': 'model_5',
-            'predictions_per_model': 40 * 5,
+            'predictions_per_model': 20 * 5,
             'num_ensemble': 1,
             'num_recycle': 3,
         },
