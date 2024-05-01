@@ -53,21 +53,13 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
         if run_methods is None:
             # non-alphafold2 predictors
-            self.run_methods = ['default_multimer', 'def_mul_struct', 'def_mul_tmsearch', 'def_mul_pdb70',
-                                'def_mul_pdb', 'def_mul_comp', 'def_mul_drop_s', # 'def_mul_af',
-                                'def_mul_drop_nos', 'def_mul_notemp', 'def_mul_not_drop_s', 
-                                'def_mul_not_drop_nos', 'def_mul_esm_msa', 'uniclust_ox_a3m',
-                                'pdb_inter_ref_a3m', 'pdb_inter_ref_sto', 'pdb_inter_prot_sto', 
-                                # 'uniprot_distance_uniref_a3m', 'uniprot_distance_uniref_sto', 'uniprot_distance_uniprot_sto', 
-                                'spec_inter_ref_a3m', 'spec_struct',
-                                'spec_pdb70', 'spec_pdb', 'spec_comp', # 'spec_af',
-                                'spec_inter_ref_sto', 'spec_inter_prot_sto', 
-                                #'string_interact_uniref_a3m', 'string_interact_uniref_sto', 'str_struct',
-                                #'str_pdb70', 'str_pdb', 'str_comp', 'str_af', 'string_interact_uniprot_sto'
-                                #'AFProfile',
-                                'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not',
-                                'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not']
-
+            self.run_methods = ['afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not', 'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not',
+                                'def_mul_comp', 'def_mul_drop_nos', 'def_mul_drop_s', 'def_mul_esm_msa', 'def_mul_not_drop_nos',
+                                'def_mul_not_drop_s', 'def_mul_notemp', 'def_mul_pdb', 'def_mul_pdb70', 'def_mul_struct',
+                                'def_mul_tmsearch', 'default_multimer', 'pdb_inter_prot_sto', 'pdb_inter_ref_a3m', 'pdb_inter_ref_sto',
+                                'spec_comp', 'spec_inter_prot_sto', 'spec_inter_ref_a3m', 'spec_inter_ref_sto', 'spec_pdb',
+                                'spec_pdb70', 'spec_struct', 'uniclust_ox_a3m']
+            
             self.run_methods += ['esmfold']
         else:
             self.run_methods = run_methods

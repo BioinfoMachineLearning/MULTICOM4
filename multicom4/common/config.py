@@ -33,9 +33,9 @@ class pipeline():
 
 MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
-        'num_ensemble': 1, #8,
-        'num_recycle': 8,
-        'predictions_per_model': 20,
+        'num_ensemble': 1,
+        'num_recycle': 12,
+        'predictions_per_model': 40,
         'model_preset': 'monomer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -116,7 +116,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'model_preset': 'monomer_ptm',
             'template_source': 'notemplate',
         },
-        'def_pt_not_drop_s': {
+        'def_ptm_not_drop_s': {
             'model_preset': 'monomer_ptm',
             'template_source': 'notemplate',
             'dropout': True,
@@ -190,7 +190,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
             'model_ckpt': 'model_5',
-            'predictions_per_model': 20 * 5,
+            'predictions_per_model': 40 * 5,
             'num_ensemble': 1,
             'num_recycle': 3,
         },
@@ -206,18 +206,18 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
         'dom_manual':{
             'msa_source': 'dom_manual',
         },
-        'foldseek_refine': {
-            'number_of_input_models': 5,
-            'max_iteration': 1,
-            'max_template_count': 50,
-            'progressive_threshold': 2000,
-            'number_of_output_models': 5,
-            'relax_topn_predictions': 1,
-            'foldseek_database': 'pdb+afdb',
-            'msa_source': 'foldseek',
-            'template_source': 'foldseek',
-            'predictions_per_model': 4,
-        },
+        # 'foldseek_refine': {
+        #     'number_of_input_models': 5,
+        #     'max_iteration': 1,
+        #     'max_template_count': 50,
+        #     'progressive_threshold': 2000,
+        #     'number_of_output_models': 5,
+        #     'relax_topn_predictions': 1,
+        #     'foldseek_database': 'pdb+afdb',
+        #     'msa_source': 'foldseek',
+        #     'template_source': 'foldseek',
+        #     'predictions_per_model': 4,
+        # },
         # 'foldseek_refine_esm': {
         #     'number_of_input_models': 5,
         #     'max_iteration': 5,
@@ -253,7 +253,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 20,
+        'predictions_per_model': 40,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -264,9 +264,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     },
     'predictors':{
         'default_multimer': {
-        },
-        'default_mul_pdb70_n': {
-            'template_source': 'pdb_seqres_new',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -283,9 +280,9 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'def_mul_comp': {
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'def_mul_af': {
-            'template_source': 'alphafold_model_templates'
-        },
+        # 'def_mul_af': {
+        #     'template_source': 'alphafold_model_templates'
+        # },
         'def_mul_drop_s': {
             'dropout': True,
             'dropout_structure_module': True,
@@ -350,10 +347,10 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'species_interact_uniref_a3m',
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'spec_af': {
-            'msa_paired_source': 'species_interact_uniref_a3m',
-            'template_source': 'alphafold_model_templates'
-        },
+        # 'spec_af': {
+        #     'msa_paired_source': 'species_interact_uniref_a3m',
+        #     'template_source': 'alphafold_model_templates'
+        # },
         'spec_inter_ref_sto': {
             'msa_paired_source': 'species_interact_uniref_sto',
         },
@@ -382,10 +379,10 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'string_interact_uniref_sto',
             'template_source': 'sequence_based_template_pdb_complex',
         },
-        'str_af': {
-            'msa_paired_source': 'string_interact_uniref_sto',
-            'template_source': 'alphafold_model_templates',
-        },
+        # 'str_af': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        #     'template_source': 'alphafold_model_templates',
+        # },
         'str_inter_prot_sto': {
             'msa_paired_source': 'string_interact_uniprot_sto',
         },
@@ -465,7 +462,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
             'relax_topn_predictions': 1,
-            'predictions_per_model': 5,
+            'predictions_per_model': 10,
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
@@ -475,7 +472,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v1_not': {
             'model_preset': "multimer_v1",
@@ -484,7 +480,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v1_r21_not': {
             'model_preset': "multimer_v1",
@@ -493,14 +488,12 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 20,
         },
         'afsample_v2': {
             'model_preset': "multimer_v2",
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v2_not': {
             'model_preset': "multimer_v2",
@@ -509,7 +502,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v2_r21_not': {
             'model_preset': "multimer_v2",
@@ -518,7 +510,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 20,
         },
     }
 })
@@ -527,7 +518,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 20,
+        'predictions_per_model': 40,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -537,9 +528,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     },
     'predictors':{
         'default_multimer': {
-        },
-        'default_mul_pdb70_n': {
-            'template_source': 'pdb_seqres_new',
         },
         'def_mul_struct': {
             'template_source': 'foldseek_structure_based_template'
@@ -556,9 +544,9 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         'def_mul_comp': {
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'def_mul_af': {
-            'template_source': 'alphafold_model_templates'
-        },
+        # 'def_mul_af': {
+        #     'template_source': 'alphafold_model_templates'
+        # },
         'def_mul_drop_s': {
             'dropout': True,
             'dropout_structure_module': True,
@@ -620,10 +608,10 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'species_interact_uniref_a3m',
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'spec_af': {
-            'msa_paired_source': 'species_interact_uniref_a3m',
-            'template_source': 'alphafold_model_templates'
-        },
+        # 'spec_af': {
+        #     'msa_paired_source': 'species_interact_uniref_a3m',
+        #     'template_source': 'alphafold_model_templates'
+        # },
         'spec_inter_ref_sto': {
             'msa_paired_source': 'species_interact_uniref_sto',
         },
@@ -730,14 +718,13 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
-            'predictions_per_model': 5,
+            'predictions_per_model': 10,
         },
         'afsample_v1': {
             'model_preset': "multimer_v1",
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v1_not': {
             'model_preset': "multimer_v1",
@@ -746,7 +733,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v1_r21_not': {
             'model_preset': "multimer_v1",
@@ -755,14 +741,12 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 20,
         },
         'afsample_v2': {
             'model_preset': "multimer_v2",
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v2_not': {
             'model_preset': "multimer_v2",
@@ -771,7 +755,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 20,
         },
         'afsample_v2_r21_not': {
             'model_preset': "multimer_v2",
@@ -780,7 +763,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 20,
         },
     }
 })
@@ -876,7 +858,7 @@ MONOMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'model_preset': 'monomer_ptm',
             'template_source': 'notemplate',
         },
-        'def_pt_not_drop_s': {
+        'def_ptm_not_drop_s': {
             'model_preset': 'monomer_ptm',
             'template_source': 'notemplate',
             'dropout': True,
@@ -1040,9 +1022,9 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         'def_mul_comp': {
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'def_mul_af': {
-            'template_source': 'alphafold_model_templates'
-        },
+        # 'def_mul_af': {
+        #     'template_source': 'alphafold_model_templates'
+        # },
         'def_mul_drop_s': {
             'dropout': True,
             'dropout_structure_module': True,
@@ -1107,10 +1089,10 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'species_interact_uniref_a3m',
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'spec_af': {
-            'msa_paired_source': 'species_interact_uniref_a3m',
-            'template_source': 'alphafold_model_templates'
-        },
+        # 'spec_af': {
+        #     'msa_paired_source': 'species_interact_uniref_a3m',
+        #     'template_source': 'alphafold_model_templates'
+        # },
         'spec_inter_ref_sto': {
             'msa_paired_source': 'species_interact_uniref_sto',
         },
@@ -1139,15 +1121,15 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'string_interact_uniref_sto',
             'template_source': 'sequence_based_template_pdb_complex',
         },
-        'str_af': {
-            'msa_paired_source': 'string_interact_uniref_sto',
-            'template_source': 'alphafold_model_templates',
-        },
+        # 'str_af': {
+        #     'msa_paired_source': 'string_interact_uniref_sto',
+        #     'template_source': 'alphafold_model_templates',
+        # },
         'str_inter_prot_sto': {
             'msa_paired_source': 'string_interact_uniprot_sto',
         },
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
-            'max_pairs': 20,
+            'max_pairs': 50,
         },
         'def_mul_esm_msa': {
             'input_msa_source': 'default',
@@ -1222,7 +1204,7 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
             'relax_topn_predictions': 1,
-            'predictions_per_model': 5,
+            'predictions_per_model': 40,
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
@@ -1232,7 +1214,6 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v1_not': {
             'model_preset': "multimer_v1",
@@ -1241,7 +1222,6 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v1_r21_not': {
             'model_preset': "multimer_v1",
@@ -1250,14 +1230,12 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 200,
         },
         'afsample_v2': {
             'model_preset': "multimer_v2",
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v2_not': {
             'model_preset': "multimer_v2",
@@ -1266,7 +1244,6 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v2_r21_not': {
             'model_preset': "multimer_v2",
@@ -1275,7 +1252,6 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 200,
         },
     }
 })
@@ -1374,10 +1350,10 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'species_interact_uniref_a3m',
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        'spec_af': {
-            'msa_paired_source': 'species_interact_uniref_a3m',
-            'template_source': 'alphafold_model_templates'
-        },
+        # 'spec_af': {
+        #     'msa_paired_source': 'species_interact_uniref_a3m',
+        #     'template_source': 'alphafold_model_templates'
+        # },
         'spec_inter_ref_sto': {
             'msa_paired_source': 'species_interact_uniref_sto',
         },
@@ -1414,18 +1390,18 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         #     'msa_paired_source': 'string_interact_uniprot_sto',
         # },
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
-            'max_pairs': 20,
+            'max_pairs': 50,
         },
         'def_mul_esm_msa': {
             'input_msa_source': 'default',
             'msa_paired_source': 'esm_msa',
         },
-        'AFProfile': 
-        {
-            'confidence_threshold': 0.95,
-            'max_iteration': 1000,
-            'learning_rate': 0.0001,
-        },
+        # 'AFProfile': 
+        # {
+        #     'confidence_threshold': 0.95,
+        #     'max_iteration': 1000,
+        #     'learning_rate': 0.0001,
+        # },
         'folds_iter': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'foldseek',
@@ -1484,14 +1460,13 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
-            'predictions_per_model': 5,
+            'predictions_per_model': 40,
         },
         'afsample_v1': {
             'model_preset': "multimer_v1",
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v1_not': {
             'model_preset': "multimer_v1",
@@ -1500,7 +1475,6 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v1_r21_not': {
             'model_preset': "multimer_v1",
@@ -1509,14 +1483,12 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 200,
         },
         'afsample_v2': {
             'model_preset': "multimer_v2",
             'dropout': True,
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v2_not': {
             'model_preset': "multimer_v2",
@@ -1525,7 +1497,6 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 3,
-            'predictions_per_model': 200,
         },
         'afsample_v2_r21_not': {
             'model_preset': "multimer_v2",
@@ -1534,7 +1505,6 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
-            'predictions_per_model': 200,
         },
     }
 })

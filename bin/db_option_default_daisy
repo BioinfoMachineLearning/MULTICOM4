@@ -92,7 +92,7 @@ alphafold_benchmark = True
 
 use_gpu_relax = True
 
-max_template_date = 9999-06-01
+max_template_date = 9999-04-01
 
 pdb_release_date_file = /bmlfast/bml_casp16/tools/multicom3_db/pdb_release_date_filtered.csv
 

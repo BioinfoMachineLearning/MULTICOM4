@@ -79,18 +79,7 @@ def main(argv):
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
     makedir_if_not_exists(N6_outdir)
-    run_methods = ['def_mul_struct', 'def_mul_tmsearch', 'def_mul_pdb70',
-                                'def_mul_pdb', 'def_mul_comp', 'def_mul_drop_s', #'def_mul_af',
-                                'def_mul_drop_nos', 'def_mul_notemp', 'def_mul_not_drop_s',
-                                'def_mul_not_drop_nos', 'def_mul_nopair', 'def_mul_esm_msa', 'uniclust_ox_a3m',
-                                'pdb_inter_ref_a3m', 'pdb_inter_ref_sto', 'pdb_inter_prot_sto',
-                                'unidist_ref_a3m', 'unidist_ref_sto', 'unidist_prot_sto', 'spec_inter_ref_a3m', 'spec_struct',
-                                'spec_pdb70', 'spec_pdb', 'spec_comp', # 'spec_af',
-                                'spec_inter_ref_sto', 'spec_inter_prot_sto',
-                                'str_inter_ref_a3m', 'str_inter_ref_sto', 'str_struct',
-                                'str_pdb70', 'str_pdb', 'str_comp', 'str_inter_prot_sto', # 'str_af',
-                                'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not',
-                                'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not']
+
     if not run_multimer_structure_generation_pipeline_v2(params=params,
                                                          fasta_path=FLAGS.fasta_path,
                                                          chain_id_map=chain_id_map,
