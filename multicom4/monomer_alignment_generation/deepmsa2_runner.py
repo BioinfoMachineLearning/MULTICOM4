@@ -9,6 +9,17 @@ from typing import Any, Mapping, Optional, Sequence
 from absl import logging
 from multicom4.tool import utils
 import shlex
+from concurrent.futures import ProcessPoolExecutor
+
+def run_command(inparams):
+    cmdcontent, title = inparams
+    logging.info('Launching subprocess "%s"', cmdcontent)
+    cmd = shlex.split(cmdcontent)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    with utils.timing(title):
+        stdout, stderr = process.communicate()
+        retcode = process.wait()
+    
 
 class DeepMSA2_runner:
     """Python wrapper of the HHblits binary."""
@@ -53,16 +64,14 @@ class DeepMSA2_runner:
 
         mMSAJGI = self.JGIclust_database_path
 
-        print("22222222222222222222222222222222")
-
         # qMSA
         MSAdir = os.path.join(outpath, 'MSA')
         os.makedirs(MSAdir, exist_ok=True)
         qseq_file = os.path.join(MSAdir, 'qMSA.fasta')
         os.system(f"cp {input_fasta_path} {qseq_file}")
         
+        process_list = []
         if not os.path.exists(os.path.join(MSAdir, 'qMSA.aln')):
-            print("333333333333333333333333333333")
             cmdcontent = f"python {self.qMSApkg}/scripts/qMSA2.py " \
                         f"-hhblitsdb={qMSAhhblitsdb} " \
                         f"-jackhmmerdb={qMSAjackhmmerdb} " \
@@ -71,44 +80,36 @@ class DeepMSA2_runner:
                         f"-ncpu={cpu} " \
                         f"-outdir={MSAdir} " \
                         f"{qseq_file}"
-            logging.info('Launching subprocess "%s"', cmdcontent)
-
-            cmd = shlex.split(cmdcontent)
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            with utils.timing('qMSA query'):
-                stdout, stderr = process.communicate()
-                retcode = process.wait()
+            process_list.append([cmdcontent, 'qMSA query'])
             
         # dMSA
         if not os.path.exists(os.path.join(MSAdir, 'dMSA.aln')):
             dseq_file = os.path.join(MSAdir, 'dMSA.fasta')
             os.system(f"cp {input_fasta_path} {dseq_file}")
-
             cmdcontent = f"python {self.dMSApkg}/scripts/build_MSA.py " \
                         f"-hhblitsdb={dMSAhhblitsdb} " \
                         f"-jackhmmerdb={dMSAjackhmmerdb} " \
                         f"-hmmsearchdb={dMSAhmmsearchdb} " \
                         f"-ncpu={cpu} " \
                         f"-outdir={MSAdir} " \
-                        f"{dseq_file}"
-            logging.info('Launching subprocess "%s"', cmdcontent)
+                        f"{dseq_file}"        
+            process_list.append([cmdcontent, 'dMSA query'])
 
-            cmd = shlex.split(cmdcontent)
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            with utils.timing('dMSA query'):
-                stdout, stderr = process.communicate()
-                retcode = process.wait()
+        if len(process_list) > 0:
+            with ProcessPoolExecutor(max_workers=len(process_list)) as executor:
+                results = executor.map(run_command, process_list)
 
         if os.path.isfile(f"{MSAdir}/dMSA.a3m") and os.path.isfile(f"{MSAdir}/qMSA.a3m"):
             print("DeepMSA2_noIMG has been complete!")
-
-        print("4444444444444444444444444444444")
-
+       
         JGIdir = os.path.join(outpath, 'JGI')
         os.makedirs(JGIdir, exist_ok=True)
         if not os.path.isfile(f"{MSAdir}/qMSA.jaca3m") and not os.path.isfile(f"{MSAdir}/dMSA.jaca3m"):
             print(f"{targetname} does not need additional JGI search due to no jack result. skip")
         else:
+
+            process_list = []
+
             recorddir = f"{outpath}/record"
             os.makedirs(recorddir, exist_ok=True)
 
@@ -168,13 +169,13 @@ class DeepMSA2_runner:
                     fw.write(f"sync\n")
                     fw.write(f"rm -rf {tmpdir}\n")
                     fw.write(f"echo ending time: `date`   >>{recorddir}/ware_{tag}\n")
-
-                cmd = ['bash', bashfile]
-                logging.info('Launching subprocess "%s"', ' '.join(cmd))
-                process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                with utils.timing('JGI query'):
-                    stdout, stderr = process.communicate()
-                    retcode = process.wait()
+  
+                cmd = 'bash ' + bashfile
+                process_list.append([cmd, 'JGI query'])
+            
+            if len(process_list) > 0:
+                with ProcessPoolExecutor(max_workers=len(process_list)) as executor:
+                    results = executor.map(run_command, process_list)
 
             print("2rd step/JGI combination is starting!\n")
             tag = "sJGI"

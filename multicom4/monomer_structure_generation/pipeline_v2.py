@@ -15,11 +15,11 @@ from multicom4.monomer_templates_search.structure_tmsearch_pipeline import monom
 
 class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
-    def __init__(self, params, run_methods=None):
+    def __init__(self, params, run_methods=None, is_subunit=False):
         
         is_human = True if params['is_human'] == "1" else False
 
-        super().__init__(is_human=is_human)
+        super().__init__(is_human=is_human, is_subunit=False)
 
         self.params = params
 

@@ -1,5 +1,7 @@
 import os, sys, argparse, time
-from multiprocessing import Pool
+#from multiprocessing import Pool
+from concurrent.futures import ProcessPoolExecutor
+from multiprocessing import current_process
 from tqdm import tqdm
 from multicom4.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
 from multicom4.monomer_alignment_generation.alignment import *
@@ -255,11 +257,9 @@ class Monomer_alignment_generation_pipeline:
                 f'{targetname}_dhr.a3m', 'dhr_a3m'])
 
         if multiprocess:
-            pool = Pool(processes=len(msa_process_list))
-            results = pool.map(run_msa_tool, msa_process_list)
-            pool.close()
-            pool.join()
-            #
+            with ProcessPoolExecutor(max_workers=len(msa_process_list)) as executor:
+                results = executor.map(run_msa_tool, msa_process_list)
+
             result_dict = {}
             for result in results:
                 msa_key, msa_out_path = result

@@ -39,11 +39,11 @@ def get_complex_alignments_by_method(monomers, concatenate_method, aln_dir):
 
 class Multimer_structure_prediction_pipeline_v2(config.pipeline):
 
-    def __init__(self, params, run_methods=None, is_subunit=False):
+    def __init__(self, params, run_methods=None):
 
         is_human = True if params['is_human'] == "1" else False
 
-        super().__init__(is_human=is_human, is_subunit=is_subunit)
+        super().__init__(is_human=is_human)
 
         self.params = params
 
