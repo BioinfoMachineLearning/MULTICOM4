@@ -46,43 +46,22 @@ def main(argv):
 
     makedir_if_not_exists(outdir)
 
+    print("3. Start to generate tertiary structure for monomers using alphafold")
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
-    
-    default_workdir = os.path.join(N3_outdir, 'default')
-    ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-    if not os.path.exists(ranking_json_file):
-        raise Exception(f"Haven't generated default models!")
-    
-    bash_script_dir = os.path.join(N3_outdir, 'post_def_bash_scripts')
-    if os.path.exists(params['slurm_script_template']):
-        bash_script_dir = os.path.join(N3_outdir, 'post_def_slurm_scripts')
-    os.makedirs(bash_script_dir, exist_ok=True)
+    makedir_if_not_exists(N3_outdir)
+    run_methods = [ 'def_esm_msa', 'def_esm_msa_ckpt5']
 
-    run_methods = ['foldseek_refine'] #, 'foldseek_refine_esm', 'foldseek_refine_esm_h']
+    if not run_monomer_structure_generation_pipeline_v2(params=params,
+                                                        targetname=targetname,
+                                                        fasta_path=FLAGS.fasta_path,
+                                                        alndir=N1_outdir, 
+                                                        img_alndir=N1_outdir_img,
+                                                        templatedir=N2_outdir, 
+                                                        outdir=N3_outdir,
+                                                        run_methods=run_methods,
+                                                        run_script=os.path.exists(params['slurm_script_template'])):
+        print("Program failed in step 3: monomer structure generation")
 
-    for run_method in run_methods:
-
-        for i in range(MONOMER_CONFIG.predictors[run_method].number_of_input_models):
-
-            cmd = f"python bin/monomer/monomer_refine.py --option_file {FLAGS.option_file} " \
-            f"--fasta_path {FLAGS.fasta_path} --output_dir {FLAGS.output_dir} " \
-            f"--config_name {run_method} --idx {i}"
-
-            if os.path.exists(params['slurm_script_template']):
-                bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
-                print(f"Generating bash file for {run_method}: {bash_file}")
-                jobname = f"{targetname}_{run_method}"
-                with open(bash_file, 'w') as fw:
-                    for line in open(params['slurm_script_template']):
-                        line = line.replace("JOBNAME", jobname)
-                        fw.write(line)
-                    fw.write(cmd)
-                os.system(f"sbatch {bash_file}")
-            else:
-                bash_file = os.path.join(bash_script_dir, f"{run_method}_{i}.sh")
-                print(bash_file)
-                with open(bash_file, 'w') as fw:
-                    fw.write(cmd)
 
 if __name__ == '__main__':
     flags.mark_flags_as_required([
