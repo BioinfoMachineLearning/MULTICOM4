@@ -112,10 +112,10 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                 msa_paired_source = self.get_homomer_config(predictor_config, 'msa_paired_source')
                 template_source = self.get_homomer_config(predictor_config, 'template_source')
+                monomers = [chain_id for chain_id in chain_id_map]
 
                 if method == "default_multimer":
                     # run alphafold default pipeline:
-                    monomers = [chain_id for chain_id in chain_id_map]
                     if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
                         bfd_uniref_a3ms = []
                         mgnify_stos = []
