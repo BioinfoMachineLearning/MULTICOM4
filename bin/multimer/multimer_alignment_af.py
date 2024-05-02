@@ -22,7 +22,6 @@ import pandas as pd
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_boolean('run_img', True, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -198,19 +197,90 @@ def main(argv):
 
     makedir_if_not_exists(N6_outdir)
     run_methods = ['default_multimer']
-    if not run_multimer_structure_generation_pipeline_v2(params=params,
-                                                         fasta_path=FLAGS.fasta_path,
-                                                         chain_id_map=chain_id_map,
-                                                         aln_dir=N1_outdir,
-                                                         complex_aln_dir=N4_outdir,
-                                                         template_dir=N5_outdir,
-                                                         monomer_model_dir=N3_outdir,
-                                                         output_dir=N6_outdir,
-                                                         run_methods=run_methods,
-                                                         run_script=True,
-                                                         run_deepmsa=False):
-        print("Program failed in step 7")
 
+    if is_homomers:
+        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
+                                                                    fasta_path=FLAGS.fasta_path,
+                                                                    chain_id_map=chain_id_map,
+                                                                    aln_dir=N1_outdir,
+                                                                    complex_aln_dir=N4_outdir,
+                                                                    template_dir=N5_outdir,
+                                                                    monomer_model_dir=N3_outdir,
+                                                                    output_dir=N6_outdir,
+                                                                    run_methods=run_methods,
+                                                                    run_script=True,
+                                                                    run_deepmsa=False):
+            print("Program failed in step 7")
+        
+        default_feature_pkl = os.path.join(N6_outdir, 'default_multimer', 'features.pkl')
+        while not os.path.exists(default_feature_pkl):
+            time.sleep(300)
+        
+        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
+                                                                fasta_path=FLAGS.fasta_path,
+                                                                chain_id_map=chain_id_map,
+                                                                aln_dir=N1_outdir,
+                                                                complex_aln_dir=N4_outdir,
+                                                                template_dir=N5_outdir,
+                                                                monomer_model_dir=N3_outdir,
+                                                                output_dir=N6_outdir,
+                                                                run_script=os.path.exists(params['slurm_script_template'])):
+            print("Program failed in step 7")
+
+        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
+                                                                  fasta_path=FLAGS.fasta_path,
+                                                                  chain_id_map=chain_id_map,
+                                                                  aln_dir=N1_outdir,
+                                                                  complex_aln_dir=N4_outdir,
+                                                                  template_dir=N5_outdir,
+                                                                  monomer_model_dir=N3_outdir,
+                                                                  output_dir=N6_outdir,
+                                                                  run_methods=["esmfold"],
+                                                                  run_script=True,
+                                                                  run_deepmsa=False):
+            print("Program failed in step 7")
+
+    else:
+        if not run_multimer_structure_generation_pipeline_v2(params=params,
+                                                            fasta_path=FLAGS.fasta_path,
+                                                            chain_id_map=chain_id_map,
+                                                            aln_dir=N1_outdir,
+                                                            complex_aln_dir=N4_outdir,
+                                                            template_dir=N5_outdir,
+                                                            monomer_model_dir=N3_outdir,
+                                                            output_dir=N6_outdir,
+                                                            run_methods=run_methods,
+                                                            run_script=True,
+                                                            run_deepmsa=False):
+            print("Program failed in step 7")
+
+        default_feature_pkl = os.path.join(N6_outdir, 'default_multimer', 'features.pkl')
+        while not os.path.exists(default_feature_pkl):
+            time.sleep(300)
+        
+        if not run_multimer_structure_generation_pipeline_v2(params=params,
+                                                             fasta_path=FLAGS.fasta_path,
+                                                             chain_id_map=chain_id_map,
+                                                             aln_dir=N1_outdir,
+                                                             complex_aln_dir=N4_outdir,
+                                                             template_dir=N5_outdir,
+                                                             monomer_model_dir=N3_outdir,
+                                                             output_dir=N6_outdir,
+                                                             run_script=os.path.exists(params['slurm_script_template'])):
+            print("Program failed in step 7")
+        
+        if not run_multimer_structure_generation_pipeline_v2(params=params,
+                                                            fasta_path=FLAGS.fasta_path,
+                                                            chain_id_map=chain_id_map,
+                                                            aln_dir=N1_outdir,
+                                                            complex_aln_dir=N4_outdir,
+                                                            template_dir=N5_outdir,
+                                                            monomer_model_dir=N3_outdir,
+                                                            output_dir=N6_outdir,
+                                                            run_methods=["esmfold"],
+                                                            run_script=True,
+                                                            run_deepmsa=False):
+            print("Program failed in step 7")
 
 if __name__ == '__main__':
     flags.mark_flags_as_required([

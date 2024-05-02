@@ -60,42 +60,6 @@ def main(argv):
     chain_id_map, chain_id_seq_map = make_chain_id_map(sequences=input_seqs,
                                                        descriptions=input_descs)
 
-    processed_seuqences = {}
-    monomer_qas_res = {}
-    for chain_id in chain_id_map:
-        monomer_id = chain_id
-        monomer_sequence = chain_id_map[chain_id].sequence
-
-        if monomer_sequence not in processed_seuqences:
-            with open(f"{FLAGS.output_dir}/{monomer_id}.fasta", "w") as fw:
-                write_fasta({monomer_id: monomer_sequence}, fw)
-            N1_monomer_outdir = N1_outdir + '/' + monomer_id
-            makedir_if_not_exists(N1_monomer_outdir)
-            result = run_monomer_msa_pipeline(f"{FLAGS.output_dir}/{monomer_id}.fasta", N1_monomer_outdir, params)
-            if result is None:
-                raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
-
-            N2_monomer_outdir = N2_outdir + '/' + monomer_id
-            makedir_if_not_exists(N2_monomer_outdir)
-            template_file = run_monomer_template_search_pipeline(targetname=monomer_id, sequence=monomer_id,
-                                                                 a3m=f"{N1_monomer_outdir}/{monomer_id}_uniref90.sto",
-                                                                 outdir=N2_monomer_outdir, params=params)
-            if template_file is None:
-                raise RuntimeError(f"Program failed in step 2: monomer {monomer_id} template search")
-
-            processed_seuqences[monomer_sequence] = monomer_id
-
-        else:
-            with open(f"{FLAGS.output_dir}/{monomer_id}.fasta", "w") as fw:
-                write_fasta({monomer_id: monomer_sequence}, fw)
-            N1_monomer_outdir = N1_outdir + '/' + monomer_id
-            makedir_if_not_exists(N1_monomer_outdir)
-
-            copy_same_sequence_msas(srcdir=f"{N1_outdir}/{processed_seuqences[monomer_sequence]}",
-                                    trgdir=N1_monomer_outdir,
-                                    srcname=processed_seuqences[monomer_sequence],
-                                    trgname=monomer_id)
-
     print("#################################################################################################")
 
     print("#################################################################################################")
@@ -104,17 +68,21 @@ def main(argv):
     N6_outdir = FLAGS.output_dir + '/N6_multimer_structure_generation'
     makedir_if_not_exists(N2_outdir)
 
-    if not run_multimer_structure_generation_pipeline_default(params=params,
-                                                                fasta_path=FLAGS.fasta_path,
-                                                                chain_id_map=chain_id_map,
-                                                                aln_dir=N1_outdir,
-                                                                output_dir=N6_outdir):
+    run_methods = ['default_multimer']
+    if not run_multimer_structure_generation_pipeline_v2(params=params,
+                                                         fasta_path=FLAGS.fasta_path,
+                                                         chain_id_map=chain_id_map,
+                                                         aln_dir=N1_outdir,
+                                                         complex_aln_dir='',
+                                                         template_dir='',
+                                                         monomer_model_dir='',
+                                                         output_dir=N6_outdir,
+                                                         run_methods=run_methods,
+                                                         run_script=True,
+                                                         run_deepmsa=False):
         print("Program failed in step 7")
 
-    print("7. Start to evaluate multimer models")
-
-
-    N9_outdir = FLAGS.output_dir + '/N9_multimer_structure_evaluation'
+    N9_outdir = FLAGS.output_dir + '/N8_multimer_structure_evaluation'
     multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
                                                           params=params,
                                                           chain_id_map=chain_id_map,

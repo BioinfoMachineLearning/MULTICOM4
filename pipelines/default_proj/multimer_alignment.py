@@ -37,6 +37,13 @@ def main(argv):
 
     check_dirs(params, ['hhblits_program', 'jackhmmer_program'], isdir=False)
 
+    os.makedirs(output_dir, exist_ok=True)
+
+    params['uniclust_db'] = []
+    params['colabfold_databases'] = []
+    params['JGIclust_database'] = []
+    params['DHR_database_path'] = []
+
     for fasta_path in os.listdir(FLAGS.fastadir):
 
         fasta_path = FLAGS.fastadir + '/' + fasta_path
@@ -48,10 +55,8 @@ def main(argv):
         makedir_if_not_exists(output_dir)
 
         N1_outdir = output_dir + '/N1_monomer_alignments_generation'
-        N1_outdir_img = output_dir + '/N1_monomer_alignments_generation_img'
         N2_outdir = output_dir + '/N2_monomer_template_search'
         N3_outdir = output_dir + '/N3_monomer_structure_generation'
-        img_msas = {}
 
         print("#################################################################################################")
 
@@ -77,15 +82,11 @@ def main(argv):
                     write_fasta({monomer_id: monomer_sequence}, fw)
                 N1_monomer_outdir = N1_outdir + '/' + monomer_id
                 makedir_if_not_exists(N1_monomer_outdir)
-                result = run_monomer_msa_pipeline(f"{output_dir}/{monomer_id}.fasta", N1_monomer_outdir, params)
+                result = run_monomer_msa_pipeline(fasta=f"{output_dir}/{monomer_id}.fasta", 
+                                                  outdir=N1_monomer_outdir, params=params, 
+                                                  run_auxi_output=False)
                 if result is None:
                     raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
-
-                N1_monomer_outdir_img = N1_outdir_img + '/' + monomer_id
-                makedir_if_not_exists(N1_monomer_outdir_img)
-                img_msas[chain_id] = run_monomer_msa_pipeline_img(params=params,
-                                                                fasta=f"{output_dir}/{monomer_id}.fasta",
-                                                                outdir=N1_monomer_outdir_img)
 
                 N2_monomer_outdir = N2_outdir + '/' + monomer_id
                 makedir_if_not_exists(N2_monomer_outdir)
@@ -106,9 +107,6 @@ def main(argv):
                                         trgdir=N1_monomer_outdir,
                                         srcname=processed_seuqences[monomer_sequence],
                                         trgname=monomer_id)
-
-                N1_monomer_outdir_img = N1_outdir_img + '/' + monomer_id
-                makedir_if_not_exists(N1_monomer_outdir_img)
 
                 N2_monomer_outdir = N2_outdir + '/' + monomer_id
                 makedir_if_not_exists(N2_monomer_outdir)
