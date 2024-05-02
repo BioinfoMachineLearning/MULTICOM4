@@ -261,6 +261,12 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                             if not os.path.exists(default_alphafold_monomer_a3m):
                                 raise Exception(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_monomer_a3m}")
                             multimer_a3ms += [default_alphafold_monomer_a3m]
+                    
+                    elif msa_paired_source == "colabfold":
+                        for chain_id in chain_id_map:
+                            monomer = chain_id
+                            monomer_colabfold_a3m = os.path.join(aln_dir, monomer, f"{monomer}_colabfold.a3m")
+                            multimer_a3ms += [monomer_colabfold_a3m]
                     else:
                         multimer_a3ms = [os.path.join(complex_aln_dir, msa_paired_source, monomer + "_con.a3m") for monomer in monomers]
 
@@ -410,7 +416,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-                print(f"Generating bash file for {predictor}: {bash_file}")
+                print(f"sh {bash_file}")
                 with open(bash_file, 'w') as fw:
                     fw.write('\n'.join(predictor_commands[predictor]))
                 bash_files += [bash_file]

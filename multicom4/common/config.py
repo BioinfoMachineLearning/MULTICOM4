@@ -524,7 +524,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 40,
+        'predictions_per_model': 200,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
