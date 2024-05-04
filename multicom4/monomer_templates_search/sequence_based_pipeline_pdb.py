@@ -71,14 +71,14 @@ def assess_hhsearch_hit(
     duplicate = (template_sequence in query_sequence and
                  length_ratio > max_subsequence_ratio)
 
-    if max_template_date is not None and release_dates is not None:
-        if hit.name.lower()[:4] in release_dates:
-            hit_release_date = datetime.datetime.strptime(release_dates[hit.name.lower()[:4]], '%Y-%m-%d')
-            if hit_release_date > max_template_date:
-                raise DateError(f'Date ({release_dates[hit.name.lower()[:4]]}) > max template date '
-                                f'({max_template_date}).')
-        else:
-            raise DateError(f'Cannot find release date for ({hit.name.lower()[:4]}).')
+    # if max_template_date is not None and release_dates is not None:
+    #     if hit.name.lower()[:4] in release_dates:
+    #         hit_release_date = datetime.datetime.strptime(release_dates[hit.name.lower()[:4]], '%Y-%m-%d')
+    #         if hit_release_date > max_template_date:
+    #             raise DateError(f'Date ({release_dates[hit.name.lower()[:4]]}) > max template date '
+    #                             f'({max_template_date}).')
+    #     else:
+    #         raise DateError(f'Cannot find release date for ({hit.name.lower()[:4]}).')
 
     if align_ratio <= min_align_ratio:
         raise AlignRatioError('Proportion of residues aligned to query too small. '

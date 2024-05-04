@@ -94,10 +94,9 @@ def main(argv):
             if result is None:
                 raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
 
-            if FLAGS.run_img:
-                N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
-                makedir_if_not_exists(N1_monomer_outdir_img)
-                img_msas[chain_id] = run_monomer_msa_pipeline_img(params=params,
+            N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
+            makedir_if_not_exists(N1_monomer_outdir_img)
+            img_msas[chain_id] = run_monomer_msa_pipeline_img(params=params,
                                                                 fasta=monomer_fasta,
                                                                 outdir=N1_monomer_outdir_img)
 
@@ -163,12 +162,14 @@ def main(argv):
     
     is_homomers = len(processed_seuqences) == 1
     try:
-        concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
-                           'string_interact', 'uniprot_distance', 'deepmsa2']
+        #concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
+        #                   'string_interact', 'uniprot_distance', 'deepmsa2']
+        concat_methods = ['deepmsa2']
         if is_homomers:
             concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch', 'deepmsa2'] 
         run_monomer_msas_concatenation_pipeline(
-            multimer=','.join([chain_id for chain_id in chain_id_map]),
+            # multimer=','.join([chain_id for chain_id in chain_id_map]),
+            chain_id_map=chain_id_map,
             run_methods=concat_methods,
             monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params, is_homomers=is_homomers)
     except Exception as e:

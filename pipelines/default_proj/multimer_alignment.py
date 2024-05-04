@@ -4,15 +4,7 @@ from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_
     read_option_file
 from multicom4.monomer_alignment_generation.alignment import write_fasta
 from multicom4.common.protein import read_qa_txt_as_df, parse_fasta, complete_result, make_chain_id_map
-from multicom4.multimer_structure_refinement import iterative_refine_pipeline_multimer
-from multicom4.monomer_structure_refinement import iterative_refine_pipeline
-from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
-    run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, run_monomer_refinement_pipeline, \
-    run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
-    run_multimer_structure_generation_pipeline_v2, \
-    run_multimer_structure_generation_pipeline_foldseek, run_multimer_refinement_pipeline, \
-    run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
-    copy_same_sequence_msas
+from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, copy_same_sequence_msas
 
 from absl import flags
 from absl import app
@@ -37,7 +29,7 @@ def main(argv):
 
     check_dirs(params, ['hhblits_program', 'jackhmmer_program'], isdir=False)
 
-    os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(FLAGS.output_dir, exist_ok=True)
 
     params['uniclust_db'] = []
     params['colabfold_databases'] = []

@@ -12,7 +12,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_multimer_structure_generation_homo_pipeline_v2, \
     run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
-    copy_same_sequence_msas
+    copy_same_sequence_msas, run_multimer_structure_generation_pipeline_v2
 
 from absl import flags
 from absl import app
@@ -110,18 +110,18 @@ def main(argv):
             if template_file is None:
                 raise RuntimeError(f"Program failed in step 2: monomer {monomer_id} template search")
 
-            N3_monomer_outdir = os.path.join(N3_outdir, monomer_id)
-            makedir_if_not_exists(N3_monomer_outdir)
-            if not run_monomer_structure_generation_pipeline_v2(params=params,
-                                                                targetname=targetname,
-                                                                fasta_path=monomer_fasta,
-                                                                alndir=N1_monomer_outdir,
-                                                                img_alndir=N1_monomer_outdir_img,
-                                                                templatedir=N2_monomer_outdir,
-                                                                outdir=N3_monomer_outdir,
-                                                                run_methods=monomer_run_methods,
-                                                                is_subunit=True):
-                print(f"Program failed in step 3: monomer {monomer_id} structure generation")
+            # N3_monomer_outdir = os.path.join(N3_outdir, monomer_id)
+            # makedir_if_not_exists(N3_monomer_outdir)
+            # if not run_monomer_structure_generation_pipeline_v2(params=params,
+            #                                                     targetname=targetname,
+            #                                                     fasta_path=monomer_fasta,
+            #                                                     alndir=N1_monomer_outdir,
+            #                                                     img_alndir=N1_monomer_outdir_img,
+            #                                                     templatedir=N2_monomer_outdir,
+            #                                                     outdir=N3_monomer_outdir,
+            #                                                     run_methods=monomer_run_methods,
+            #                                                     is_subunit=True):
+            #     print(f"Program failed in step 3: monomer {monomer_id} structure generation")
 
             processed_seuqences[monomer_sequence] = monomer_id
         else:
@@ -198,23 +198,45 @@ def main(argv):
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_local')
 
     makedir_if_not_exists(N6_outdir)
-    run_methods = ['afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not', 'afsample_v2', 'afsample_v2_not',
-                    'afsample_v2_r21_not', 'colabfold_casp16_web', 'colabfold_casp16_web_not']
+
+    run_methods = ['default_multimer', 'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not', 
+                    'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not']
+                    # 'colabfold_casp16_web', 'colabfold_casp16_web_not']
                     # 'def_mul_drop_nos', 'def_mul_drop_s', 'def_mul_not_drop_nos', 'def_mul_not_drop_s',
                     # 'def_mul_notemp', 'default_multimer', 'colabfold_casp16_web', 'colabfold_casp16_web_not']
 
-    if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
-                                                         fasta_path=FLAGS.fasta_path,
-                                                         chain_id_map=chain_id_map,
-                                                         aln_dir=N1_outdir,
-                                                         complex_aln_dir='',
-                                                         template_dir='',
-                                                         monomer_model_dir='',
-                                                         output_dir=N6_outdir,
-                                                         run_methods=run_methods,
-                                                         run_script=True,
-                                                         run_deepmsa=False):
-        print("Program failed in step 7")
+    default_feature_pkl = os.path.join(N6_outdir, 'default_multimer', 'features.pkl')
+
+    if os.path.exists(default_feature_pkl):
+        run_methods += ['def_mul_drop_nos', 'def_mul_drop_s', 'def_mul_not_drop_nos', 
+                        'def_mul_not_drop_s', 'def_mul_notemp']
+    
+    if len(processed_seuqences) == 1:
+        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
+                                                            fasta_path=FLAGS.fasta_path,
+                                                            chain_id_map=chain_id_map,
+                                                            aln_dir=N1_outdir,
+                                                            complex_aln_dir='',
+                                                            template_dir='',
+                                                            monomer_model_dir='',
+                                                            output_dir=N6_outdir,
+                                                            run_methods=run_methods,
+                                                            run_script=True,
+                                                            run_deepmsa=False):
+            print("Program failed in step 7")
+    else:
+        if not run_multimer_structure_generation_pipeline_v2(params=params,
+                                                            fasta_path=FLAGS.fasta_path,
+                                                            chain_id_map=chain_id_map,
+                                                            aln_dir=N1_outdir,
+                                                            complex_aln_dir='',
+                                                            template_dir='',
+                                                            monomer_model_dir='',
+                                                            output_dir=N6_outdir,
+                                                            run_methods=run_methods,
+                                                            run_script=True,
+                                                            run_deepmsa=False):
+            print("Program failed in step 7")
 
 
 if __name__ == '__main__':

@@ -6,6 +6,15 @@ import pandas as pd
 from multicom4.monomer_alignment_generation.alignment import *
 from multicom4.monomer_alignments_concatenation.species_interact_v3 import Species_interact_v3
 import itertools
+from multicom4.common import config
+
+def getTopN(maxP, chainN, is_homomers):
+    topN = 10
+    if is_homomers:
+        topN = 50
+    else:
+        topN = math.floor(math.pow(maxP, 1.0 / chainN))
+    return topN
 
 def combineMSAs(MSA_Tags, is_homomers=False):  # dict
 
@@ -26,27 +35,61 @@ def combineMSAs(MSA_Tags, is_homomers=False):  # dict
     return combined_MSA_Tags
 
 
-class DeepMSA2_pairing:
+class DeepMSA2_pairing(config.pipeline):
 
-    def get_pairs(deepmsa_chain_alignments, is_homomers=False):
-        num_examples = len(list(deepmsa_chain_alignments.keys()))
+    def __init__(self, is_human, is_homomers=False):
+
+        super().__init__(is_human=is_human)
+
+        self.deepmsa2_config = self.homomer_config.predictors.deepmsa2 if is_homomers else self.heteromer_config.predictors.deepmsa2
+
+        self.is_homomers = is_homomers
+
+    def get_pairs(self, chain_alignments):
+
+        unique_seuqences = {}
+
+        for chain in chain_alignments:
+            if chain == "outdir":
+                continue
+            chain_sequence = chain_alignments[chain]['seq']
+            if chain_sequence not in unique_seuqences:
+                unique_seuqences[chain_sequence] = []
+            unique_seuqences[chain_sequence] += [chain]
+
+        topN = getTopN(self.deepmsa2_config.max_pairs, len(unique_seuqences), self.is_homomers)
+
         MSA_Tags = {}
-        for chain in deepmsa_chain_alignments:
-            MSA_Tags[chain] = list(deepmsa_chain_alignments[chain].keys())
+        for sequence in unique_seuqences:
+            MSA_Tags[sequence] = []
+            deepmsa_ranking_file = chain_alignments[unique_seuqences[sequence][0]]['deepmsa_ranking_file']
+            contents = open(deepmsa_ranking_file).readlines()
+            for index, line in enumerate(contents):
+                if index >= topN:
+                    break
+                line = line.rstrip('\n')
+                msa_name, plddt = line.split()
+                msa_name = msa_name.replace('_', '.')
+                MSA_Tags[sequence] += [msa_name]
 
-        combined_MSA_Tags = combineMSAs(MSA_Tags, is_homomers)
+        combined_MSA_Tags = combineMSAs(MSA_Tags, self.is_homomers)
 
         combined_MSA_alignments = {}
         for combined_MSA_Tag in combined_MSA_Tags:  # c(qMSA,DeepMSA.hhb,DeepJGI3)
-            MSA_name = '_'.join([combined_MSA_Tag[i] for i in range(num_examples)])
+            MSA_name = '_'.join(list(combined_MSA_Tag))
             deepmsa_alignments = []
-            for i, chain in enumerate(deepmsa_chain_alignments):
-                deepmsa_alignments += [deepmsa_chain_alignments[chain][combined_MSA_Tag[i]]]
+            for i, sequence in enumerate(unique_seuqences):
+                aln_name = combined_MSA_Tag[i]
+                for chain_id in unique_seuqences[sequence]:
+                    with open(chain_alignments[chain_id][aln_name]) as f:
+                        deepmsa_alignment = Alignment.from_file(f, format="a3m", a3m_inserts="delete")
+                    deepmsa_alignments += [deepmsa_alignment]
+
             combined_MSA_alignments[MSA_name] = deepmsa_alignments
 
         return combined_MSA_alignments
 
-    def rank_msas(deepmsa_complex_aln_dir, deepmsa_ranking_files, outfile, calNf):
+    def rank_msas(self, deepmsa_complex_aln_dir, deepmsa_ranking_files, outfile, calNf):
 
         deepmsa_ranking_info = []
         for deepmsa_ranking_file in deepmsa_ranking_files:

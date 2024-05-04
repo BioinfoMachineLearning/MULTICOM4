@@ -391,31 +391,15 @@ def rerun_monomer_evaluation_pipeline(params, targetname, fasta_file, outputdir)
 #     pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(params)
 #     pipeline.select_v1(indir=outdir, outdir=finaldir, prefix=prefix)
 
-
-def getTopN(maxP, chainN, is_homomers):
-    topN = 10
-    if is_homomers:
-        topN = 50
-    else:
-        topN = math.floor(math.pow(maxP, 1.0 / chainN))
-    return topN
-
-def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_dir, monomer_model_dir,
+def run_monomer_msas_concatenation_pipeline(chain_id_map, run_methods, monomer_aln_dir, monomer_model_dir,
                                             outputdir, params, is_homomers=False):
-    chains = multimer.split(',')
+
     alignment = {'outdir': outputdir}
 
-    config_deepmsa2 = config.HETEROMULTIMER_CONFIG.predictors.deepmsa2
-    if is_homomers:
-        config_deepmsa2 = config.HOMOMULTIMER_CONFIG.predictors.deepmsa2
-
-    topN = getTopN(config_deepmsa2.max_pairs, len(chains), is_homomers)
-
-    for i in range(len(chains)):
-        chain = chains[i]
+    for i, chain in enumerate(chain_id_map):
         chain_aln_dir = os.path.join(monomer_aln_dir, chain)
         if os.path.exists(chain_aln_dir):
-            chain_a3ms = {'name': chain,
+            chain_a3ms = {'name': chain, 'seq': chain_id_map[chain].sequence,
                           'colabfold_a3m': os.path.join(chain_aln_dir, f"{chain}_colabfold.a3m"),
                           'uniref30_a3m': os.path.join(chain_aln_dir, f"{chain}_uniref30.a3m"),
                           'uniref90_sto': os.path.join(chain_aln_dir, f"{chain}_uniref90.sto"),
@@ -425,12 +409,10 @@ def run_monomer_msas_concatenation_pipeline(multimer, run_methods, monomer_aln_d
             deepmsa_ranking_file = os.path.join(monomer_model_dir, chain, 'deepmsa.rank')
             contents = open(deepmsa_ranking_file).readlines()
             for index, line in enumerate(contents):
-                if index >= topN:
-                    break
                 line = line.rstrip('\n')
                 msa_name, plddt = line.split()
                 msa_name = msa_name.replace('_', '.')
-                chain_a3ms['deepmsa_' + msa_name] = os.path.join(chain_aln_dir, 'DeepMSA2_a3m', 'finalMSAs', msa_name + '.a3m')
+                chain_a3ms[msa_name] = os.path.join(chain_aln_dir, 'DeepMSA2_a3m', 'finalMSAs', msa_name + '.a3m')
             chain_a3ms['deepmsa_ranking_file'] = deepmsa_ranking_file
         else:
             chain_a3ms = {'name': chain}

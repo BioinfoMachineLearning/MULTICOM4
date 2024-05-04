@@ -163,11 +163,11 @@ class Monomer_alignment_generation_pipeline:
                 binary_path=hhblits_binary_path,
                 databases=[bfd_database_path, uniref30_database_path])
 
-        # if len(colabfold_databases) > 0:
-        #     self.colabfold_msa_runner = ColabFold_Msa_runner(colabfold_search_binary_path=colabfold_search_binary,
-        #                                                      colabfold_split_msas_binary_path=colabfold_split_msas_binary,
-        #                                                      mmseq_binary_path=mmseq_binary,
-        #                                                      colabfold_databases=colabfold_databases)
+        if len(colabfold_databases) > 0:
+            self.colabfold_msa_runner = ColabFold_Msa_runner(colabfold_search_binary_path=colabfold_search_binary,
+                                                             colabfold_split_msas_binary_path=colabfold_split_msas_binary,
+                                                             mmseq_binary_path=mmseq_binary,
+                                                             colabfold_databases=colabfold_databases)
         
         if len(JGIclust_database_path) > 0:
             self.deepmsa2_runner = DeepMSA2_runner(tool_path=deepmsa2_path,

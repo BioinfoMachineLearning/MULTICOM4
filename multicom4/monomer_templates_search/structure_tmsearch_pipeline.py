@@ -32,7 +32,7 @@ class monomer_tmsearch_based_template_search_pipeline:
         row_list = []
         for i in range(len(templates)):
             query = templates.loc[i, 'query']
-            target = templates.loc[i, 'target'].rstrip('.pdb')
+            target = templates.loc[i, 'target'].replace('.pdb', '')
             qaln = templates.loc[i, 'qaln']
             qstart = int(templates.loc[i, 'qstart'])
             qend = int(templates.loc[i, 'qend'])
@@ -47,13 +47,13 @@ class monomer_tmsearch_based_template_search_pipeline:
                 hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
                 if hit_release_date < self._max_template_date:
                     hit = TemplateHit(index=i,
-                                    name=target.split('.')[0],
-                                    aligned_cols=alnlen,
-                                    query=qaln,
-                                    hit_sequence=taln,
-                                    indices_query=build_alignment_indices(qaln, qstart),
-                                    indices_hit=build_alignment_indices(taln, tstart),
-                                    sum_probs=0.0)
+                                      name=target.split('.')[0],
+                                      aligned_cols=alnlen,
+                                      query=qaln,
+                                      hit_sequence=taln,
+                                      indices_query=build_alignment_indices(qaln, qstart),
+                                      indices_hit=build_alignment_indices(taln, tstart),
+                                      sum_probs=0.0)
 
                     try:
                         assess_foldseek_hit(hit=hit, query_sequence=query_sequence)

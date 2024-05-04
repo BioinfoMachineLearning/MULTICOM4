@@ -222,7 +222,7 @@ def concatenate_alignments(inparams):
         uniprot_sto_alignments = []
         colabfold_alignments = []
 
-        deepmsa_chain_alignments = {}
+        # deepmsa_chain_alignments = {}
         deepmsa_ranking_files = []
         for chain in alignment:
             if chain == "outdir":
@@ -237,14 +237,14 @@ def concatenate_alignments(inparams):
                 uniprot_sto_alignments += [Alignment.from_file(f, format="stockholm")]
             colabfold_alignments += [alignment[chain]["colabfold_a3m"]]
 
-            deepmsa_a3m_dict = {}
-            for aln_name in alignment[chain]:
-                if aln_name.find('deepmsa_') < 0 or aln_name == "deepmsa_ranking_file":
-                    continue
-                with open(alignment[chain][aln_name]) as f:
-                    deepmsa_a3m_dict[aln_name.replace('deepmsa_', '')] = Alignment.from_file(f, format="a3m", a3m_inserts="delete")
+            # deepmsa_a3m_dict = {}
+            # for aln_name in alignment[chain]:
+            #     if aln_name.find('deepmsa_') < 0 or aln_name == "deepmsa_ranking_file":
+            #         continue
+            #     with open(alignment[chain][aln_name]) as f:
+            #         deepmsa_a3m_dict[aln_name.replace('deepmsa_', '')] = Alignment.from_file(f, format="a3m", a3m_inserts="delete")
                     
-            deepmsa_chain_alignments[chain] = deepmsa_a3m_dict
+            # deepmsa_chain_alignments[chain] = deepmsa_a3m_dict
             deepmsa_ranking_files += [alignment[chain]['deepmsa_ranking_file']]
 
         for method in methods:
@@ -351,39 +351,37 @@ def concatenate_alignments(inparams):
                     print(f"uniprot_distance_uniprot_sto: {len(pair_ids)} pairs")
                     
             elif method == "deepmsa2":
-
-                if len(list(deepmsa_chain_alignments.keys())) > 0:
-
-                    comb_pairs = DeepMSA2_pairing.get_pairs(deepmsa_chain_alignments, is_homomers)
-                    #print(comb_pairs)
-                    method_outdir = os.path.join(outdir, 'deepmsa2')
-                    for comb_msa_name in comb_pairs:
-                        print(comb_msa_name)
-                        interact_dict = {}
-                        if is_homomers:
-                            msa_len = -1
-                            for i in range(len(comb_pairs[comb_msa_name])):
-                                current_len = len(comb_pairs[comb_msa_name][i].seqs) + 1
-                                if msa_len == -1:
-                                    msa_len = current_len
-                                elif current_len != msa_len:
-                                    raise Exception(f"The length of each msas are not equal! {multimer_a3ms}")
-                                interact_dict[f'index_{i + 1}'] = [j for j in range(msa_len)]
-                            pair_ids = pd.DataFrame(interact_dict)
-                        else:
-                            pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
-                        
+                print("1111111111111111111")
+                comb_pairs = runners['deepmsa2'].get_pairs(alignment)
+                print(comb_pairs)
+                method_outdir = os.path.join(outdir, 'deepmsa2')
+                for comb_msa_name in comb_pairs:
+                    print(comb_msa_name)
+                    interact_dict = {}
+                    if is_homomers:
+                        msa_len = -1
+                        for i in range(len(comb_pairs[comb_msa_name])):
+                            current_len = len(comb_pairs[comb_msa_name][i].seqs) + 1
+                            if msa_len == -1:
+                                msa_len = current_len
+                            elif current_len != msa_len:
+                                raise Exception(f"The length of each msas are not equal! {multimer_a3ms}")
+                            interact_dict[f'index_{i + 1}'] = [j for j in range(msa_len)]
+                        pair_ids = pd.DataFrame(interact_dict)
+                    else:
                         pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
-                        alignment[comb_msa_name] = write_multimer_a3ms(pair_ids,
-                                                                       comb_pairs[comb_msa_name],
-                                                                       method_outdir,
-                                                                       comb_msa_name,
-                                                                       is_homomers)
-                        print(f"{comb_msa_name}: {len(pair_ids)} pairs")
+                    
+                    pair_ids = Species_interact_v3.get_interactions_v2(comb_pairs[comb_msa_name])
+                    alignment[comb_msa_name] = write_multimer_a3ms(pair_ids,
+                                                                    comb_pairs[comb_msa_name],
+                                                                    method_outdir,
+                                                                    comb_msa_name,
+                                                                    is_homomers)
+                    print(f"{comb_msa_name}: {len(pair_ids)} pairs")
 
-                    print("Start to generate deepmsa ranking")
-                    ranking_file = os.path.join(method_outdir, 'deepmsa_paired_ranking.csv')
-                    DeepMSA2_pairing.rank_msas(method_outdir, deepmsa_ranking_files, ranking_file, calNf)
+                print("Start to generate deepmsa ranking")
+                ranking_file = os.path.join(method_outdir, 'deepmsa_paired_ranking.csv')
+                runners['deepmsa2'].rank_msas(method_outdir, deepmsa_ranking_files, ranking_file, calNf)
 
         os.system("touch " + os.path.join(outdir, "DONE"))
 
@@ -422,6 +420,12 @@ class Monomer_alignments_concatenation_pipeline:
         self.process_num = process_num
 
     def concatenate(self, alignments, is_homomers):
+
+        if "deepmsa2" in self.methods:
+            deepmsa2_runner = DeepMSA2_pairing(is_human= True if self.params['is_human'] == "1" else False,
+                                               is_homomers=is_homomers)
+            self.runners['deepmsa2'] = deepmsa2_runner
+
         res_alignments = []
         if self.multiprocess:
             concatenate_list = []
