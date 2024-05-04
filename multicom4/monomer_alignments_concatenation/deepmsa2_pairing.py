@@ -76,7 +76,7 @@ class DeepMSA2_pairing(config.pipeline):
 
         combined_MSA_alignments = {}
         for combined_MSA_Tag in combined_MSA_Tags:  # c(qMSA,DeepMSA.hhb,DeepJGI3)
-            MSA_name = '_'.join(list(combined_MSA_Tag))
+            MSA_names = []
             deepmsa_alignments = []
             for i, sequence in enumerate(unique_seuqences):
                 aln_name = combined_MSA_Tag[i]
@@ -84,8 +84,9 @@ class DeepMSA2_pairing(config.pipeline):
                     with open(chain_alignments[chain_id][aln_name]) as f:
                         deepmsa_alignment = Alignment.from_file(f, format="a3m", a3m_inserts="delete")
                     deepmsa_alignments += [deepmsa_alignment]
+                    MSA_names += [aln_name]
 
-            combined_MSA_alignments[MSA_name] = deepmsa_alignments
+            combined_MSA_alignments['_'.join(MSA_names)] = deepmsa_alignments
 
         return combined_MSA_alignments
 

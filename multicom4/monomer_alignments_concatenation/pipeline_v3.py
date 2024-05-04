@@ -351,12 +351,9 @@ def concatenate_alignments(inparams):
                     print(f"uniprot_distance_uniprot_sto: {len(pair_ids)} pairs")
                     
             elif method == "deepmsa2":
-                print("1111111111111111111")
                 comb_pairs = runners['deepmsa2'].get_pairs(alignment)
-                print(comb_pairs)
                 method_outdir = os.path.join(outdir, 'deepmsa2')
                 for comb_msa_name in comb_pairs:
-                    print(comb_msa_name)
                     interact_dict = {}
                     if is_homomers:
                         msa_len = -1
