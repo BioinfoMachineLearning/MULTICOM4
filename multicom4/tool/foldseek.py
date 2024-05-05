@@ -169,25 +169,29 @@ class Foldseek:
 
         for result in search_results:
             database, outfile = result
-            if database == self.pdb_database:
-                keep_indices = []
-                pdb_df = pd.read_csv(outfile, sep='\t')
-                for i in range(len(pdb_df)):
-                    target = pdb_df.loc[i, 'target']
-                    if target.lower()[:4] in self._release_dates:
-                        hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
-                        if hit_release_date < self._max_template_date:
-                            keep_indices += [i]
+            # if database == self.pdb_database:
+            #     keep_indices = []
+            #     pdb_df = pd.read_csv(outfile, sep='\t')
+                # for i in range(len(pdb_df)):
+                #     target = pdb_df.loc[i, 'target']
+                #     if target.lower()[:4] in self._release_dates:
+                #         hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
+                #         if hit_release_date < self._max_template_date:
+                #             keep_indices += [i]
 
-                pdb_df_filtered = pdb_df.iloc[keep_indices]
-                pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
-                pdb_df_filtered.reset_index(inplace=True, drop=True)
-                pdb_df_filtered.to_csv(outfile, sep='\t')
+                # pdb_df_filtered = pdb_df.iloc[keep_indices]
+                # pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
+                # pdb_df_filtered.reset_index(inplace=True, drop=True)
+                # pdb_df_filtered.to_csv(outfile, sep='\t')
 
             evalue_df = evalue_df.append(pd.read_csv(outfile, sep='\t'))
 
         evalue_df = evalue_df.sort_values(by='evalue')
         evalue_df.reset_index(inplace=True, drop=True)
+
+        talns = [evalue_df.loc[i, 'taln'].upper() for i in range(len(evalue_df))]
+        evalue_df.taln = talns
+
         evalue_df.to_csv(os.path.join(outdir, "evalue.m8"), sep='\t')
 
         if len(evalue_df) < progressive_threshold:
@@ -212,25 +216,27 @@ class Foldseek:
 
             for result in search_results:
                 database, outfile = result
-                if database == self.pdb_database:
-                    keep_indices = []
-                    pdb_df = pd.read_csv(outfile, sep='\t')
-                    for i in range(len(pdb_df)):
-                        target = pdb_df.loc[i, 'target']
-                        if target.lower()[:4] in self._release_dates:
-                            hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
-                            if hit_release_date < self._max_template_date:
-                                keep_indices += [i]
+                # if database == self.pdb_database:
+                #     keep_indices = []
+                #     pdb_df = pd.read_csv(outfile, sep='\t')
+                #     for i in range(len(pdb_df)):
+                #         target = pdb_df.loc[i, 'target']
+                #         if target.lower()[:4] in self._release_dates:
+                #             hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
+                #             if hit_release_date < self._max_template_date:
+                #                 keep_indices += [i]
 
-                    pdb_df_filtered = pdb_df.iloc[keep_indices]
-                    pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
-                    pdb_df_filtered.reset_index(inplace=True, drop=True)
-                    pdb_df_filtered.to_csv(outfile, sep='\t')
+                #     pdb_df_filtered = pdb_df.iloc[keep_indices]
+                #     pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
+                #     pdb_df_filtered.reset_index(inplace=True, drop=True)
+                #     pdb_df_filtered.to_csv(outfile, sep='\t')
                 
                 tmscore_df = tmscore_df.append(pd.read_csv(outfile, sep='\t'))
             
             tmscore_df = tmscore_df.sort_values(by='evalue', ascending=False)
             tmscore_df.reset_index(inplace=True, drop=True)
+            talns = [tmscore_df.loc[i, 'taln'].upper() for i in range(len(tmscore_df))]
+            tmscore_df.taln = talns
             tmscore_df.to_csv(os.path.join(outdir, "tmscore.m8"), sep='\t')
 
         result_df = result_df.append(evalue_df)
@@ -280,25 +286,29 @@ class Foldseek:
                         'Foldseek failed:\nstdout:\n%s\n\nstderr:\n%s\n' % (
                             stdout.decode('utf-8'), stderr[:100_000].decode('utf-8')))
 
-            if database == self.pdb_database:
-                keep_indices = []
-                pdb_df = pd.read_csv(outfile, sep='\t')
-                for i in range(len(pdb_df)):
-                    target = pdb_df.loc[i, 'target']
-                    if target.lower()[:4] in self._release_dates:
-                        hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
-                        if hit_release_date < self._max_template_date:
-                            keep_indices += [i]
+            # if database == self.pdb_database:
+            #     keep_indices = []
+            #     pdb_df = pd.read_csv(outfile, sep='\t')
+            #     for i in range(len(pdb_df)):
+            #         target = pdb_df.loc[i, 'target']
+            #         if target.lower()[:4] in self._release_dates:
+            #             hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
+            #             if hit_release_date < self._max_template_date:
+            #                 keep_indices += [i]
 
-                pdb_df_filtered = pdb_df.iloc[keep_indices]
-                pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
-                pdb_df_filtered.reset_index(inplace=True, drop=True)
-                pdb_df_filtered.to_csv(outfile, sep='\t')
+            #     pdb_df_filtered = pdb_df.iloc[keep_indices]
+            #     pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
+            #     pdb_df_filtered.reset_index(inplace=True, drop=True)
+            #     pdb_df_filtered.to_csv(outfile, sep='\t')
 
             result_df = result_df.append(pd.read_csv(outfile, sep='\t'))
 
         result_df = result_df.sort_values(by='evalue', ascending=False)
         result_df.reset_index(inplace=True, drop=True)
+
+        talns = [result_df.loc[i, 'taln'].upper() for i in range(len(result_df))]
+        result_df.taln = talns
+
         result_df.to_csv(os.path.join(outdir, "tmscore.m8"), sep='\t')
 
         return result_df
@@ -339,25 +349,27 @@ class Foldseek:
                         'Foldseek failed:\nstdout:\n%s\n\nstderr:\n%s\n' % (
                             stdout.decode('utf-8'), stderr[:100_000].decode('utf-8')))
 
-            if database == self.pdb_database:
-                keep_indices = []
-                pdb_df = pd.read_csv(outfile, sep='\t')
-                for i in range(len(pdb_df)):
-                    target = pdb_df.loc[i, 'target']
-                    if target.lower()[:4] in self._release_dates:
-                        hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
-                        if hit_release_date < self._max_template_date:
-                            keep_indices += [i]
+            # if database == self.pdb_database:
+            #     keep_indices = []
+            #     pdb_df = pd.read_csv(outfile, sep='\t')
+            #     for i in range(len(pdb_df)):
+            #         target = pdb_df.loc[i, 'target']
+            #         if target.lower()[:4] in self._release_dates:
+            #             hit_release_date = datetime.datetime.strptime(self._release_dates[target.lower()[:4]], '%Y-%m-%d')
+            #             if hit_release_date < self._max_template_date:
+            #                 keep_indices += [i]
 
-                pdb_df_filtered = pdb_df.iloc[keep_indices]
-                pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
-                pdb_df_filtered.reset_index(inplace=True, drop=True)
-                pdb_df_filtered.to_csv(outfile, sep='\t')
+            #     pdb_df_filtered = pdb_df.iloc[keep_indices]
+            #     pdb_df_filtered.drop(pdb_df_filtered.filter(regex="Unnamed"), axis=1, inplace=True)
+            #     pdb_df_filtered.reset_index(inplace=True, drop=True)
+            #     pdb_df_filtered.to_csv(outfile, sep='\t')
 
             result_df = result_df.append(pd.read_csv(outfile, sep='\t'))
 
         result_df = result_df.sort_values(by='evalue')
         result_df.reset_index(inplace=True, drop=True)
+        talns = [result_df.loc[i, 'taln'].upper() for i in range(len(result_df))]
+        result_df.taln = talns
         result_df.to_csv(os.path.join(outdir, "result.m8"), sep='\t')
 
         empty_df = pd.DataFrame(
