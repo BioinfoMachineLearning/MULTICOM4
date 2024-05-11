@@ -189,12 +189,18 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                 fw.write('\n'.join(fasta_chunks) + '\n')
             
             out_multimer_msa = os.path.join(msa_out_path, f"{chain_id}.iteration{iteration}.multimer.a3m")
-            combine_a3ms([start_multimer_msa, f"{start_multimer_msa}.temp"], out_multimer_msa)
+            if os.path.exists(start_multimer_msa):
+                combine_a3ms([start_multimer_msa, f"{start_multimer_msa}.temp"], out_multimer_msa)
+            else:
+                os.system(f"cp {start_multimer_msa}.temp {out_multimer_msa}")
+                
             out_multimer_msas += [out_multimer_msa]
 
-            out_monomer_msa = os.path.join(msa_out_path, f"{chain_id}.iteration{iteration}.monomer.a3m")
-            os.system("cp " + os.path.join(start_msa_path, chain_id + ".start.monomer.a3m") + " " + out_monomer_msa)
-            out_monomer_msas += [out_monomer_msa]
+            start_monomer_msa = os.path.join(start_msa_path, chain_id + ".start.monomer.a3m")
+            if os.path.exists(start_monomer_msa):
+                out_monomer_msa = os.path.join(msa_out_path, f"{chain_id}.iteration{iteration}.monomer.a3m")
+                os.system("cp " + start_monomer_msa + " " + out_monomer_msa)
+                out_monomer_msas += [out_monomer_msa]
 
         interact_dict = {}
         msa_len = -1
@@ -300,17 +306,21 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                 os.system(f"rm -rf {start_msa_path}")
             makedir_if_not_exists(start_msa_path)
 
-            with open(ref_start_pkl, 'rb') as f:
-                ref_avg_lddt = float(pickle.load(f)['ranking_confidence'])
+            if os.path.exists(ref_start_pkl):
+                with open(ref_start_pkl, 'rb') as f:
+                    ref_avg_lddt = float(pickle.load(f)['ranking_confidence'])
+                os.system(f"cp {ref_start_pkl} {start_pkl}")
+            else:
+                ref_avg_lddt = 0
 
             for chain_id in ref_start_msa_paths:
-                os.system(f"cp {ref_start_msa_paths[chain_id]['paired_msa']} " +
-                          os.path.join(start_msa_path, chain_id+".start.multimer.a3m"))
-                os.system(f"cp {ref_start_msa_paths[chain_id]['monomer_msa']} " + 
-                          os.path.join(start_msa_path, chain_id+".start.monomer.a3m"))
+                if len(ref_start_msa_paths[chain_id]['paired_msa']) > 0:
+                    os.system(f"cp {ref_start_msa_paths[chain_id]['paired_msa']} " +
+                            os.path.join(start_msa_path, chain_id+".start.multimer.a3m"))
+                    os.system(f"cp {ref_start_msa_paths[chain_id]['monomer_msa']} " + 
+                            os.path.join(start_msa_path, chain_id+".start.monomer.a3m"))
 
             os.system(f"cp {ref_start_pdb} {start_pdb}")
-            os.system(f"cp {ref_start_pkl} {start_pkl}")
 
             model_iteration_scores += [ref_avg_lddt]
 
@@ -373,11 +383,15 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
 
                 cmd = f"python {self.params['alphafold_multimer_program']}  " \
                       f"--multimer_a3ms={','.join(multimer_msa_files)} " \
-                      f"--monomer_a3ms={','.join(monomer_msa_files)} " \
                       f"--msa_pair_file={msa_pair_file} " \
                       f"--monomer_temp_csvs={','.join(template_files)} " \
                       f"--struct_atom_dir={out_template_dir} " \
                       f"--output_dir={out_model_dir} " + common_parameters
+
+                if len(monomer_msa_files) > 0:
+                    cmd += f"--monomer_a3ms={','.join(monomer_msa_files)} "
+                else:
+                    cmd += f"--monomer_a3ms={','.join(multimer_msa_files)} "
 
                 try:
                     os.chdir(self.params['alphafold_program_dir'])

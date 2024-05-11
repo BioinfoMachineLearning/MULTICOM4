@@ -213,7 +213,10 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                 fw.write('\n'.join(fasta_chunks) + '\n')
             
             out_msa = os.path.join(msa_out_path, f"{chain_id}.iteration{iteration}.a3m")
-            combine_a3ms([start_msa, f"{start_msa}.temp"], out_msa)
+            if os.path.exists(start_msa):
+                combine_a3ms([start_msa, f"{start_msa}.temp"], out_msa)
+            else:
+                os.system(f"cp {start_msa}.temp {out_msa}")
             out_msas += [out_msa]
 
         interact_dict = {}
@@ -321,15 +324,19 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                 os.system(f"rm -rf {start_msa_path}")
             makedir_if_not_exists(start_msa_path)
 
-            with open(ref_start_pkl, 'rb') as f:
-                ref_avg_lddt = float(pickle.load(f)['ranking_confidence'])
-
+            if os.path.exists(ref_start_pkl):
+                with open(ref_start_pkl, 'rb') as f:
+                    ref_avg_lddt = float(pickle.load(f)['ranking_confidence'])
+                os.system(f"cp {ref_start_pkl} {start_pkl}")
+            else:
+                ref_avg_lddt = 0
+                
             for chain_id in chain_id_map:
-                os.system(f"cp {ref_start_msa_paths[chain_id]['monomer_msa']} " + 
-                          os.path.join(start_msa_path, chain_id+".start.a3m"))
+                if len(ref_start_msa_paths[chain_id]['monomer_msa']) > 0:
+                    os.system(f"cp {ref_start_msa_paths[chain_id]['monomer_msa']} " + 
+                            os.path.join(start_msa_path, chain_id+".start.a3m"))
 
             os.system(f"cp {ref_start_pdb} {start_pdb}")
-            os.system(f"cp {ref_start_pkl} {start_pkl}")
 
             model_iteration_scores += [ref_avg_lddt]
 

@@ -6,6 +6,9 @@ from multicom4.monomer_domain_combination.domain import *
 import pandas as pd
 from absl import flags
 from absl import app
+from multicom4.common.config import *
+from multicom4.common.pipeline import run_monomer_structure_generation_pipeline_v2
+    
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
@@ -68,18 +71,17 @@ def main(argv):
     domain_info_dict = {}
 
     # 1. hhsearch
-    domain_info_dict['dom_hhsearch'] = run_hhsearch_dom(disorder_pred=disorder_pred, 
+    domain_info_dict['def_dom_hhsearch'] = run_hhsearch_dom(disorder_pred=disorder_pred, 
                                                         N1_outdir=N1_outdir,
                                                         fasta_path=FLAGS.fasta_path,
                                                         params=params)
-    
+    domain_info_dict['dmsa_dom_hhsearch'] = domain_info_dict['def_dom_hhsearch']
+
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')    
     default_workdir = os.path.join(N3_outdir, 'default')
     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
     if not os.path.exists(ranking_json_file):
         raise Exception(f"Haven't generated default models!")
-
-    alphafold_def_a3m = os.path.join(N3_outdir, 'default', 'msas', 'monomer_final.a3m')
 
     ranked_0_pdb = os.path.join(N3_outdir, 'default', 'ranked_0.pdb')
     # 2. domain_parser, requires the predicted full-length model as input
@@ -94,20 +96,29 @@ def main(argv):
                                                 params=params)
         
         if len(dom_parser_domain_file) > 0:
-            domain_info_dict['dom_parser'] = dom_parser_domain_file 
+            domain_info_dict['def_dom_parser'] = dom_parser_domain_file 
+            domain_info_dict['dmsa_dom_parser'] = domain_info_dict['def_dom_parser']
 
     # 3. Unidoc structure-based
-    domain_info_dict['dom_unidoc'] = run_unidoc(disorder_pred=disorder_pred, 
+    domain_info_dict['def_dom_unidoc'] = run_unidoc(disorder_pred=disorder_pred, 
                                                 N1_outdir=N1_outdir,
                                                 fasta_path=FLAGS.fasta_path,
                                                 ranked_0_pdb=ranked_0_pdb,
                                                 params=params)
+    domain_info_dict['dmsa_dom_unidoc'] = domain_info_dict['def_dom_unidoc']
+
 
     if FLAGS.domain_info is not None:
+        domain_info_dict['def_dom_manual'] = FLAGS.domain_info
+        domain_info_dict['dmsa_dom_manual'] = FLAGS.domain_info
 
-        domain_info_dict['dom_manual'] = FLAGS.domain_info
 
-    for run_method in domain_info_dict:
+    monomer_config = MONOMER_HUMAN_CONFIG if params['is_human'] == 1 else MONOMER_CONFIG
+
+    # for run_method in domain_info_dict:
+    for run_method in ['def_dom_hhsearch', 'dmsa_dom_hhsearch',   
+                       #'def_dom_parser', 'dmsa_dom_parser',
+                       'def_dom_manual', 'dmsa_dom_manual']:
 
         method_outdir = os.path.join(N3_outdir, run_method)
         os.makedirs(method_outdir, exist_ok=True)
@@ -126,14 +137,23 @@ def main(argv):
                                    domain_fastas_dir=fastadir,
                                    output_dir=alndir)
         
-        paired_a3m = combine_domain_msas(sequence=sequence, 
-                                        domain_info=domain_info_dict[run_method], 
-                                        domaindir=alndir)
-        
+        paired_a3m, unpaired_a3m, domain_ranges = combine_domain_msas(sequence=sequence, 
+                                                                      domain_info=domain_info_dict[run_method], 
+                                                                      domaindir=alndir, 
+                                                                      domain_msa_source=monomer_config.predictors[run_method].domain_msa_source)
+        start_a3m = ""
         combine_a3m = os.path.join(alndir, 'final.a3m')
-        with open(combine_a3m, 'w') as fw:
-            fw.write(open(alphafold_def_a3m).read())
-            fw.write(open(paired_a3m).read())
+
+        if monomer_config.predictors[run_method].start_msa == "default":
+            start_a3m = os.path.join(N3_outdir, 'default', 'msas', 'monomer_final.a3m')
+        if monomer_config.predictors[run_method].start_msa == "deepmsa2_dMSA":
+            start_a3m = os.path.join(N3_outdir, 'deepmsa_dMSA', 'msas', 'monomer_final.a3m')
+
+        merge_msas(start_msa=start_a3m, 
+                   paired_msa=paired_a3m, 
+                   unpaired_msa=unpaired_a3m, 
+                   domain_ranges=domain_ranges, 
+                   out_msa=combine_a3m)
     
 
     if not run_monomer_structure_generation_pipeline_v2(params=params,

@@ -2,7 +2,7 @@
 
 slurm_script_template = ""
 
-is_human = 0
+is_human = 1
 ################################tools option#########################################
 
 # hhblits program path
@@ -146,7 +146,7 @@ foldseek_af_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/a
 
 foldseek_af_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/pdbs
 
-foldseek_esm_atlas_database =/bmlfast/bml_casp16/tools/multicom3_db/foldseek_databases/esm_atlas/foldseekdb
+foldseek_esm_atlas_database =/bmlfast/bml_casp16/tools/multicom3_db/foldseek_databases/complex/esm_atlas/foldseekdb
 
 ################################databases option#####################################
 

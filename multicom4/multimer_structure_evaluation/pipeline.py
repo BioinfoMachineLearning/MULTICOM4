@@ -37,12 +37,11 @@ class Multimer_structure_evaluation_pipeline:
         # makedir_if_not_exists(msadir)
 
         for method in os.listdir(model_dir):
-            print(method)
             ranking_json_file = os.path.join(model_dir, method, "ranking_debug.json")
             if not os.path.exists(ranking_json_file):
                 continue
             ranking_json = json.loads(open(ranking_json_file).read())
-
+            print(method)
             for i in range(model_count):
                 ranked_pdb = os.path.join(model_dir, method, f"ranked_{i}.pdb")
                 trg_pdb = os.path.join(pdbdir, f"{method}_{i}.pdb")
@@ -67,26 +66,23 @@ class Multimer_structure_evaluation_pipeline:
 
         if "alphafold" in self.run_methods:
             result_file = os.path.join(output_dir, 'alphafold_ranking.csv')
-            if not os.path.exists(result_file):
-                alphafold_ranking = self.alphafold_qa.run(pkldir)
-                alphafold_ranking.to_csv(result_file)
+            alphafold_ranking = self.alphafold_qa.run(pkldir)
+            alphafold_ranking.to_csv(result_file)
             result_dict["alphafold"] = result_file
 
         if "bfactor" in self.run_methods:
             result_file = os.path.join(output_dir, 'bfactor_ranking.csv')
-            if not os.path.exists(result_file):
-                bfactor_ranking = self.bfactorqa.run(input_dir=pdbdir)
-                bfactor_ranking.to_csv(result_file)
+            bfactor_ranking = self.bfactorqa.run(input_dir=pdbdir)
+            bfactor_ranking.to_csv(result_file)
             result_dict["bfactor"] = result_file
 
         if "multieva" in self.run_methods:
             result_file = os.path.join(output_dir, 'multieva.csv')
-            if not os.path.exists(result_file):
-                workdir = os.path.join(output_dir, 'multieva')
-                makedir_if_not_exists(workdir)
-        
-                multieva_pd = self.multieva_qa.run(input_dir=pdbdir, workdir=workdir)
-                multieva_pd.to_csv(result_file)
+            workdir = os.path.join(output_dir, 'multieva')
+            makedir_if_not_exists(workdir)
+    
+            multieva_pd = self.multieva_qa.run(input_dir=pdbdir, workdir=workdir)
+            multieva_pd.to_csv(result_file)
 
             result_dict["multieva"] = result_file
 
@@ -158,14 +154,13 @@ class Multimer_structure_evaluation_pipeline:
 
         if "gate" in self.run_methods:
             resultfile = os.path.join(output_dir, 'gate.csv')
-            if not os.path.exists(resultfile):
-                gate_ranking_df_file = self.gate_qa.run_multimer_qa(fasta_path=fasta_path, 
-                                                                input_dir=pdbdir, 
-                                                                pkl_dir=pkldir,
-                                                                outputdir=os.path.join(output_dir, 'gate'))
-                gate_ranking_df = pd.read_csv(gate_ranking_df_file)
-                gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
-                gate_ranking_df.to_csv(resultfile)
+            gate_ranking_df_file = self.gate_qa.run_multimer_qa(fasta_path=fasta_path, 
+                                                            input_dir=pdbdir, 
+                                                            pkl_dir=pkldir,
+                                                            outputdir=os.path.join(output_dir, 'gate'))
+            gate_ranking_df = pd.read_csv(gate_ranking_df_file)
+            gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
+            gate_ranking_df.to_csv(resultfile)
             result_dict['gate'] = resultfile
             result_dict["gate_cluster"] = os.path.join(output_dir, 'gate', 'feature', 'usalign_pairwise', 'pairwise_usalign.csv')
 
@@ -189,5 +184,18 @@ class Multimer_structure_evaluation_pipeline:
             ranking_file = os.path.join(output_dir, 'gate_af_avg.ranking')
             avg_ranking_df.to_csv(ranking_file)
             result_dict["gate_af_avg"] = ranking_file
+
+        if "gate_noaf" in self.run_methods:
+            resultfile = os.path.join(output_dir, 'gate.csv')
+            gate_ranking_df_file = self.gate_qa.run_multimer_qa(fasta_path=fasta_path, 
+                                                                input_dir=pdbdir, 
+                                                                pkl_dir='pkldir',
+                                                                use_af_features=False,
+                                                                outputdir=os.path.join(output_dir, 'gate'))
+            gate_ranking_df = pd.read_csv(gate_ranking_df_file)
+            gate_ranking_df['model'] = [model + '.pdb' for model in gate_ranking_df['model']]
+            gate_ranking_df.to_csv(resultfile)
+            result_dict['gate'] = resultfile
+            result_dict["gate_cluster"] = os.path.join(output_dir, 'gate', 'feature', 'usalign_pairwise', 'pairwise_usalign.csv')
 
         return result_dict

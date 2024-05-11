@@ -244,6 +244,13 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                             if not os.path.exists(default_alphafold_monomer_a3m):
                                 print(f"Cannot find default alphafold alignments for {monomer}: {default_alphafold_monomer_a3m}")
                             monomer_a3ms += [default_alphafold_monomer_a3m]
+                    elif msa_unpaired_source == "colabfold_web":
+                        for chain_id in chain_id_map:
+                            monomer = chain_id
+                            colabfold_monomer_a3m = os.path.join(aln_dir, monomer, f"{monomer}_colabfold_web.a3m")
+                            if not os.path.exists(colabfold_monomer_a3m):
+                                print(f"Cannot find colabfold alignments for {monomer}: {colabfold_monomer_a3m}")
+                            monomer_a3ms += [colabfold_monomer_a3m]
 
                     base_cmd += f"--monomer_a3ms={','.join(monomer_a3ms)} "
 

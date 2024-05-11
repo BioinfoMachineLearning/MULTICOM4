@@ -197,7 +197,7 @@ def main(argv):
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
     makedir_if_not_exists(N6_outdir)
-    run_methods = ['default_multimer']
+    run_methods = ['colabfold_casp16_web', 'colabfold_casp16_web_not']
 
     if is_homomers:
         if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
@@ -209,30 +209,11 @@ def main(argv):
                                                                     monomer_model_dir=N3_outdir,
                                                                     output_dir=N6_outdir,
                                                                     run_methods=run_methods,
-                                                                    run_script=True,
+                                                                    run_script=os.path.exists(params['slurm_script_template']),
                                                                     run_deepmsa=False):
-            print("Program failed in step 7")
-        
-        default_feature_pkl = os.path.join(N6_outdir, 'default_multimer', 'features.pkl')
-        while not os.path.exists(default_feature_pkl):
-            time.sleep(300)
-        
-        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
-                                                                fasta_path=FLAGS.fasta_path,
-                                                                chain_id_map=chain_id_map,
-                                                                aln_dir=N1_outdir,
-                                                                complex_aln_dir=N4_outdir,
-                                                                template_dir=N5_outdir,
-                                                                monomer_model_dir=N3_outdir,
-                                                                output_dir=N6_outdir,
-                                                                run_script=os.path.exists(params['slurm_script_template'])):
             print("Program failed in step 7")
 
     else:
-        default_feature_pkl = os.path.join(N6_outdir, 'default_multimer', 'features.pkl')
-        while not os.path.exists(default_feature_pkl):
-            time.sleep(300)
-        
         if not run_multimer_structure_generation_pipeline_v2(params=params,
                                                              fasta_path=FLAGS.fasta_path,
                                                              chain_id_map=chain_id_map,
@@ -241,7 +222,9 @@ def main(argv):
                                                              template_dir=N5_outdir,
                                                              monomer_model_dir=N3_outdir,
                                                              output_dir=N6_outdir,
-                                                             run_script=os.path.exists(params['slurm_script_template'])):
+                                                             run_methods=run_methods,
+                                                             run_script=os.path.exists(params['slurm_script_template']),
+                                                             run_deepmsa=False):
             print("Program failed in step 7")
         
 if __name__ == '__main__':

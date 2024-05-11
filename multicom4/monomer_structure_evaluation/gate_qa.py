@@ -51,9 +51,9 @@ class Gate_qa:
 
         return resultfile
 
-    def run_multimer_qa(self, fasta_path, input_dir, pkl_dir, outputdir):
+    def run_multimer_qa(self, fasta_path, input_dir, pkl_dir, outputdir, use_af_features=True):
                             
-        cmd = f"sh {self.params['gate_qa_program_dir']} multimer {fasta_path} {input_dir} {outputdir} {pkl_dir}"
+        cmd = f"sh {self.params['gate_qa_program_dir']} multimer {fasta_path} {input_dir} {outputdir} {pkl_dir} {use_af_features}"
         os.system(cmd)
 
         resultfile = os.path.join(outputdir, 'prediction', 'casp15_inhouse_top_v8', 'ensemble.csv')

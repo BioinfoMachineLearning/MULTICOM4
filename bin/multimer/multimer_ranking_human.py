@@ -89,18 +89,18 @@ def main(argv):
 
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
-    run_methods = ['def_mul_refine']
+    run_methods = ['def_mul_refine', 'af3_refine']
     
     stoichiometry = "homomers" if len(set(input_seqs)) == 1 else 'heteromers'
-    # for run_method in run_methods:
-    #     if os.path.exists(os.path.join(N6_outdir, run_method)):
-    #         if not complete_result(os.path.join(N6_outdir, run_method), 5):
-    #             refine_dir = os.path.join(N6_outdir, run_method, 'workdir')
-    #             final_dir = os.path.join(N6_outdir, run_method, 'finaldir')
-    #             os.makedirs(final_dir, exist_ok=True)
-    #             pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection(params=params, config_name=run_method, stoichiometry=stoichiometry)
-    #             pipeline.select_v1(indir=refine_dir, outdir=final_dir)
-    #             pipeline.make_predictor_results(final_dir, os.path.join(N6_outdir, run_method))
+    for run_method in run_methods:
+        if os.path.exists(os.path.join(N6_outdir, run_method)):
+            if not complete_result(os.path.join(N6_outdir, run_method), 5):
+                refine_dir = os.path.join(N6_outdir, run_method, 'workdir')
+                final_dir = os.path.join(N6_outdir, run_method, 'finaldir')
+                os.makedirs(final_dir, exist_ok=True)
+                pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection(params=params, config_name=run_method, stoichiometry=stoichiometry)
+                pipeline.select_v1(indir=refine_dir, outdir=final_dir)
+                pipeline.make_predictor_results(final_dir, os.path.join(N6_outdir, run_method))
 
     print("Multimer structure generation has been finished!")
 
@@ -109,20 +109,21 @@ def main(argv):
     print("#################################################################################################")
 
     print("9. Start to evaluate multimer models")
-    run_methods=["alphafold", "bfactor", 'multieva', 'gate']
+    run_methods=["alphafold", "bfactor", 'multieva', 'gate', 'gate_noaf']
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_multimer_structure_evaluation')
     multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
                                                           params=params, run_methods=run_methods,
                                                           chain_id_map=chain_id_map,
-                                                          indir=N6_outdir, outdir=N7_outdir)
+                                                          indir=N6_outdir, outdir=N7_outdir,
+                                                          is_human=True)
 
     print("#################################################################################################")
 
-    N8_outdir = os.path.join(FLAGS.output_dir, 'N8_monomer_structure_evaluation')
+    # N8_outdir = os.path.join(FLAGS.output_dir, 'N8_monomer_structure_evaluation')
     
-    select_final_monomer_models_from_complex(chain_id_map=chain_id_map, 
-                                             multimer_qa_result_dir=N7_outdir, 
-                                             outputdir=N8_outdir)
+    # select_final_monomer_models_from_complex(chain_id_map=chain_id_map, 
+    #                                          multimer_qa_result_dir=N7_outdir, 
+    #                                          outputdir=N8_outdir)
 
     print("#################################################################################################")
 

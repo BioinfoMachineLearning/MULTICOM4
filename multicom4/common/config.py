@@ -41,7 +41,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 12,
-        'predictions_per_model': 40,
+        'predictions_per_model': 5,
         'model_preset': 'monomer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -200,17 +200,45 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'num_ensemble': 1,
             'num_recycle': 3,
         },
-        'dom_hhsearch':{
-            'msa_source': 'dom_hhsearch',
+        'def_dom_hhsearch':{
+            'start_msa': 'default',
+            'domain_msa_source': 'default',
+            'msa_source': 'def_dom_hhsearch',
         },
-        'dom_parser':{
-            'msa_source': 'dom_parser',
+        'def_dom_parser':{
+            'start_msa': 'default',
+            'domain_msa_source': 'default',
+            'msa_source': 'def_dom_parser',
         },
-        'dom_unidoc':{
-            'msa_source': 'dom_unidoc',
+        'def_dom_unidoc':{
+            'start_msa': 'default',
+            'domain_msa_source': 'default',
+            'msa_source': 'def_dom_unidoc',
         },
-        'dom_manual':{
-            'msa_source': 'dom_manual',
+        'def_dom_manual':{
+            'start_msa': 'default',
+            'domain_msa_source': 'default',
+            'msa_source': 'def_dom_manual',
+        },
+        'dmsa_dom_hhsearch':{
+            'start_msa': 'deepmsa2_dMSA',
+            'domain_msa_source': 'deepmsa2_dMSA',
+            'msa_source': 'dmsa_dom_hhsearch',
+        },
+        'dmsa_dom_parser':{
+            'start_msa': 'deepmsa2_dMSA',
+            'domain_msa_source': 'deepmsa2_dMSA',
+            'msa_source': 'dmsa_dom_parser',
+        },
+        'dmsa_dom_unidoc':{
+            'start_msa': 'deepmsa2_dMSA',
+            'domain_msa_source': 'deepmsa2_dMSA',
+            'msa_source': 'dmsa_dom_unidoc',
+        },
+        'dmsa_dom_manual':{
+            'start_msa': 'deepmsa2_dMSA',
+            'domain_msa_source': 'deepmsa2_dMSA',
+            'msa_source': 'dmsa_dom_manual',
         },
         # 'foldseek_refine': {
         #     'number_of_input_models': 5,
@@ -259,7 +287,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 200,
+        'predictions_per_model': 40,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -468,7 +496,18 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
             'relax_topn_predictions': 1,
-            'predictions_per_model': 10,
+            'predictions_per_model': 40,
+            'foldseek_database': 'pdb+afdb',
+            'msa_source': 'foldseek',
+            'template_source': 'foldseek',
+        },
+        'af3_refine': {
+            'max_iteration': 1,
+            'max_template_count': 50,
+            'progressive_threshold': 2000,
+            'number_of_output_models': 5,
+            'relax_topn_predictions': 5,
+            'predictions_per_model': 200,
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
@@ -517,6 +556,15 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'num_ensemble': 1,
             'num_recycle': 21,
         },
+        'colabfold_casp16_web': {
+            'msa_paired_source': 'colabfold_web',
+            'msa_unpaired_source': 'colabfold_web',
+        },
+        'colabfold_casp16_web_not': {
+            'msa_paired_source': 'colabfold_web',
+            'msa_unpaired_source': 'colabfold_web',
+            'template_source': 'notemplate',
+        },
     }
 })
 
@@ -524,7 +572,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 200,
+        'predictions_per_model': 100,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -724,7 +772,18 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
-            'predictions_per_model': 10,
+            'predictions_per_model': 40,
+        },
+        'af3_refine': {
+            'max_iteration': 1,
+            'max_template_count': 50,
+            'progressive_threshold': 2000,
+            'number_of_output_models': 5,
+            'relax_topn_predictions': 5,
+            'predictions_per_model': 200,
+            'foldseek_database': 'pdb+afdb',
+            'msa_source': 'foldseek',
+            'template_source': 'foldseek',
         },
         'afsample_v1': {
             'model_preset': "multimer_v1",
@@ -771,10 +830,10 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'num_recycle': 21,
         },
         'colabfold_casp16_web': {
-            'msa_paired_source': 'colabfold',
+            'msa_paired_source': 'colabfold_web',
         },
         'colabfold_casp16_web_not': {
-            'msa_paired_source': 'colabfold',
+            'msa_paired_source': 'colabfold_web',
             'template_source': 'notemplate',
         },
     }
@@ -1264,6 +1323,15 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'num_ensemble': 1,
             'num_recycle': 21,
         },
+        'colabfold_casp16_web': {
+            'msa_paired_source': 'colabfold_web',
+            'msa_paired_source': 'colabfold_web',
+        },
+        'colabfold_casp16_web_not': {
+            'msa_paired_source': 'colabfold_web',
+            'msa_paired_source': 'colabfold_web',
+            'template_source': 'notemplate',
+        },
     }
 })
 
@@ -1516,6 +1584,13 @@ HOMOMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'num_ensemble': 1,
             'num_recycle': 21,
+        },
+        'colabfold_casp16_web': {
+            'msa_paired_source': 'colabfold_web',
+        },
+        'colabfold_casp16_web_not': {
+            'msa_paired_source': 'colabfold_web',
+            'template_source': 'notemplate',
         },
     }
 })

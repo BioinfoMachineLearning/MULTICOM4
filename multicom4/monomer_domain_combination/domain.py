@@ -6,6 +6,7 @@ import numpy as np
 from multicom4.monomer_templates_concatenation import parsers
 from multicom4.monomer_alignment_generation.alignment import *
 from multicom4.common.pipeline import run_monomer_msa_pipeline
+from multicom4.common.protein import parse_fasta
 
 mgnify_max_hits = 501
 uniref_max_hits = 10000
@@ -185,7 +186,7 @@ def reorder_paired_rows(all_paired_msa_rows_dict) :
         all_paired_msa_rows.extend(paired_rows[paired_rows_sort_index])
     return np.array(all_paired_msa_rows)
 
-def write_paired_a3ms(sequence, domain_alignments, domain_ranges, paired_rows, outfile):
+def write_paired_a3ms(sequence, domain_alignments, domain_ranges, paired_rows, paired_out_file, unpaired_out_file):
     def _prepare_header(ids):
         return "_____".join(ids)
 
@@ -241,7 +242,11 @@ def write_paired_a3ms(sequence, domain_alignments, domain_ranges, paired_rows, o
         seq_full = "".join(paired_sequence)
         sequences_full[header_full] = seq_full
 
+    with open(paired_out_file, "w") as of:
+        write_a3m(sequences_full, of)
+
     # add unpaired sequences
+    sequences_full = {}
     for domain_alignment, (domain_starts, domain_ends) in zip(domain_alignments, domain_ranges):
         #print(domain_alignment.ids)
         for seqid in domain_alignment.ids:
@@ -257,7 +262,7 @@ def write_paired_a3ms(sequence, domain_alignments, domain_ranges, paired_rows, o
             sequences_full[f"{domain_alignment.main_id}_{seqid}"] = seq_full
             # print(sequences_full.keys())
 
-    with open(outfile, "w") as of:
+    with open(unpaired_out_file, "w") as of:
         write_a3m(sequences_full, of)
 
 def run_hhsearch_dom(disorder_pred, N1_outdir, fasta_path, params):
@@ -398,9 +403,9 @@ def generate_domain_alignments(params, domain_fastas_dir, output_dir):
         print("#################################################################################################")
         print(f"1. Start to generate alignments for monomers")
 
-        params['uniclust_db'] = []
+        # params['uniclust_db'] = []
         params['colabfold_databases'] = []
-        params['JGIclust_database'] = []
+        # params['JGIclust_database'] = []
         params['DHR_database_path'] = []
 
         result = run_monomer_msa_pipeline(fasta=fasta_path, outdir=outdir, params=params, 
@@ -409,7 +414,7 @@ def generate_domain_alignments(params, domain_fastas_dir, output_dir):
         if result is None:
             raise RuntimeError('The monomer alignment generation has failed!')
 
-def combine_domain_msas(sequence, domain_info, domaindir):
+def combine_domain_msas(sequence, domain_info, domaindir, domain_msa_source):
 
     all_domain_id_dict = []
     all_domain_ranges = []
@@ -437,28 +442,39 @@ def combine_domain_msas(sequence, domain_info, domaindir):
 
         alndir = os.path.join(domaindir, domain_name)
 
-        uniref_sto = os.path.join(alndir, domain_name + '_uniref90.sto')
-        with open(uniref_sto) as f:
-            uniref90_msa = parsers.parse_stockholm(f.read())
-            uniref90_msa = uniref90_msa.truncate(max_seqs=uniref_max_hits)
+        if domain_msa_source == "default":
+            uniref_sto = os.path.join(alndir, domain_name + '_uniref90.sto')
+            with open(uniref_sto) as f:
+                uniref90_msa = parsers.parse_stockholm(f.read())
+                uniref90_msa = uniref90_msa.truncate(max_seqs=uniref_max_hits)
 
-        bfd_uniref30_a3m = os.path.join(alndir, domain_name + '_uniref30_bfd.a3m')
-        with open(bfd_uniref30_a3m) as f:
-            bfd_msa = parsers.parse_a3m(f.read())
+            bfd_uniref30_a3m = os.path.join(alndir, domain_name + '_uniref30_bfd.a3m')
+            with open(bfd_uniref30_a3m) as f:
+                bfd_msa = parsers.parse_a3m(f.read())
 
-        mgnify_a3m = os.path.join(alndir, domain_name + '_mgnify.sto')
-        with open(mgnify_a3m) as f:
-            mgnify_msa = parsers.parse_stockholm(f.read())
-            mgnify_msa = mgnify_msa.truncate(max_seqs=mgnify_max_hits)
+            mgnify_a3m = os.path.join(alndir, domain_name + '_mgnify.sto')
+            with open(mgnify_a3m) as f:
+                mgnify_msa = parsers.parse_stockholm(f.read())
+                mgnify_msa = mgnify_msa.truncate(max_seqs=mgnify_max_hits)
 
-        domain_a3m_dir = os.path.join(domaindir, 'domain_a3ms')
-        os.makedirs(domain_a3m_dir, exist_ok=True)
+            domain_a3m_dir = os.path.join(domaindir, 'domain_a3ms')
+            os.makedirs(domain_a3m_dir, exist_ok=True)
 
-        alphafold_a3m = os.path.join(domain_a3m_dir, domain_name + '_alphafold.a3m')
-        make_msa_features((uniref90_msa, bfd_msa, mgnify_msa), msa_save_path=alphafold_a3m)
+            alphafold_a3m = os.path.join(domain_a3m_dir, domain_name + '_alphafold.a3m')
+            make_msa_features((uniref90_msa, bfd_msa, mgnify_msa), msa_save_path=alphafold_a3m)
 
-        domain_alignment = DomainAlignment.from_a3m(alphafold_a3m)
-        domain_alignments += [domain_alignment]
+            domain_alignment = DomainAlignment.from_a3m(alphafold_a3m)
+            domain_alignments += [domain_alignment]
+
+        elif domain_msa_source == "deepmsa_q4JGI":
+            deepmsa2_msa = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', 'q4JGI.a3m')
+            domain_alignment = DomainAlignment.from_a3m(deepmsa2_msa)
+            domain_alignments += [domain_alignment]
+
+        elif domain_msa_source == "deepmsa2_dMSA":
+            deepmsa2_msa = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', 'dMSA.a3m')
+            domain_alignment = DomainAlignment.from_a3m(deepmsa2_msa)
+            domain_alignments += [domain_alignment]
 
         msa_df = _make_msa_df(domain_alignment)
         id_dict = _create_id_dict(msa_df)
@@ -508,8 +524,61 @@ def combine_domain_msas(sequence, domain_info, domaindir):
 
     # print(paired_rows)
 
-    outfile = os.path.join(domaindir, 'paired.a3m')
+    paired_out_file = os.path.join(domaindir, 'paired.a3m')
+    unpaired_out_file = os.path.join(domaindir, 'unpaired.a3m')
     write_paired_a3ms(sequence=sequence, domain_alignments=domain_alignments, 
-                      domain_ranges=all_domain_ranges, paired_rows=paired_rows, outfile=outfile)
+                      domain_ranges=all_domain_ranges, paired_rows=paired_rows, 
+                      paired_out_file=paired_out_file, unpaired_out_file=unpaired_out_file)
 
-    return outfile
+    return paired_out_file, unpaired_out_file, all_domain_ranges
+
+def merge_msas(start_msa, paired_msa, unpaired_msa, domain_ranges, out_msa):
+
+    fasta_string = open(start_msa).read()
+
+    sequences, headers = parse_fasta(fasta_string)
+
+    seen_domain_alignments = [[] for i in range(len(domain_ranges))]
+
+    merged_sequences = {}
+    for header, sequence in zip(headers, sequences):
+        for domain_idx, domain_range in enumerate(domain_ranges):
+            (starts, ends) = domain_range
+            domain_sequence = ""
+            for start, end in zip(starts, ends):
+                domain_sequence += sequence[start:end]
+            seen_domain_alignments[domain_idx] += [domain_sequence]
+        merged_sequences[header] = sequence
+    
+    fasta_string = open(paired_msa).read()
+    sequences, headers = parse_fasta(fasta_string)
+    for header, sequence in zip(headers, sequences):
+        for domain_idx, domain_range in enumerate(domain_ranges):
+            (starts, ends) = domain_range
+            domain_sequence = ""
+            for start, end in zip(starts, ends):
+                domain_sequence += sequence[start:end]
+            seen_domain_alignments[domain_idx] += [domain_sequence]
+        merged_sequences[header] = sequence
+
+    fasta_string = open(unpaired_msa).read()
+    sequences, headers = parse_fasta(fasta_string)
+    for header, sequence in zip(headers, sequences):
+        is_redundant = False
+        for domain_idx, domain_range in enumerate(domain_ranges):
+            (starts, ends) = domain_range
+            domain_sequence = ""
+            for start, end in zip(starts, ends):
+                domain_sequence += sequence[start:end]
+
+            if all(char == '-' for char in domain_sequence):
+                continue
+            
+            if domain_sequence in  seen_domain_alignments[domain_idx]:
+                is_redundant = True
+        
+        if not is_redundant:
+            merged_sequences[header] = sequence
+
+    with open(out_msa, "w") as of:
+        write_a3m(merged_sequences, of)

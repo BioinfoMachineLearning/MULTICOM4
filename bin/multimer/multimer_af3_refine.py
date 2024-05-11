@@ -12,16 +12,21 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_multimer_structure_generation_pipeline_v2, \
     run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
-    copy_same_sequence_msas, select_final_monomer_models_from_complex
+    copy_same_sequence_msas
 
 from absl import flags
 from absl import app
 import copy
 import pandas as pd
+import json 
 
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
+flags.DEFINE_string('config_name', "af3_refine", 'Whether to use IMG alignment to generate models')
+flags.DEFINE_string('inpdb', None, 'Whether to use IMG alignment to generate models')
+flags.DEFINE_boolean('is_homomers', False, '')
+
 FLAGS = flags.FLAGS
 
 
@@ -65,7 +70,6 @@ def main(argv):
     input_seqs, input_descs = parse_fasta(fasta_string=input_fasta_str)
     chain_id_map, chain_id_seq_map = make_chain_id_map(sequences=input_seqs,
                                                        descriptions=input_descs)
-
     print("#################################################################################################")
 
     print("#################################################################################################")
@@ -89,42 +93,27 @@ def main(argv):
 
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
-    run_methods = ['def_mul_refine']
+    method_out_dir = os.path.join(N6_outdir, FLAGS.config_name) 
+    # refine default top-ranked models
+    refinement_inputs = []
     
-    stoichiometry = "homomers" if len(set(input_seqs)) == 1 else 'heteromers'
-    # for run_method in run_methods:
-    #     if os.path.exists(os.path.join(N6_outdir, run_method)):
-    #         if not complete_result(os.path.join(N6_outdir, run_method), 5):
-    #             refine_dir = os.path.join(N6_outdir, run_method, 'workdir')
-    #             final_dir = os.path.join(N6_outdir, run_method, 'finaldir')
-    #             os.makedirs(final_dir, exist_ok=True)
-    #             pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection(params=params, config_name=run_method, stoichiometry=stoichiometry)
-    #             pipeline.select_v1(indir=refine_dir, outdir=final_dir)
-    #             pipeline.make_predictor_results(final_dir, os.path.join(N6_outdir, run_method))
+    msa_paths = {}
+    for chain_id in chain_id_map:
+        msa_paths[chain_id] = dict(paired_msa="", monomer_msa="")
 
-    print("Multimer structure generation has been finished!")
+    refine_input = iterative_refine_pipeline_multimer.refinement_input_multimer(chain_id_map=chain_id_map,
+                                                                                fasta_path=FLAGS.fasta_path,
+                                                                                pdb_path=FLAGS.inpdb,
+                                                                                pkl_path="",
+                                                                                msa_paths=msa_paths)
+    refinement_inputs += [refine_input]
 
-    print("#################################################################################################")
+    refine_dir = os.path.join(method_out_dir, 'workdir')
+    makedir_if_not_exists(refine_dir)
 
-    print("#################################################################################################")
+    pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=params, config_name=FLAGS.config_name)
+    pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry= "homomer" if FLAGS.is_homomers else "heteromer")
 
-    print("9. Start to evaluate multimer models")
-    run_methods=["alphafold", "bfactor", 'multieva', 'gate']
-    N7_outdir = os.path.join(FLAGS.output_dir, 'N7_multimer_structure_evaluation')
-    multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
-                                                          params=params, run_methods=run_methods,
-                                                          chain_id_map=chain_id_map,
-                                                          indir=N6_outdir, outdir=N7_outdir)
-
-    print("#################################################################################################")
-
-    N8_outdir = os.path.join(FLAGS.output_dir, 'N8_monomer_structure_evaluation')
-    
-    select_final_monomer_models_from_complex(chain_id_map=chain_id_map, 
-                                             multimer_qa_result_dir=N7_outdir, 
-                                             outputdir=N8_outdir)
-
-    print("#################################################################################################")
 
 if __name__ == '__main__':
     flags.mark_flags_as_required([

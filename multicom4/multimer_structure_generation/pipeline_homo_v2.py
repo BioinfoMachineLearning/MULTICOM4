@@ -265,7 +265,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                     elif msa_paired_source == "colabfold":
                         for chain_id in chain_id_map:
                             monomer = chain_id
-                            monomer_colabfold_a3m = os.path.join(aln_dir, monomer, f"{monomer}_colabfold.a3m")
+                            monomer_colabfold_a3m = os.path.join(aln_dir, monomer, f"{monomer}_colabfold_web.a3m")
                             multimer_a3ms += [monomer_colabfold_a3m]
                     else:
                         multimer_a3ms = [os.path.join(complex_aln_dir, msa_paired_source, monomer + "_con.a3m") for monomer in monomers]

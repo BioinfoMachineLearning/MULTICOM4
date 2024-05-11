@@ -194,6 +194,16 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                             errormsg = errormsg + f"Cannot find deepmsa alignment for {chain_name}: {deepmsa_a3m}\n"
                         common_parameters += f"--custom_msa={deepmsa_a3m} "
                     
+                    elif msa_source.find('dom_hhsearch') > 0 or msa_source.find('dom_parser') > 0 or msa_source.find('dom_unidoc') > 0 or msa_source.find('dom_manual') > 0:
+                        
+                        dom_combine_a3m = os.path.join(method_out_dir, 'domain_alns', 'final.a3m')
+                        print("2222222222222222222222222222")
+                        if not os.path.exists(dom_combine_a3m):
+
+                            errormsg = errormsg + f"Cannot find domain alignment for {chain_name}: {dom_combine_a3m}\n"
+
+                        common_parameters += f"--custom_msa={dom_combine_a3m} "
+
                     if template_source == "pdb70" or template_source == "pdb70_newest":
                         uniref90_sto = os.path.join(alndir, chain_name + '_uniref90.sto')
                         if not os.path.exists(uniref90_sto):
@@ -555,16 +565,6 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                                 errormsg = errormsg + f"Failed to generate the esm msa: {esm_msa_path}"
                         
                         common_parameters += f"--custom_msa={esm_msa_path} "
-
-                    elif msa_source in ['dom_hhsearch', 'dom_parser', 'dom_unidoc', 'dom_manual']:
-                        
-                        dom_combine_a3m = os.path.join(method_outdir, 'domain_alns', 'final.a3m')
-
-                        if not os.path.exists(dom_combine_a3m):
-
-                            errormsg = errormsg + f"Cannot find domain alignment for {chain_name}: {dom_combine_a3m}\n"
-
-                        common_parameters += f"--custom_msa={dom_combine_a3m} "
 
                     elif run_method.find('deepmsa_') >= 0:
                         deepmsa_a3m = os.path.join(alndir, 'DeepMSA2_a3m', 'finalMSAs', msa_source + '.a3m')
