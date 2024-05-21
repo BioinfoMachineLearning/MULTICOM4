@@ -302,47 +302,92 @@ def select_models_by_cluster(ranking_df_file, cluster_result_file, outputdir, pr
     selected_df.to_csv(os.path.join(outputdir, f'{prefix}_selected.csv'))
     return selected_models
 
-def select_models_monomer_only(qa_result, outputdir, params):
+def select_models_monomer_only(qa_result, outputdir, params, is_human):
 
-    select_models_by_tmscore(tmscore_program=params['tmscore_program'],
+    if not is_human:
+        
+        select_models_by_tmscore(tmscore_program=params['tmscore_program'],
+                            ranking_df_file=qa_result["alphafold"],
+                            outputdir=outputdir,
+                            prefix="ai",
+                            tmscore_threshold=0.8)
+
+        select_models_by_cluster(ranking_df_file=qa_result["gate"],
+                                cluster_result_file=qa_result["gate_cluster"],
+                                outputdir=outputdir,
+                                prefix="gate")
+        
+        select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
+                                cluster_result_file=qa_result["gate_cluster"],
+                                outputdir=outputdir,
+                                prefix="llm")
+
+
+    else:
+
+        select_models_by_tmscore(tmscore_program=params['tmscore_program'],
                              ranking_df_file=qa_result["alphafold"],
                              outputdir=outputdir,
-                             prefix="ai",
+                             prefix="multicom",
                              tmscore_threshold=0.8)
 
-    select_models_by_cluster(ranking_df_file=qa_result["gate"],
-                             cluster_result_file=qa_result["gate_cluster"],
-                             outputdir=outputdir,
-                             prefix="gate")
-    
-    select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
-                             cluster_result_file=qa_result["gate_cluster"],
-                             outputdir=outputdir,
-                             prefix="llm")
+        data_dict = {'model': [], 'source': [], 'source_rank': []}
+
+        need_sort_qas = ['gcpnet_ema', 'enqa']
+        for i in range(10):
+            for qa_method in ['gate_af_avg', 'gate', 'gcpnet_ema', 'enqa', 'apollo_monomer']:
+                df = pd.read_csv(qa_result[qa_method])
+                if qa_method in need_sort_qas:
+                    df = df.sort_values(by=['score'], ascending=False)
+                    df.reset_index(inplace=True, drop=True)
+
+                ranked_model = df.loc[i, 'model']
+                data_dict['model'] += [ranked_model + '.pdb' if ranked_model.find('.pdb') < 0 else ranked_model]
+                data_dict['source'] += [qa_method]
+                data_dict['source_rank'] += [str(i)]
+
+        ranking_df = pd.DataFrame(data_dict)
+        ranking_df.to_csv(os.path.join(outputdir, 'multicom_human_ranking.csv'))
+
+        multicom_human_selected_models = []
+        multicom_human_selected_model_paths = []
+        for i in range(len(ranking_df)):
+            model = ranking_df.loc[i, 'model']
+            if model in multicom_human_selected_models:
+                continue
+            multicom_human_selected_models += [model]
+            multicom_human_selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
+
+        for i in range(NUM_FINAL_MODELS):
+            final_pdb = os.path.join(outputdir, f'multicom_human{i+1}.pdb')
+            os.system("cp " + multicom_human_selected_model_paths[i] + " " + final_pdb)
+        
+        selected_df = pd.DataFrame({'selected_models': multicom_human_selected_models})
+        selected_df.to_csv(os.path.join(outputdir, 'multicom_human_selected.csv'))
 
 
-def select_models_with_multimer(qa_result, outputdir, params):
+# def select_models_with_multimer(qa_result, outputdir, params):
     
-    select_models_by_tmscore(tmscore_program=params['tmscore_program'],
-                             ranking_df_file=qa_result["alphafold_multimer"],
-                             outputdir=outputdir,
-                             prefix="ai",
-                             tmscore_threshold=0.8)
+#     select_models_by_tmscore(tmscore_program=params['tmscore_program'],
+#                              ranking_df_file=qa_result["alphafold_multimer"],
+#                              outputdir=outputdir,
+#                              prefix="ai",
+#                              tmscore_threshold=0.8)
 
-    select_models_by_cluster(ranking_df_file=qa_result["gate_multimer"],
-                             cluster_result_file=qa_result["gate_cluster"],
-                             outputdir=outputdir,
-                             prefix="gate")
+#     select_models_by_cluster(ranking_df_file=qa_result["gate_multimer"],
+#                              cluster_result_file=qa_result["gate_cluster"],
+#                              outputdir=outputdir,
+#                              prefix="gate")
     
-    select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg_multimer"],
-                             cluster_result_file=qa_result["gate_cluster"],
-                             outputdir=outputdir,
-                             prefix="llm")
+#     select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg_multimer"],
+#                              cluster_result_file=qa_result["gate_cluster"],
+#                              outputdir=outputdir,
+#                              prefix="llm")
 
 
 def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monomer_dir, outputdir, 
                                     contact_map_file, dist_map_file,
-                                    run_methods=None,
+                                    run_methods=None, is_human=False,
                                     input_multimer_dir="",
                                     generate_final_models=False, model_count=5):
 
@@ -361,7 +406,7 @@ def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monome
 
     if generate_final_models:
         if input_multimer_dir == "" or not os.path.exists(input_multimer_dir):
-            select_models_monomer_only(qa_result=qa_result, outputdir=outputdir, params=params)
+            select_models_monomer_only(qa_result=qa_result, outputdir=outputdir, params=params, is_human=is_human)
         # else:
             # select_models_with_multimer(qa_result=qa_result, outputdir=outputdir, params=params)
 
@@ -685,27 +730,25 @@ def run_multimer_structure_generation_pipeline_foldseek_old(params, fasta_path, 
         return False
     return True
 
-
-def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map, outdir, is_homomer=False):
-    makedir_if_not_exists(outdir)
-    pipeline = Multimer_structure_evaluation_pipeline(params=params)
-    multimer_qa_result = None
-    try:
-        multimer_qa_result = pipeline.reprocess(fasta_path=fasta_path,
-                                                chain_id_map=chain_id_map, output_dir=outdir, 
-                                                is_homomer=is_homomer)
-    except Exception as e:
-        print(e)
+def get_usalign_tmscore(inparams):
+    cmd = inparams[0]
+    tmscore_contents = os.popen(cmd).read().split('\n')
+    tmscore = float(tmscore_contents[1].rstrip('\n'))
+    return tmscore
 
 def cal_tmscores_usalign(usalign_program, src_pdbs, trg_pdb, outputdir):
-    tmscores = []
+
+    process_list = []
     for src_pdb in src_pdbs:
         cmd = usalign_program + ' ' + src_pdb + ' ' + trg_pdb + " -TMscore 6 -ter 1 | grep TM-score | awk '{print $2}' "
-        tmscore_contents = os.popen(cmd).read().split('\n')
-        tmscore = float(tmscore_contents[1].rstrip('\n'))
-        tmscores += [tmscore]
+        process_list.append([cmd])
 
-    return tmscores
+    pool = Pool(processes=40)
+    results = pool.map(get_usalign_tmscore, process_list)
+    pool.close()
+    pool.join()
+
+    return results
 
 def select_models_by_usalign(usalign_program, ranking_df_file, outputdir, prefix, tmscore_threshold):
     selected_models = []
@@ -759,6 +802,25 @@ def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
 
     return multimer_qa_result
 
+def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
+                                       outdir, run_methods=None, 
+                                       is_homomer=False, is_human=False):
+    makedir_if_not_exists(outdir)
+    pipeline = Multimer_structure_evaluation_pipeline(params=params, run_methods=run_methods)
+    multimer_qa_result = None
+    try:
+        multimer_qa_result = pipeline.reprocess(fasta_path=fasta_path,
+                                                output_dir=outdir)
+    except Exception as e:
+        print(e)
+
+    select_models_multimer(chain_id_map=chain_id_map, 
+                           qa_result=multimer_qa_result, 
+                           outputdir=outdir, params=params, 
+                           is_homomer=is_homomer, is_human=True)
+
+    return multimer_qa_result
+
 # def extract_final_monomer_models_from_complex(chain_id_map, selected_models, outputdir, prefix, is_homomer):
 #     for i in range(NUM_FINAL_MODELS):
 #         final_pdb = os.path.join(outputdir, f"{prefix}{i + 1}.pdb")
@@ -775,57 +837,73 @@ def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
 #                 os.system(f"cp {srcpdb} {trgpdb}")
 
 def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homomer, is_human):
-    
+        
     if not is_human:
         ai_selected_models = select_models_by_usalign(usalign_program=params['usalign_program'],
                                                     ranking_df_file=qa_result["alphafold"],
                                                     outputdir=outputdir,
                                                     prefix="ai",
                                                     tmscore_threshold=0.8)
+        gate_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate"],
+                                cluster_result_file=qa_result["gate_cluster"],
+                                outputdir=outputdir,
+                                prefix="gate")
+        llm_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
+                                cluster_result_file=qa_result["gate_cluster"],
+                                outputdir=outputdir,
+                                prefix="llm")
+
+
     else:
+
         multicom_selected_models = select_models_by_usalign(usalign_program=params['usalign_program'],
                                                     ranking_df_file=qa_result["alphafold"],
                                                     outputdir=outputdir,
                                                     prefix="multicom",
                                                     tmscore_threshold=0.8)
 
-    if "gate" not in qa_result:
-        return
-    # extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
-    #                                           selected_models=ai_selected_models, 
-    #                                           outputdir=outputdir, 
-    #                                           prefix="ai", 
-    #                                           is_homomer=is_homomer)
+        data_dict = {'model': [], 'source': [], 'source_rank': []}
 
-    if not is_human:
-        gate_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate"],
-                                cluster_result_file=qa_result["gate_cluster"],
-                                outputdir=outputdir,
-                                prefix="gate")
-    else:
-        multicom_human_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate"],
-                                                                  cluster_result_file=qa_result["gate_cluster"],
-                                                                  outputdir=outputdir,
-                                                                  prefix="multicom_human")
+        need_sort_qas = ['gcpnet_ema', 'enqa']
+        for i in range(10):
+            for qa_method in ['gate_af_avg', 'gate', 'gcpnet_ema', 'enqa', 'gate_noaf', 'multieva']:
+                df = pd.read_csv(qa_result[qa_method])
+                if qa_method in need_sort_qas:
+                    df = df.sort_values(by=['score_norm'], ascending=False)
+                    df.reset_index(inplace=True, drop=True)
+                ranked_model = ""
+                if qa_method == "multieva":
+                    ranked_model = df.loc[i, 'Name']
+                else:
+                    ranked_model = df.loc[i, 'model']
 
-    # extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
-    #                                           selected_models=gate_selected_models, 
-    #                                           outputdir=outputdir, 
-    #                                           prefix="gate", 
-    #                                           is_homomer=is_homomer)
+                data_dict['model'] += [ranked_model + '.pdb' if ranked_model.find('.pdb') < 0 else ranked_model]
+                data_dict['source'] += [qa_method]
+                data_dict['source_rank'] += [str(i)]
 
-    if not is_human:
+        ranking_df = pd.DataFrame(data_dict)
+        ranking_df.to_csv(os.path.join(outputdir, 'multicom_human_ranking.csv'))
+
+        multicom_human_selected_models = []
+        multicom_human_selected_model_paths = []
+        for i in range(len(ranking_df)):
+            model = ranking_df.loc[i, 'model']
+            if model in multicom_human_selected_models:
+                continue
+            multicom_human_selected_models += [model]
+            multicom_human_selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
+
+        for i in range(NUM_FINAL_MODELS):
+            final_pdb = os.path.join(outputdir, f'multicom_human{i+1}.pdb')
+            os.system("cp " + multicom_human_selected_model_paths[i] + " " + final_pdb)
+        
+        selected_df = pd.DataFrame({'selected_models': multicom_human_selected_models})
+        selected_df.to_csv(os.path.join(outputdir, 'multicom_human_selected.csv'))
+
         llm_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
                                 cluster_result_file=qa_result["gate_cluster"],
                                 outputdir=outputdir,
                                 prefix="llm")
-
-    # extract_final_monomer_models_from_complex(chain_id_map=chain_id_map,
-    #                                           selected_models=llm_selected_models, 
-    #                                           outputdir=outputdir, 
-    #                                           prefix="llm", 
-    #                                           is_homomer=is_homomer)
-
 
 def extract_monomer_models_from_complex(complex_pdb, complex_pkl, chain_id_map, chain_group, workdir):
 

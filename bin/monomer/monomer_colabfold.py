@@ -27,6 +27,7 @@ def main(argv):
 
     FLAGS.fasta_path = os.path.abspath(FLAGS.fasta_path)
     FLAGS.output_dir = os.path.abspath(FLAGS.output_dir)
+    targetname = os.path.basename(FLAGS.fasta_path).replace('.fasta', '')
 
     check_file(FLAGS.option_file)
 
@@ -48,21 +49,28 @@ def main(argv):
     N1_outdir = os.path.join(outdir, 'N1_monomer_alignments_generation')
     makedir_if_not_exists(N1_outdir)
 
-    contact_map_file = os.path.join(N1_outdir, 'dncon4', f'{targetname}.dncon2.rr')
-    #if not os.path.exists(contact_map_file):
-    #    raise Exception(f"The contact map file hasn't been generated: {contact_map_file}")
-
-    dist_map_file = os.path.join(N1_outdir, 'deepdist', f'{targetname}.txt')
-    #if not os.path.exists(dist_map_file):
-    #    raise Exception(f"The distance map file hasn't been generated: {dist_map_file}")
+    N1_outdir_img = os.path.join(outdir, 'N1_monomer_alignments_generation_img')
 
     print("#################################################################################################")
     print(f"1. Start to generate alignments for monomers")
+
+    result = run_monomer_msa_pipeline(fasta=FLAGS.fasta_path, outdir=N1_outdir, params=params, only_monomer=True)
     
+    if result is None:
+        raise RuntimeError('The monomer alignment generation has failed!')
+
     print("#################################################################################################")
     print("2. Start to generate template for monomer")
 
     N2_outdir = os.path.join(outdir, 'N2_monomer_template_search')
+
+    makedir_if_not_exists(N2_outdir)
+
+    template_file = run_monomer_template_search_pipeline(params=params, targetname=targetname, sequence=sequence,
+                                                         a3m=os.path.join(N1_outdir, targetname+"_uniref90.sto"), outdir=N2_outdir)
+
+    if template_file is None:
+        raise RuntimeError("Program failed in step 2: monomer template search")
 
     print("The generation for monomer template has finished!")
 
@@ -71,44 +79,22 @@ def main(argv):
     print("#################################################################################################")
 
     print("3. Start to generate tertiary structure for monomers using alphafold")
-
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
+    makedir_if_not_exists(N3_outdir)
+    run_methods = ['colabfold_web', 'colabfold_web_not']
 
-    # run_methods = ['foldseek_refine', 'foldseek_refine_esm', 'foldseek_refine_esm_h']
-    run_methods = []
-    for run_method in run_methods:
-        if not complete_result(os.path.join(N3_outdir, run_method), 5):
-            refine_dir = os.path.join(N3_outdir, run_method, 'workdir')
-            final_dir = os.path.join(N3_outdir, run_method, 'finaldir')
-            pipeline = iterative_refine_pipeline.Monomer_refinement_model_selection(params=params, config_name=run_method)
-            pipeline.select_v1(indir=refine_dir, outdir=final_dir)
-            pipeline.make_predictor_results(final_dir, os.path.join(N3_outdir, run_method))
+    if not run_monomer_structure_generation_pipeline_v2(params=params,
+                                                        targetname=targetname,
+                                                        fasta_path=FLAGS.fasta_path,
+                                                        alndir=N1_outdir, 
+                                                        img_alndir=N1_outdir_img,
+                                                        templatedir=N2_outdir, 
+                                                        outdir=N3_outdir,
+                                                        run_methods=run_methods,
+                                                        run_script=os.path.exists(params['slurm_script_template'])):
+        print("Program failed in step 3: monomer structure generation")
 
     print("The prediction for monomers has finished!")
-
-    print("#################################################################################################")
-
-    print("#################################################################################################")
-
-    print("4. Start to evaluate monomer models")
-
-    N4_outdir = os.path.join(outdir, 'N4_monomer_structure_evaluation')
-
-    makedir_if_not_exists(N4_outdir)
-
-    run_methods = None
-    if os.path.exists(params['slurm_script_template']):
-        run_methods = ["alphafold", "bfactor", "apollo"]
-
-    result = run_monomer_evaluation_pipeline(params=params, targetname=targetname, fasta_file=FLAGS.fasta_path,
-                                             input_monomer_dir=N3_outdir, outputdir=N4_outdir,
-                                             generate_final_models=True, contact_map_file=contact_map_file,
-                                             dist_map_file=dist_map_file, run_methods=run_methods)
-
-    if result is None:
-        raise RuntimeError("Program failed in step 4: monomer model evaluation")
-
-    print("The evaluation for monomer models has been finished!")
 
     print("#################################################################################################")
 
@@ -119,6 +105,6 @@ if __name__ == '__main__':
     flags.mark_flags_as_required([
         'option_file',
         'fasta_path',
-        'output_dir',
+        'output_dir'
     ])
     app.run(main)

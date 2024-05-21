@@ -153,7 +153,7 @@ foldseek_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 
 foldseek_pdb_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/complex/complex
 
-foldseek_pdb_database_dir = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
+foldseek_pdb_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/foldseek_databases/complex/complex_pdb
 
 foldseek_af_database = /home/bml_casp15/tools/multicom3_db/foldseek_databases/af_db
 

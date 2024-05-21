@@ -10,6 +10,24 @@ from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_
 from multicom4.multimer_structure_evaluation.alphafold_ranking import Alphafold_pkl_qa
 import json
 
+PDB_CHAIN_IDS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+def _reorder_chains(pdbstring):
+    new_pdbstring = []
+    first_chain_id = None
+    for line in pdbstring.split('\n'):
+        if line.startswith('ATOM') or line.startswith('TER'):
+            chain_id = line[21]
+            if first_chain_id is None:
+                first_chain_id = chain_id
+            if first_chain_id != "A":
+                new_pdbstring += [line[:21] + PDB_CHAIN_IDS[PDB_CHAIN_IDS.find(chain_id)-1] + line[22:]]
+            else:
+                new_pdbstring += [line]
+        else:
+            new_pdbstring += [line]
+    return '\n'.join(new_pdbstring)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -23,7 +41,7 @@ if __name__ == '__main__':
         if pdb.find('unrelaxed') != 0:
             continue
         pkl = pdb.replace('unrelaxed', 'result').replace('.pdb', '.pkl')
-        with open(pkl, 'rb') as f:
+        with open(args.indir + '/' + pkl, 'rb') as f:
             prediction_result = pickle.load(f)
             print(prediction_result['ranking_confidence'])
             ranking_confidences[pdb.replace('unrelaxed_', '').replace('.pdb', '')] = float(prediction_result['ranking_confidence'])
@@ -35,10 +53,14 @@ if __name__ == '__main__':
             sorted(ranking_confidences.items(), key=lambda x: x[1], reverse=True)):
         ranked_order.append(model_name)
         ranked_output_path = os.path.join(args.indir, f'ranked_{idx}.pdb')
-        srcpdb = f"relaxed_{model_name}.pdb"
+        srcpdb = args.indir + '/' + f"relaxed_{model_name}.pdb"
         if not os.path.exists(srcpdb):
-            srcpdb = f"unrelaxed_{model_name}.pdb"
-        os.system(f"cp {srcpdb} {ranked_output_path}")
+            srcpdb = args.indir + '/' + f"unrelaxed_{model_name}.pdb"
+            pdbstring = ''.join(open(srcpdb).readlines())
+            with open(ranked_output_path, 'w') as f:
+                f.write(_reorder_chains(pdbstring))
+        else:
+            os.system(f"cp {srcpdb} {ranked_output_path}")
 
     ranking_output_path = os.path.join(args.indir, 'ranking_debug.json')
     with open(ranking_output_path, 'w') as f:

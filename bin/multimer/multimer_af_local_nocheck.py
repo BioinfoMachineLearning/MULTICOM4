@@ -115,7 +115,10 @@ def main(argv):
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
     makedir_if_not_exists(N6_outdir)
-    run_methods = ['default_multimer']
+
+    run_methods = ['default_multimer',
+                   'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not',
+                   'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not']
 
     is_homomers = len(processed_seuqences) == 1
 
@@ -155,3 +158,4 @@ if __name__ == '__main__':
         'output_dir'
     ])
     app.run(main)
+

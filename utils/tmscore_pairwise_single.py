@@ -21,7 +21,7 @@ def run_command(inparams):
         if contents[0] == 'GDT-score':
             gdtscore = float(contents[2])
             
-    return pdb1, pdb2, tmscore
+    return pdb1, pdb2, tmscore, gdtscore
     
 def run_pairwise(tmscore_program, indir, workdir, outfile):
 
@@ -84,8 +84,7 @@ if __name__ == '__main__':
     if not os.path.exists(tempdir):
         os.makedirs(tempdir)
 
-    for target in os.listdir(args.indir):
-        workdir = tempdir + '/' + target
-        if not os.path.exists(workdir):
-            os.makedirs(workdir)
-        run_pairwise(args.tmscore, args.indir + '/' + target, workdir, args.outdir + '/' + target + '.csv')
+    workdir = tempdir
+    if not os.path.exists(workdir):
+        os.makedirs(workdir)
+    run_pairwise(args.tmscore, args.indir, workdir, args.outdir + '/pairwise.csv')
