@@ -72,7 +72,9 @@ def main(argv):
     monomer_run_methods = ['default', 'deepmsa_DeepJGI', 'deepmsa_DeepJGI_hms', 'deepmsa_aMSA', 'deepmsa_dMSA', 'deepmsa_dMSA_hhb',
                             'deepmsa_dMSA_hms', 'deepmsa_dMSA_jac', 'deepmsa_q3JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI',
                             'deepmsa_q4JGI_hms', 'deepmsa_qMSA', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hhb', 'deepmsa_qMSA_hms',
-                            'deepmsa_qMSA_jac', 'def_drop_nos', 'def_drop_s', 'def_esm_msa', 'def_esm_msa_ckpt5', 'def_notemp',
+                            'deepmsa_qMSA_jac', 'def_drop_nos', 'def_drop_s', 
+                            #'def_esm_msa', 'def_esm_msa_ckpt5', 
+                            'def_notemp',
                             'def_notemp_drop_nos', 'def_notemp_drop_s', 'def_ptm_not_drop_s', 'def_ptm_drop_nos', 'def_ptm_drop_s',
                             'def_ptm_not_drop_nos', 'def_ptm_notemp', 'default_pdb70_new', 'default_ptm',
                             'default_seq_temp', 'dhr', 'ori_seq_temp', 'original']

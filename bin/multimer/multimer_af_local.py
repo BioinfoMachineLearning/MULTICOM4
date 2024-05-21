@@ -195,15 +195,16 @@ def main(argv):
     print("#################################################################################################")
 
     print("6. Start to generate complex multimer structures")
-    N6_outdir = os.path.join(FLAGS.output_dir, 'N6_local')
+    N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
     makedir_if_not_exists(N6_outdir)
 
-    run_methods = ['default_multimer', 'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not', 
-                    'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not']
+    run_methods = ['default_multimer', 
+                   'afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not', 
+                   'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not']
                     # 'colabfold_casp16_web', 'colabfold_casp16_web_not']
-                    # 'def_mul_drop_nos', 'def_mul_drop_s', 'def_mul_not_drop_nos', 'def_mul_not_drop_s',
-                    # 'def_mul_notemp', 'default_multimer', 'colabfold_casp16_web', 'colabfold_casp16_web_not']
+                    #'def_mul_drop_nos', 'def_mul_drop_s', 'def_mul_not_drop_nos', 'def_mul_not_drop_s', 'def_mul_notemp']
+                    #, 'default_multimer', 'colabfold_casp16_web', 'colabfold_casp16_web_not']
 
     default_feature_pkl = os.path.join(N6_outdir, 'default_multimer', 'features.pkl')
 

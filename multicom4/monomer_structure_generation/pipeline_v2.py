@@ -159,6 +159,12 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         if not os.path.exists(colabfold_a3m):
                             errormsg = errormsg + f"Cannot find rosettafold alignment for {chain_name}: {colabfold_a3m}\n"
                         common_parameters += f"--custom_msa={colabfold_a3m} "
+                    
+                    elif msa_source == "colabfold_web":
+                        colabfold_a3m = os.path.join(alndir, chain_name + '_colabfold_web.a3m')
+                        if not os.path.exists(colabfold_a3m):
+                            errormsg = errormsg + f"Cannot find rosettafold alignment for {chain_name}: {colabfold_a3m}\n"
+                        common_parameters += f"--custom_msa={colabfold_a3m} "
 
                     elif msa_source == "img":
                         img_a3m = os.path.join(img_alndir, chain_name + '.a3m')

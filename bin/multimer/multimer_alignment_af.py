@@ -9,7 +9,7 @@ from multicom4.monomer_structure_refinement import iterative_refine_pipeline
 from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
-    run_multimer_structure_generation_pipeline_v2, \
+    run_multimer_structure_generation_pipeline_v2, run_multimer_structure_generation_homo_pipeline_v2,\
     run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
     copy_same_sequence_msas
@@ -28,7 +28,7 @@ FLAGS = flags.FLAGS
 def main(argv):
     if len(argv) > 1:
         raise app.UsageError('Too many command-line arguments.')
-
+    cwd = os.getcwd()
     os.environ['TF_FORCE_UNIFIED_MEMORY'] = '1'
     os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION'] = '4.0'
     
@@ -162,15 +162,21 @@ def main(argv):
     
     is_homomers = len(processed_seuqences) == 1
     try:
-        #concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
-        #                   'string_interact', 'uniprot_distance', 'deepmsa2']
-        concat_methods = ['deepmsa2']
+        concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
+                          'string_interact', 'uniprot_distance']
         if is_homomers:
-            concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch', 'deepmsa2'] 
+            concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch'] 
+            
+        #run_monomer_msas_concatenation_pipeline(
+            # multimer=','.join([chain_id for chain_id in chain_id_map]),
+       #     chain_id_map=chain_id_map,
+       #     run_methods=concat_methods,
+       #     monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params, is_homomers=is_homomers)
+
         run_monomer_msas_concatenation_pipeline(
             # multimer=','.join([chain_id for chain_id in chain_id_map]),
             chain_id_map=chain_id_map,
-            run_methods=concat_methods,
+            run_methods=['deepmsa2'],
             monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params, is_homomers=is_homomers)
     except Exception as e:
         print(e)
@@ -197,22 +203,8 @@ def main(argv):
     N6_outdir = os.path.join(FLAGS.output_dir, 'N6_multimer_structure_generation')
 
     makedir_if_not_exists(N6_outdir)
-    run_methods = ['default_multimer']
-
+    os.chdir(cwd)
     if is_homomers:
-        if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
-                                                                    fasta_path=FLAGS.fasta_path,
-                                                                    chain_id_map=chain_id_map,
-                                                                    aln_dir=N1_outdir,
-                                                                    complex_aln_dir=N4_outdir,
-                                                                    template_dir=N5_outdir,
-                                                                    monomer_model_dir=N3_outdir,
-                                                                    output_dir=N6_outdir,
-                                                                    run_methods=run_methods,
-                                                                    run_script=True,
-                                                                    run_deepmsa=False):
-            print("Program failed in step 7")
-        
         default_feature_pkl = os.path.join(N6_outdir, 'default_multimer', 'features.pkl')
         while not os.path.exists(default_feature_pkl):
             time.sleep(300)

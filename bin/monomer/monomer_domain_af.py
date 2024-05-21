@@ -117,7 +117,8 @@ def main(argv):
 
     # for run_method in domain_info_dict:
     for run_method in ['def_dom_hhsearch', 'dmsa_dom_hhsearch',   
-                       #'def_dom_parser', 'dmsa_dom_parser',
+                       'def_dom_parser', 'dmsa_dom_parser',
+                       'def_dom_unidoc', 'dmsa_dom_unidoc',
                        'def_dom_manual', 'dmsa_dom_manual']:
 
         method_outdir = os.path.join(N3_outdir, run_method)

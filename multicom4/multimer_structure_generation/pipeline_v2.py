@@ -119,6 +119,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 monomers = [chain_id for chain_id in chain_id_map]
                 if method == "default_multimer":
                     # run alphafold default pipeline:
+                    print("2222222222222222222222222222222222222")
                     if not complete_result(outdir, 5 * num_multimer_predictions_per_model):
                         bfd_uniref_a3ms = []
                         mgnify_stos = []
