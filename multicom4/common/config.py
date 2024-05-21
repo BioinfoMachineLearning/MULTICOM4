@@ -41,7 +41,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 12,
-        'predictions_per_model': 5,
+        'predictions_per_model': 10,
         'model_preset': 'monomer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -65,6 +65,13 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
         'ori_seq_temp': {
             'msa_source': 'original',
             'template_source': 'pdb_sort90'
+        },
+        'colabfold_web': {
+            'msa_source': 'colabfold_web',
+        },
+        'colabfold_web_not': {
+            'msa_source': 'colabfold_web',
+            'template_source': 'notemplate',
         },
         # 'colabfold': {
         #     'msa_source': 'colabfold',
@@ -196,7 +203,7 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
             'model_ckpt': 'model_5',
-            'predictions_per_model': 40 * 5,
+            'predictions_per_model': 200 * 5,
             'num_ensemble': 1,
             'num_recycle': 3,
         },
@@ -287,7 +294,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 40,
+        'predictions_per_model': 10,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -421,7 +428,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'string_interact_uniprot_sto',
         },
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
-            'max_pairs': 20,
+            'max_pairs': 50,
         },
         'def_mul_esm_msa': {
             'input_msa_source': 'default',
@@ -491,7 +498,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         # },
         'def_mul_refine': {
             'number_of_input_models': 5,
-            'max_iteration': 5,
+            'max_iteration': 1,
             'max_template_count': 50,
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
@@ -507,7 +514,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
             'relax_topn_predictions': 5,
-            'predictions_per_model': 200,
+            'predictions_per_model': 40,
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
@@ -572,7 +579,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 100,
+        'predictions_per_model': 5,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -764,7 +771,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         },
         'def_mul_refine': {
             'number_of_input_models': 5,
-            'max_iteration': 5,
+            'max_iteration': 1,
             'max_template_count': 50,
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
@@ -780,7 +787,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
             'relax_topn_predictions': 5,
-            'predictions_per_model': 200,
+            'predictions_per_model': 40,
             'foldseek_database': 'pdb+afdb',
             'msa_source': 'foldseek',
             'template_source': 'foldseek',
@@ -1065,7 +1072,7 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 200,
+        'predictions_per_model': 100,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -1199,7 +1206,7 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'string_interact_uniprot_sto',
         },
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
-            'max_pairs': 50,
+            'max_pairs': 20,
         },
         'def_mul_esm_msa': {
             'input_msa_source': 'default',
@@ -1269,7 +1276,7 @@ HETEROMULTIMER_HUMAN_CONFIG = ml_collections.ConfigDict({
         # },
         'def_mul_refine': {
             'number_of_input_models': 5,
-            'max_iteration': 5,
+            'max_iteration': 1,
             'max_template_count': 50,
             'progressive_threshold': 2000,
             'number_of_output_models': 5,
@@ -1599,7 +1606,7 @@ MONOMER_SUBUNIT_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 12,
-        'predictions_per_model': 20,
+        'predictions_per_model': 5,
         'model_preset': 'monomer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -1754,7 +1761,7 @@ MONOMER_SUBUNIT_CONFIG = ml_collections.ConfigDict({
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
             'model_ckpt': 'model_5',
-            'predictions_per_model': 20 * 5,
+            'predictions_per_model': 5 * 5,
             'num_ensemble': 1,
             'num_recycle': 3,
         },
