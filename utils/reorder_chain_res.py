@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pickle
 from scipy.stats import pearsonr
-from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
+from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
     read_option_file, is_file, is_dir
 
 
@@ -82,6 +82,7 @@ def add_local_scores(inpdb, outdir, outpdb):
         for chain_id in new_chain_contents:
             fw.writelines(new_chain_contents[chain_id])
             fw.write("TER\n")
+        fw.write("END")
 
 
 

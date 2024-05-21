@@ -129,7 +129,7 @@ def main(argv):
                                                                     monomer_model_dir='',
                                                                     output_dir=N6_outdir,
                                                                     run_methods=run_methods,
-                                                                    run_script=False,
+                                                                    run_script=True,
                                                                     run_deepmsa=False):
             print("Program failed in step 7")
 
@@ -144,7 +144,7 @@ def main(argv):
                                                             monomer_model_dir='',
                                                             output_dir=N6_outdir,
                                                             run_methods=run_methods,
-                                                            run_script=False,
+                                                            run_script=True,
                                                             run_deepmsa=False):
             print("Program failed in step 7")
         

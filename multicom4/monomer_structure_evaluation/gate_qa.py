@@ -16,7 +16,7 @@ class Gate_qa:
 
     def run_monomer_qa(self, fasta_path, input_dir, outputdir, contact_map_file = "", dist_map_file = ""):
 
-        resultfile = os.path.join(outputdir, 'prediction', 'ensemble.csv')
+        resultfile = os.path.join(outputdir, 'ensemble_af.csv')
 
         if not os.path.exists(resultfile):
 
@@ -53,12 +53,15 @@ class Gate_qa:
 
     def run_multimer_qa(self, fasta_path, input_dir, pkl_dir, outputdir, use_af_features=True):
                             
-        cmd = f"sh {self.params['gate_qa_program_dir']} multimer {fasta_path} {input_dir} {outputdir} {pkl_dir} {use_af_features}"
+        resultfile = os.path.join(outputdir, 'ensemble_af.csv')
+        if not use_af_features:
+            resultfile = os.path.join(outputdir, 'ensemble_nonaf.csv')
+
+        if os.path.exists(resultfile) and len(pd.read_csv(resultfile)) == len(os.listdir(input_dir)):
+            return resultfile
+
+        cmd = f"sh {self.params['gate_qa_program_dir']} multimer {fasta_path} {input_dir} {outputdir} {pkl_dir} "
+        cmd += "True" if use_af_features else "False"
         os.system(cmd)
-
-        resultfile = os.path.join(outputdir, 'prediction', 'casp15_inhouse_top_v8', 'ensemble.csv')
-
-        if not os.path.exists(resultfile):
-            raise Exception(f"Failed to run gate qa!")
 
         return resultfile

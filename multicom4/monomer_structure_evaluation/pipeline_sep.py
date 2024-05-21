@@ -277,6 +277,9 @@ class Monomer_structure_evaluation_pipeline:
             gate_ranking_multimer.to_csv(ranking_file)
             result_dict["gate_multimer"] = ranking_file
             result_dict["gate_cluster"] = os.path.join(output_dir_abs, 'gate', 'feature', 'tmscore_pairwise', 'pairwise_tmscore.csv')
+            result_dict["enqa"] = os.path.join(output_dir_abs, 'gate', 'feature', 'enqa', 'enqa.csv')
+            result_dict["gcpnet_ema"] = os.path.join(output_dir_abs, 'gate', 'feature', 'gcpnet_ema', 'esm_plddt.csv')
+
 
         if "gate" in self.run_methods and "alphafold" in self.run_methods:
             gate_df = pd.read_csv(result_dict['gate'])
