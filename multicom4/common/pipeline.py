@@ -501,7 +501,7 @@ def run_monomer_templates_concatenation_pipeline(multimers, monomer_aln_dir, mon
             monomer_pdbs += [monomer_trg_pdb]
         pipeline = structure_based_pipeline_v2.Complex_structure_based_template_search_pipeline(params)
         pipeline.search(monomer_sequences, monomer_pdbs, struct_temp_dir)
-    
+    return 
     print("searching complex structure based tmsearch pipeline")
     struct_temp_dir = os.path.join(outdir, 'tmsearch')
     makedir_if_not_exists(struct_temp_dir)
