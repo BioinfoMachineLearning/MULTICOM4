@@ -366,6 +366,8 @@ class Monomer_structure_evaluation_pipeline:
                 ranking_json_file = os.path.join(monomer_model_dir, method, "ranking_debug.json")
                 if not os.path.exists(ranking_json_file):
                     continue
+                if method.find('af3') == 0 and model_count == 5:
+                    model_count = 10
                 ranking_json = json.loads(open(ranking_json_file).read())
                 for i in range(model_count):
                     pdbname = f"{method}_{i}"
@@ -399,6 +401,8 @@ class Monomer_structure_evaluation_pipeline:
                 ranking_json_file = os.path.join(multimer_model_dir, method, "ranking_debug.json")
                 if not os.path.exists(ranking_json_file):
                     continue
+                if method.find('af3') == 0 and model_count == 5:
+                    model_count = 10
                 ranking_json = json.loads(open(ranking_json_file).read())
                 for i in range(model_count):
                     complex_pdb = os.path.join(multimer_model_dir, method, f"ranked_{i}.pdb")

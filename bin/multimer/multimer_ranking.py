@@ -109,7 +109,7 @@ def main(argv):
     print("#################################################################################################")
 
     print("9. Start to evaluate multimer models")
-    run_methods=["alphafold", "bfactor", 'multieva']
+    run_methods=["alphafold", "bfactor", 'multieva', 'gate']
     N7_outdir = os.path.join(FLAGS.output_dir, 'N7_multimer_structure_evaluation')
     multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
                                                           params=params, run_methods=run_methods,

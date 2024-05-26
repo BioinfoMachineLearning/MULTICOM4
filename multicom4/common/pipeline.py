@@ -122,7 +122,6 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, run_auxi
     return result
 
 
-
 def copy_same_sequence_msas(srcdir, trgdir, srcname, trgname, rename_prefix=True):
     for msa in os.listdir(srcdir):
         if rename_prefix and msa[0] != srcname:
@@ -444,7 +443,8 @@ def run_monomer_msas_concatenation_pipeline(chain_id_map, run_methods, monomer_a
     for i, chain in enumerate(chain_id_map):
         chain_aln_dir = os.path.join(monomer_aln_dir, chain)
         if os.path.exists(chain_aln_dir):
-            chain_a3ms = {'name': chain, 'seq': chain_id_map[chain].sequence,
+            chain_a3ms = {'name': chain, 
+                          'seq': chain_id_map[chain].sequence,
                           'colabfold_a3m': os.path.join(chain_aln_dir, f"{chain}_colabfold.a3m"),
                           'uniref30_a3m': os.path.join(chain_aln_dir, f"{chain}_uniref30.a3m"),
                           'uniref90_sto': os.path.join(chain_aln_dir, f"{chain}_uniref90.sto"),

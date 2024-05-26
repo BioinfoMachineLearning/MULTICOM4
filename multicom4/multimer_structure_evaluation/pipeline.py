@@ -42,6 +42,9 @@ class Multimer_structure_evaluation_pipeline:
                 continue
             ranking_json = json.loads(open(ranking_json_file).read())
             print(method)
+            if method.find('af3') == 0 and model_count == 5:
+                model_count = 10
+
             for i in range(model_count):
                 ranked_pdb = os.path.join(model_dir, method, f"ranked_{i}.pdb")
                 trg_pdb = os.path.join(pdbdir, f"{method}_{i}.pdb")
