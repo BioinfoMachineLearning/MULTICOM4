@@ -71,8 +71,8 @@ def main(argv):
             N1_monomer_outdir = N1_outdir + '/' + monomer_id
             makedir_if_not_exists(N1_monomer_outdir)
             result = run_monomer_msa_pipeline(fasta=f"{output_dir}/{monomer_id}.fasta", 
-                                                outdir=N1_monomer_outdir, params=params, 
-                                                run_auxi_output=False)
+                                              outdir=N1_monomer_outdir, params=params, 
+                                              run_auxi_output=False)
             if result is None:
                 raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
 

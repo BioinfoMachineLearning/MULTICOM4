@@ -14,6 +14,7 @@ flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to monomer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
 flags.DEFINE_string('domain_info', None, 'Output directory')
+flags.DEFINE_string('inpdb', None, 'Output directory')
 FLAGS = flags.FLAGS
 
 def main(argv):
@@ -80,10 +81,12 @@ def main(argv):
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')    
     default_workdir = os.path.join(N3_outdir, 'default')
     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-    if not os.path.exists(ranking_json_file):
-        raise Exception(f"Haven't generated default models!")
+    # if not os.path.exists(ranking_json_file):
+    #     raise Exception(f"Haven't generated default models!")
 
     ranked_0_pdb = os.path.join(N3_outdir, 'default', 'ranked_0.pdb')
+    if FLAGS.inpdb is not None:
+        ranked_0_pdb = FLAGS.inpdb
     # 2. domain_parser, requires the predicted full-length model as input
 
     if len(sequence) >= 3000:
@@ -112,14 +115,13 @@ def main(argv):
         domain_info_dict['def_dom_manual'] = FLAGS.domain_info
         domain_info_dict['dmsa_dom_manual'] = FLAGS.domain_info
 
-
     monomer_config = MONOMER_HUMAN_CONFIG if params['is_human'] == 1 else MONOMER_CONFIG
 
     # for run_method in domain_info_dict:
-    for run_method in ['def_dom_hhsearch', 'dmsa_dom_hhsearch',   
-                       'def_dom_parser', 'dmsa_dom_parser',
-                       'def_dom_unidoc', 'dmsa_dom_unidoc',
-                       'def_dom_manual', 'dmsa_dom_manual']:
+    for run_method in ['def_dom_hhsearch', #'dmsa_dom_hhsearch',
+                       'def_dom_parser', #'dmsa_dom_parser',
+                       'def_dom_unidoc', #'dmsa_dom_unidoc',
+                       'def_dom_manual']: #'dmsa_dom_manual']:
 
         method_outdir = os.path.join(N3_outdir, run_method)
         os.makedirs(method_outdir, exist_ok=True)

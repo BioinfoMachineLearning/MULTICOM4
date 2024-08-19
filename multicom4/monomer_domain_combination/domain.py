@@ -407,7 +407,7 @@ def generate_domain_alignments(params, domain_fastas_dir, output_dir):
         params['colabfold_databases'] = []
         # params['JGIclust_database'] = []
         params['DHR_database_path'] = []
-
+        
         result = run_monomer_msa_pipeline(fasta=fasta_path, outdir=outdir, params=params, 
                                           only_monomer=True, run_auxi_output=False)
 

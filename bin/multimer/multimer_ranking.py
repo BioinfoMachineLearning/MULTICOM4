@@ -118,11 +118,11 @@ def main(argv):
 
     print("#################################################################################################")
 
-    N8_outdir = os.path.join(FLAGS.output_dir, 'N8_monomer_structure_evaluation')
+    # N8_outdir = os.path.join(FLAGS.output_dir, 'N8_monomer_structure_evaluation')
     
-    select_final_monomer_models_from_complex(chain_id_map=chain_id_map, 
-                                             multimer_qa_result_dir=N7_outdir, 
-                                             outputdir=N8_outdir)
+    # select_final_monomer_models_from_complex(chain_id_map=chain_id_map, 
+    #                                          multimer_qa_result_dir=N7_outdir, 
+    #                                          outputdir=N8_outdir)
 
     print("#################################################################################################")
 

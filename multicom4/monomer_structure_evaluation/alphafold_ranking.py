@@ -10,7 +10,7 @@ class Alphafold_pkl_qa:
 
     def __init__(self, ranking_methods=None, sort_field='plddt_avg'):
         if ranking_methods is None:
-            ranking_methods = ['ptm', 'plddt_avg', 'confidence']
+            ranking_methods = ['iptm', 'ptm', 'plddt_avg', 'confidence', 'af3_ranking_score']
         self.methods = ranking_methods
         self.sort_field = sort_field
 
@@ -27,8 +27,16 @@ class Alphafold_pkl_qa:
                     ranking['plddt_avg'] = np.mean(prediction_result['plddt'])
                 if 'ptm' in self.methods:
                     ranking['ptm'] = float(prediction_result['ptm'])
+                if 'iptm' in self.methods:
+                    ranking['iptm'] = float(prediction_result['iptm'])
                 if 'confidence' in self.methods:
                     ranking['confidence'] = float(prediction_result['ranking_confidence'])
+                if 'af3_ranking_score' in self.methods:
+                    if 'ranking_score' in prediction_result:
+                        ranking['af3_ranking_score'] = float(prediction_result['ranking_score'])
+                    else:
+                        ranking['af3_ranking_score'] = -1
+
                 ranking_pd = ranking_pd.append(pd.DataFrame(ranking, index=[model_count]))
                 model_count += 1
         return ranking_pd.sort_values(by=[self.sort_field], ascending=False, ignore_index=True)

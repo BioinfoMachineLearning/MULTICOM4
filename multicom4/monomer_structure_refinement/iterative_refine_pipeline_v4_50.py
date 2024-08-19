@@ -370,11 +370,18 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             start_pkl = os.path.join(current_work_dir, "start.pkl")
 
             os.system(f"cp {ref_start_pdb} {start_pdb}")
-            os.system(f"cp {ref_start_msa} {start_msa}")
-            os.system(f"cp {ref_start_pkl} {start_pkl}")
 
-            with open(ref_start_pkl, 'rb') as f:
-                ref_avg_lddt = np.mean(pickle.load(f)['plddt'])
+            if len(ref_start_msa) > 0:
+                os.system(f"cp {ref_start_msa} {start_msa}")
+            else:
+                os.system(f"cp {fasta_path} {start_msa}")
+
+            if len(ref_start_pkl) > 0:
+                os.system(f"cp {ref_start_pkl} {start_pkl}")
+                with open(ref_start_pkl, 'rb') as f:
+                    ref_avg_lddt = np.mean(pickle.load(f)['plddt'])
+            else:
+                ref_avg_lddt = 0
 
             model_iteration_scores += [ref_avg_lddt]
 
@@ -430,7 +437,7 @@ class Monomer_iterative_refinement_pipeline(config.pipeline):
             
             selected_model_ranked_idx = 0
             if max_lddt_score > ref_avg_lddt:
-                if max_lddt_score - ref_avg_lddt > 5:
+                if max_lddt_score - ref_avg_lddt > 100:
                     print(f"The plddt score has increased more than 5!")
                     print(f"Looking for other models....")
 

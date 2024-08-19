@@ -83,7 +83,7 @@ def main(argv):
                 write_fasta({chain_id: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir)
-            result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params, run_auxi_output=False)
+            result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params)
             if result is None:
                 raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
 

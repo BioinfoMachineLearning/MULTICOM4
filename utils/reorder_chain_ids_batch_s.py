@@ -16,8 +16,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     for inpdb in os.listdir(args.indir):
-        if inpdb.find('.pdb') < 0:
-            continue
         print(f"Processing {inpdb}")
         chain_contents = {}
         for line in open(args.indir + '/' + inpdb):
@@ -28,9 +26,13 @@ if __name__ == '__main__':
                 else:
                     chain_contents[chain_id] += [line]
 
+        mappings = args.mapping.split(',')
+        map_chains = {mapping.split('_')[0]:mapping.split('_')[1] for mapping in mappings}
         with open(args.outdir + '/' + inpdb, 'w') as fw:
-            for map in args.mapping.split(','):
-                chain_src, chain_trg = map.split('_')
-                for line in chain_contents[chain_src]:
+            for chain_id in chain_contents:
+                for line in chain_contents[chain_id]:
+                    chain_trg = chain_id
+                    if chain_id in map_chains:
+                        chain_trg = map_chains[chain_id]
                     fw.write(line[:21] + chain_trg + line[22:])
                 fw.write("TER\n")

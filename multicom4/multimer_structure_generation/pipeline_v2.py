@@ -75,6 +75,8 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                 monomer_model_dir,
                 output_dir,
                 run_script=False):
+        
+        print(self.run_methods)
 
         makedir_if_not_exists(output_dir)
 
@@ -320,8 +322,8 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                             interact_df.to_csv(msa_pair_file)
                         else:
                             msa_pair_file = os.path.join(complex_aln_dir, msa_paired_source, msa_paired_source + "_interact.csv")
-                            if len(pd.read_csv(msa_pair_file)) <= 1:
-                                continue
+                            #if len(pd.read_csv(msa_pair_file)) <= 1:
+                            #    continue
                             multimer_a3ms = [os.path.join(complex_aln_dir, msa_paired_source, monomer + "_con.a3m") for monomer in monomers]
 
                         base_cmd += f"--multimer_a3ms={','.join(multimer_a3ms)} " \
@@ -544,7 +546,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-                print(f"Generating bash file for {predictor}: {bash_file}")
+                print(f"sh {bash_file}")
                 targetname = os.path.basename(fasta_path).replace('.fasta', '')
                 jobname = f"{targetname}_{predictor}"
                 with open(bash_file, 'w') as fw:
@@ -561,7 +563,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
             os.makedirs(bash_script_dir, exist_ok=True)
             for predictor in predictor_commands:
                 bash_file = os.path.join(bash_script_dir, predictor + '.sh')
-                print(f"Generating bash file for {predictor}: {bash_file}")
+                print(f"sh {bash_file}")
                 with open(bash_file, 'w') as fw:
                     fw.write('\n'.join(predictor_commands[predictor]))
                 bash_files += [bash_file]

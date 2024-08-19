@@ -91,9 +91,9 @@ def main(argv):
                 write_fasta({chain_id: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir)
-            result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params)
-            if result is None:
-                raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
+            #result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params)
+            #if result is None:
+            #    raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
 
             if FLAGS.run_img:
                 N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
@@ -104,11 +104,11 @@ def main(argv):
 
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
             makedir_if_not_exists(N2_monomer_outdir)
-            template_file = run_monomer_template_search_pipeline(targetname=monomer_id, sequence=monomer_id,
-                                                                 a3m=os.path.join(N1_monomer_outdir, monomer_id + "_uniref90.sto"),
-                                                                 outdir=N2_monomer_outdir, params=params)
-            if template_file is None:
-                raise RuntimeError(f"Program failed in step 2: monomer {monomer_id} template search")
+            #template_file = run_monomer_template_search_pipeline(targetname=monomer_id, sequence=monomer_id,
+            #                                                     a3m=os.path.join(N1_monomer_outdir, monomer_id + "_uniref90.sto"),
+            #                                                     outdir=N2_monomer_outdir, params=params)
+            #if template_file is None:
+            #    raise RuntimeError(f"Program failed in step 2: monomer {monomer_id} template search")
 
             # N3_monomer_outdir = os.path.join(N3_outdir, monomer_id)
             # makedir_if_not_exists(N3_monomer_outdir)
@@ -138,10 +138,10 @@ def main(argv):
             N1_monomer_deepmsa_outdir = os.path.join(N1_outdir, monomer_id, 'DeepMSA2_a3m', 'finalMSAs')
             makedir_if_not_exists(N1_monomer_deepmsa_outdir)
 
-            copy_same_sequence_msas(srcdir=os.path.join(N1_outdir, processed_seuqences[monomer_sequence], 'DeepMSA2_a3m', 'finalMSAs'),
-                                    trgdir=N1_monomer_deepmsa_outdir,
-                                    srcname=processed_seuqences[monomer_sequence],
-                                    trgname=monomer_id, rename_prefix=False)
+            #copy_same_sequence_msas(srcdir=os.path.join(N1_outdir, processed_seuqences[monomer_sequence], 'DeepMSA2_a3m', 'finalMSAs'),
+            #                        trgdir=N1_monomer_deepmsa_outdir,
+            #                        srcname=processed_seuqences[monomer_sequence],
+            #                        trgname=monomer_id, rename_prefix=False)
 
             N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir_img)

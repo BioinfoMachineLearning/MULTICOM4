@@ -54,10 +54,10 @@ def main(argv):
     print("#################################################################################################")
     print(f"1. Start to generate alignments for monomers")
 
-    result = run_monomer_msa_pipeline(fasta=FLAGS.fasta_path, outdir=N1_outdir, params=params, only_monomer=True)
+    #result = run_monomer_msa_pipeline(fasta=FLAGS.fasta_path, outdir=N1_outdir, params=params, only_monomer=True)
     
-    if result is None:
-        raise RuntimeError('The monomer alignment generation has failed!')
+    #if result is None:
+    #    raise RuntimeError('The monomer alignment generation has failed!')
 
     print("#################################################################################################")
     print("2. Start to generate template for monomer")

@@ -1,23 +1,18 @@
 import os, sys, argparse, time
 from multiprocessing import Pool
 from tqdm import tqdm
-import numpy as np
-import pandas as pd
-import pickle
-from scipy.stats import pearsonr
-from multicom4.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
-    read_option_file, is_file, is_dir
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--indir', type=str, required=True)
     parser.add_argument('--outdir', type=str, required=True)
-    parser.add_argument('--mapping', type=str, required=True)
+    parser.add_argument('--chain_ids', type=str, required=True)
     args = parser.parse_args()
 
+    remove_ids = args.chain_ids.split(',')
+
     for inpdb in os.listdir(args.indir):
-        if inpdb.find('.pdb') < 0:
-            continue
         print(f"Processing {inpdb}")
         chain_contents = {}
         for line in open(args.indir + '/' + inpdb):
@@ -29,8 +24,10 @@ if __name__ == '__main__':
                     chain_contents[chain_id] += [line]
 
         with open(args.outdir + '/' + inpdb, 'w') as fw:
-            for map in args.mapping.split(','):
-                chain_src, chain_trg = map.split('_')
-                for line in chain_contents[chain_src]:
-                    fw.write(line[:21] + chain_trg + line[22:])
+            for chain_id in chain_contents:
+                if chain_id in remove_ids:
+                    continue
+                for line in chain_contents[chain_id]:
+                    fw.write(line)
                 fw.write("TER\n")
+

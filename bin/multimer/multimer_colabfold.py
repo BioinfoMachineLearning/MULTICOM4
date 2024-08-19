@@ -9,7 +9,7 @@ from multicom4.monomer_structure_refinement import iterative_refine_pipeline
 from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_template_search_pipeline, \
     run_monomer_structure_generation_pipeline_v2, run_monomer_evaluation_pipeline, \
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
-    run_multimer_structure_generation_pipeline_v2, \
+    run_multimer_structure_generation_pipeline_v2, run_multimer_structure_generation_homo_pipeline_v2,\
     run_multimer_structure_generation_pipeline_foldseek, \
     run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
     copy_same_sequence_msas
@@ -90,9 +90,9 @@ def main(argv):
                 write_fasta({chain_id: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir)
-            result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params)
-            if result is None:
-                raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
+            #result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params)
+            #if result is None:
+            #    raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
 
             N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir_img)
@@ -135,10 +135,10 @@ def main(argv):
             N1_monomer_deepmsa_outdir = os.path.join(N1_outdir, monomer_id, 'DeepMSA2_a3m', 'finalMSAs')
             makedir_if_not_exists(N1_monomer_deepmsa_outdir)
 
-            copy_same_sequence_msas(srcdir=os.path.join(N1_outdir, processed_seuqences[monomer_sequence], 'DeepMSA2_a3m', 'finalMSAs'),
-                                    trgdir=N1_monomer_deepmsa_outdir,
-                                    srcname=processed_seuqences[monomer_sequence],
-                                    trgname=monomer_id, rename_prefix=False)
+            #copy_same_sequence_msas(srcdir=os.path.join(N1_outdir, processed_seuqences[monomer_sequence], 'DeepMSA2_a3m', 'finalMSAs'),
+            #                        trgdir=N1_monomer_deepmsa_outdir,
+            #                        srcname=processed_seuqences[monomer_sequence],
+            #                        trgname=monomer_id, rename_prefix=False)
 
             N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
             makedir_if_not_exists(N1_monomer_outdir_img)
@@ -161,20 +161,20 @@ def main(argv):
     makedir_if_not_exists(N4_outdir)
     
     is_homomers = len(processed_seuqences) == 1
-    try:
-        #concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
-        #                   'string_interact', 'uniprot_distance', 'deepmsa2']
-        concat_methods = ['deepmsa2']
-        if is_homomers:
-            concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch', 'deepmsa2'] 
-        run_monomer_msas_concatenation_pipeline(
-            # multimer=','.join([chain_id for chain_id in chain_id_map]),
-            chain_id_map=chain_id_map,
-            run_methods=concat_methods,
-            monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params, is_homomers=is_homomers)
-    except Exception as e:
-        print(e)
-        print("Program failed in step 5")
+    #try:
+    #    #concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch',
+    #    #                   'string_interact', 'uniprot_distance', 'deepmsa2']
+    #    concat_methods = ['deepmsa2']
+    #    if is_homomers:
+    #        concat_methods = ['pdb_interact', 'species_interact', 'uniclust_oxmatch', 'deepmsa2'] 
+    #    run_monomer_msas_concatenation_pipeline(
+    #        # multimer=','.join([chain_id for chain_id in chain_id_map]),
+    #        chain_id_map=chain_id_map,
+    #        run_methods=concat_methods,
+    #        monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params, is_homomers=is_homomers)
+    #except Exception as e:
+    #    print(e)
+    #    print("Program failed in step 5")
 
     print("#################################################################################################")
 
@@ -184,10 +184,10 @@ def main(argv):
 
     N5_outdir = os.path.join(FLAGS.output_dir, 'N5_monomer_templates_concatenation')
 
-    run_monomer_templates_concatenation_pipeline(multimers=[chain_id for chain_id in chain_id_map],
-                                         monomer_aln_dir=N1_outdir,
-                                         monomer_model_dir=N3_outdir,
-                                         outdir=N5_outdir, params=params)
+    #run_monomer_templates_concatenation_pipeline(multimers=[chain_id for chain_id in chain_id_map],
+    #                                     monomer_aln_dir=N1_outdir,
+    #                                     monomer_model_dir=N3_outdir,
+    #                                     outdir=N5_outdir, params=params)
 
     print("#################################################################################################")
 
@@ -200,6 +200,7 @@ def main(argv):
     run_methods = ['colabfold_casp16_web', 'colabfold_casp16_web_not']
 
     if is_homomers:
+        print("homomers!!!")
         if not run_multimer_structure_generation_homo_pipeline_v2(params=params,
                                                                     fasta_path=FLAGS.fasta_path,
                                                                     chain_id_map=chain_id_map,

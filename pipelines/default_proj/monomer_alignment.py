@@ -63,7 +63,7 @@ def main(argv):
     params['DHR_database_path'] = []
 
     result = run_monomer_msa_pipeline(fasta=FLAGS.fasta_path, outdir=N1_outdir, 
-                                      params=params, only_monomer=True, run_auxi_output=False)
+                                      params=params, only_monomer=True, run_auxi_output=True)
 
     if result is None:
         raise RuntimeError('The monomer alignment generation has failed!')

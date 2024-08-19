@@ -52,7 +52,7 @@ class DeepMSA2_pairing(config.pipeline):
         for chain in chain_alignments:
             if chain == "outdir":
                 continue
-            chain_sequence = chain_alignments[chain]['seq']
+            chain_sequence = chain_alignments[chain]['chain_seq']
             if chain_sequence not in unique_seuqences:
                 unique_seuqences[chain_sequence] = []
             unique_seuqences[chain_sequence] += [chain]
