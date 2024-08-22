@@ -52,6 +52,7 @@ class ModelsToRelax(enum.Enum):
   ALL = 0
   BEST = 1
   NONE = 2
+  TOPN = 3
 
 
 flags.DEFINE_string('fasta_path', None, 'Paths to FASTA file.')
@@ -102,6 +103,11 @@ flags.DEFINE_enum('model_preset', 'monomer',
                   'Choose preset model configuration - the monomer model, '
                   'the monomer model with extra ensembling, monomer model with '
                   'pTM head, or multimer model')
+flags.DEFINE_string('model_ckpt', None,
+                  # ['monomer', 'monomer_casp14', 'monomer_ptm'],
+                  'Choose preset model configuration - the monomer model, '
+                  'the monomer model with extra ensembling, monomer model with '
+                  'pTM head, or multimer model')
 flags.DEFINE_boolean('benchmark', False, 'Run multiple JAX model evaluations '
                      'to obtain a timing that excludes the compilation time, '
                      'which should be more indicative of the time required for '
@@ -115,7 +121,18 @@ flags.DEFINE_enum_class('models_to_relax', ModelsToRelax.ALL, ModelsToRelax,
                         'distracting stereochemical violations but might help '
                         'in case you are having issues with the relaxation '
                         'stage.')
-
+flags.DEFINE_integer('relax_topn_predictions', 5,
+                        'The models to run the final relaxation step on. '
+                        'If `all`, all models are relaxed, which may be time '
+                        'consuming. If `best`, only the most confident model '
+                        'is relaxed. If `none`, relaxation is not run. Turning '
+                        'off relaxation might result in predictions with '
+                        'distracting stereochemical violations but might help '
+                        'in case you are having issues with the relaxation '
+                        'stage.')
+flags.DEFINE_integer('nstruct_start',0, 'model to start with, can be used to parallelize jobs, '
+                     'e.g --nstruct 20 --nstruct_start 20 will only make model _20'
+                     'e.g --nstruct 21 --nstruct_start 20 will make model _20 and _21 etc.')
 FLAGS = flags.FLAGS
 
 MAX_TEMPLATE_HITS = 20
@@ -250,9 +267,14 @@ def predict_structure(
             # Remove jax dependency from results.
             np_prediction_result = _jnp_to_np(dict(prediction_result))
 
-            # Save the model outputs.
+            keys_to_remove=['distogram', 'experimentally_resolved', 'masked_msa', 'aligned_confidence_probs']    
+            d={}
+            for k in np_prediction_result.keys():
+                if k not in keys_to_remove:
+                    d[k]=np_prediction_result[k]
+
             with open(result_output_path, 'wb') as f:
-                pickle.dump(np_prediction_result, f, protocol=4)
+                pickle.dump(d, f, protocol=4)
 
             # Add the predicted LDDT in the b-factor column.
             # Note that higher predicted LDDT value means higher model confidence.
@@ -304,6 +326,8 @@ def predict_structure(
         to_relax = ranked_order
     elif models_to_relax == ModelsToRelax.NONE:
         to_relax = []
+    elif models_to_relax == ModelsToRelax.TOPN:
+        to_relax = ranked_order[:FLAGS.relax_topn_predictions]
 
     for model_name in to_relax:
         relaxed_output_path = os.path.join(output_dir, f'relaxed_{model_name}.pdb')
@@ -387,9 +411,9 @@ def main(argv):
         jackhmmer_binary_path=os.path.join(FLAGS.env_dir, 'jackhmmer'),
         hhblits_binary_path=os.path.join(FLAGS.env_dir, 'hhblits'),
         uniref90_database_path=os.path.join(FLAGS.database_dir, 'uniref90/uniref90.fasta'),
-        mgnify_database_path=os.path.join(FLAGS.database_dir, 'mgnify/mgy_clusters_2022_05.fa'),
+        mgnify_database_path=os.path.join(FLAGS.database_dir, 'mgnify/mgy_clusters_2023_02.fa'),
         bfd_database_path=os.path.join(FLAGS.database_dir, 'bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt'),
-        uniref30_database_path=os.path.join(FLAGS.database_dir, 'uniref30/UniRef30_2021_03'),
+        uniref30_database_path=os.path.join(FLAGS.database_dir, 'uniref30/UniRef30_2023_02'),
         small_bfd_database_path=os.path.join(FLAGS.database_dir, 'small_bfd/bfd-first_non_consensus_sequences.fasta'),
         template_searcher=template_searcher,
         template_featurizer=template_featurizer,
@@ -414,15 +438,19 @@ def main(argv):
     model_runners = {}
     model_names = config.MODEL_PRESETS[FLAGS.model_preset]
     for model_name in model_names:
+        if FLAGS.model_ckpt is not None and model_name != FLAGS.model_ckpt:
+            continue
         model_config = config.model_config(model_name)
         if run_multimer_system:
             model_config.model.num_ensemble_eval = num_ensemble
         else:
             model_config.data.eval.num_ensemble = num_ensemble
+            model_config.data.common.num_recycle = num_recycle
+
         model_config.model.num_recycle = num_recycle
         model_params = data.get_model_haiku_params(model_name=model_name, data_dir=FLAGS.database_dir)
         model_runner = model.RunModel(model_config, model_params)
-        for i in range(num_predictions_per_model):
+        for i in range(FLAGS.nstruct_start, num_predictions_per_model):
             model_runners[f'{model_name}_pred_{i}'] = model_runner
 
     logging.info('Have %d models: %s', len(model_runners),

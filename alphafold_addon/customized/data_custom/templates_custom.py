@@ -832,6 +832,8 @@ class CustomizedComplexHitFeaturizer:
             complex_hit_template_names = []
             complex_hit_template_sequences = []
             for i, chainid in enumerate(chain_id_map):
+                if pd.isna(row[f'template{i + 1}']):
+                    continue
                 hit = CustomizedTemplateHit(query_name=chainid,
                                             template_name=row[f'template{i + 1}'],
                                             template_chain=row[f'template{i + 1}'][4],
@@ -1122,13 +1124,24 @@ class CustomizedMonomerHitFeaturizer:
                     template_features[k].append(result.features[k])
                 hits_features += [result.features]
 
-        for name in template_features:
-            if num_hits > 0:
-                template_features[name] = np.stack(
-                    template_features[name], axis=0).astype(TEMPLATE_FEATURES[name])
-            else:
-                # Make sure the feature has correct dtype even if empty.
-                template_features[name] = np.array([], dtype=TEMPLATE_FEATURES[name])
+        if num_hits > 0:
+            for name in template_features:
+                template_features[name] = np.stack(template_features[name], axis=0).astype(TEMPLATE_FEATURES[name])
+        else:
+            num_res = len(query_sequence)
+            # Construct a default template with all zeros.
+            template_features = {
+                'template_aatype': np.zeros(
+                    (1, num_res, len(residue_constants.restypes_with_x_and_gap)),
+                    np.float32),
+                'template_all_atom_masks': np.zeros(
+                    (1, num_res, residue_constants.atom_type_num), np.float32),
+                'template_all_atom_positions': np.zeros(
+                    (1, num_res, residue_constants.atom_type_num, 3), np.float32),
+                'template_domain_names': np.array([''.encode()], dtype=object),
+                'template_sequence': np.array([''.encode()], dtype=object),
+                'template_sum_probs': np.array([0], dtype=np.float32)
+            }
 
         return TemplateSearchResult(features=template_features, hits_features=hits_features,
                                     errors=errors, warnings=warnings)

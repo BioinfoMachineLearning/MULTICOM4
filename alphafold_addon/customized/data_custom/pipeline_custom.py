@@ -201,7 +201,7 @@ class DataPipeline:
 
         custom_result = None
         if custom_inputs.custom_msa is not None:
-            if custom_inputs.custom_msa.find('.a3m') > 0:
+            if custom_inputs.custom_msa.endswith('a3m'):
                 custom_msa_out_path = os.path.join(msa_output_dir, 'custom.a3m')
                 os.system(f"cp {custom_inputs.custom_msa} {custom_msa_out_path}")
                 with open(custom_msa_out_path, 'r') as f:
@@ -270,7 +270,10 @@ class DataPipeline:
 
         templates_result_features = None
         if custom_inputs.notemplate:
-            templates_result_features = mk_mock_template(input_sequence)
+            templates_result_features = self.template_featurizer.get_templates(
+                                            query_sequence=input_sequence,
+                                            hits=[]).features
+
         elif custom_inputs.temp_struct_csv is not None:
             templates_result_features = self.template_featurizer.get_templates(query_sequence=input_sequence,
                                                                                template_pdb_dir=template_output_dir,

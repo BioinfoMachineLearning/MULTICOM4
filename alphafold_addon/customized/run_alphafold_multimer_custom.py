@@ -50,6 +50,7 @@ class ModelsToRelax(enum.Enum):
   ALL = 0
   BEST = 1
   NONE = 2
+  TOPN = 3
 
 logging.set_verbosity(logging.INFO)
 
@@ -58,6 +59,7 @@ flags.DEFINE_list('monomer_a3ms', None, 'List of paths to monomer(unpaired) a3m 
 flags.DEFINE_list('multimer_a3ms', None, 'List of paths to multimer(paired) a3m files')
 flags.DEFINE_string('msa_pair_file', None, 'Path of pair file')
 flags.DEFINE_list('template_stos', None, 'Path of stos for template search')
+flags.DEFINE_string('pdb70_database', 'pdb70', 'Path of pair file')
 
 flags.DEFINE_string('temp_struct_csv', None, 'Path of complex template csv file')
 
@@ -88,6 +90,11 @@ flags.DEFINE_enum('model_preset', 'multimer',
                   'Choose preset model configuration - the monomer model, '
                   'the monomer model with extra ensembling, monomer model with '
                   'pTM head, or multimer model')
+flags.DEFINE_string('model_ckpt', None,
+                  # ['monomer', 'monomer_casp14', 'monomer_ptm'],
+                  'Choose preset model configuration - the monomer model, '
+                  'the monomer model with extra ensembling, monomer model with '
+                  'pTM head, or multimer model')
 flags.DEFINE_boolean('benchmark', False, 'Run multiple JAX model evaluations '
                      'to obtain a timing that excludes the compilation time, '
                      'which should be more indicative of the time required for '
@@ -105,7 +112,21 @@ flags.DEFINE_boolean('use_gpu_relax', None, 'Whether to relax on GPU. '
                      'Relax on GPU can be much faster than CPU, so it is '
                      'recommended to enable if possible. GPUs must be available'
                      ' if this setting is enabled.')
-
+flags.DEFINE_boolean('dropout',False,'Turn on drop out during inference to get more diversity')
+flags.DEFINE_boolean('dropout_structure_module',True, 'Dropout in structure module at inference')
+flags.DEFINE_integer('relax_topn_predictions', 5,
+                        'The models to run the final relaxation step on. '
+                        'If `all`, all models are relaxed, which may be time '
+                        'consuming. If `best`, only the most confident model '
+                        'is relaxed. If `none`, relaxation is not run. Turning '
+                        'off relaxation might result in predictions with '
+                        'distracting stereochemical violations but might help '
+                        'in case you are having issues with the relaxation '
+                        'stage.')
+flags.DEFINE_boolean('msa_pairing_hetero', True, 'Whether to use msa pairing for hetero-multimer')
+flags.DEFINE_integer('nstruct_start',0, 'model to start with, can be used to parallelize jobs, '
+                     'e.g --nstruct 20 --nstruct_start 20 will only make model _20'
+                     'e.g --nstruct 21 --nstruct_start 20 will make model _20 and _21 etc.')
 
 FLAGS = flags.FLAGS
 
@@ -216,39 +237,68 @@ def predict_structure(
     # Run the models.
     num_models = len(model_runners)
     for model_index, (model_name, model_runner) in enumerate(model_runners.items()):
-        logging.info('Running model %s on %s', model_name, fasta_name)
-        t_0 = time.time()
-        model_random_seed = model_index + random_seed * num_models
-        processed_feature_dict = model_runner.process_features(feature_dict, random_seed=model_random_seed)
-        timings[f'process_features_{model_name}'] = time.time() - t_0
 
-        unrelaxed_pdb_path = os.path.join(output_dir, f'unrelaxed_{model_name}.pdb')
-        result_output_path = os.path.join(output_dir, f'result_{model_name}.pkl')
-
-        if not os.path.exists(unrelaxed_pdb_path) or not os.path.exists(result_output_path):
+        while True:
+            
+            logging.info('Running model %s on %s', model_name, fasta_name)
             t_0 = time.time()
-            prediction_result = model_runner.predict(processed_feature_dict, random_seed=model_random_seed)
-            t_diff = time.time() - t_0
-            timings[f'predict_and_compile_{model_name}'] = t_diff
-            logging.info('Total JAX model %s on %s predict time (includes compilation time, see --benchmark): %.1fs', model_name, fasta_name, t_diff)
+            model_random_seed = model_index + random_seed * num_models
+            processed_feature_dict = model_runner.process_features(feature_dict, random_seed=model_random_seed)
+            timings[f'process_features_{model_name}'] = time.time() - t_0
 
-            if benchmark:
+            unrelaxed_pdb_path = os.path.join(output_dir, f'unrelaxed_{model_name}.pdb')
+            result_output_path = os.path.join(output_dir, f'result_{model_name}.pkl')
+            
+            if not os.path.exists(unrelaxed_pdb_path) or not os.path.exists(result_output_path):
                 t_0 = time.time()
-                model_runner.predict(processed_feature_dict, random_seed=model_random_seed)
+                prediction_result = model_runner.predict(processed_feature_dict, random_seed=model_random_seed)
                 t_diff = time.time() - t_0
-                timings[f'predict_benchmark_{model_name}'] = t_diff
-                logging.info('Total JAX model %s on %s predict time (excludes compilation time): %.1fs', model_name, fasta_name, t_diff)
+                timings[f'predict_and_compile_{model_name}'] = t_diff
+                logging.info('Total JAX model %s on %s predict time (includes compilation time, see --benchmark): %.1fs', model_name, fasta_name, t_diff)
+
+                if benchmark:
+                    t_0 = time.time()
+                    model_runner.predict(processed_feature_dict, random_seed=model_random_seed)
+                    t_diff = time.time() - t_0
+                    timings[f'predict_benchmark_{model_name}'] = t_diff
+                    logging.info('Total JAX model %s on %s predict time (excludes compilation time): %.1fs', model_name, fasta_name, t_diff)
+
+                # Remove jax dependency from results.
+                np_prediction_result = _jnp_to_np(dict(prediction_result))
+
+                # Save the model outputs.
+                result_output_path = os.path.join(output_dir, f'result_{model_name}.pkl')
+
+                keys_to_remove=['distogram', 'experimentally_resolved', 'masked_msa', 'aligned_confidence_probs']
+                
+                d={}
+                for k in np_prediction_result.keys():
+                    if k not in keys_to_remove:
+                        d[k]=np_prediction_result[k]
+
+                with open(result_output_path, 'wb') as f:
+                    pickle.dump(d, f, protocol=4)
+
+                # with open(result_output_path, 'wb') as f:
+                #     pickle.dump(np_prediction_result, f, protocol=4)
+                
+            else:
+                logging.info('%s has been generated!', model_name)
+
+            with open(result_output_path, 'rb') as f:
+                prediction_result = pickle.load(f)
 
             plddt = prediction_result['plddt']
+
+            has_nan = np.isnan(plddt)
+            if np.any(has_nan):
+                logging.info("There is nan values in the generated model!!!!")
+                os.system(f"rm {result_output_path}")
+                random_seed = random.randrange(sys.maxsize // len(model_runners))
+                logging.info('Using random seed %d for the data pipeline', random_seed)
+                continue
+
             ranking_confidences[model_name] = prediction_result['ranking_confidence']
-
-            # Remove jax dependency from results.
-            np_prediction_result = _jnp_to_np(dict(prediction_result))
-
-            # Save the model outputs.
-            result_output_path = os.path.join(output_dir, f'result_{model_name}.pkl')
-            with open(result_output_path, 'wb') as f:
-                pickle.dump(np_prediction_result, f, protocol=4)
 
             # Add the predicted LDDT in the b-factor column.
             # Note that higher predicted LDDT value means higher model confidence.
@@ -265,30 +315,8 @@ def predict_structure(
             unrelaxed_pdb_path = os.path.join(output_dir, f'unrelaxed_{model_name}.pdb')
             with open(unrelaxed_pdb_path, 'w') as f:
                 f.write(unrelaxed_pdbs[model_name])
-        else:
-            logging.info('%s has been generated!', model_name)
-
-            with open(result_output_path, 'rb') as f:
-                prediction_result = pickle.load(f)
-
-            plddt = prediction_result['plddt']
-            ranking_confidences[model_name] = prediction_result['ranking_confidence']
-
-            # Add the predicted LDDT in the b-factor column.
-            # Note that higher predicted LDDT value means higher model confidence.
-            plddt_b_factors = np.repeat(plddt[:, None], residue_constants.atom_type_num, axis=-1)
-
-            unrelaxed_protein = protein.from_prediction(
-                features=processed_feature_dict,
-                result=prediction_result,
-                b_factors=plddt_b_factors,
-                remove_leading_feature_dimension=not model_runner.multimer_mode)
-
-            unrelaxed_proteins[model_name] = unrelaxed_protein
-            unrelaxed_pdbs[model_name] = ''.join(open(unrelaxed_pdb_path).readlines())
-            # unrelaxed_pdbs[model_name] = protein.to_pdb(unrelaxed_protein)
-            # with open(unrelaxed_pdb_path, 'w') as f:
-            #     f.write(unrelaxed_pdbs[model_name])
+            
+            break
 
     # Rank by model confidence.
     ranked_order = [model_name for model_name, confidence in sorted(ranking_confidences.items(), key=lambda x: x[1], reverse=True)]
@@ -300,12 +328,14 @@ def predict_structure(
         to_relax = ranked_order
     elif models_to_relax == ModelsToRelax.NONE:
         to_relax = []
+    elif models_to_relax == ModelsToRelax.TOPN:
+        to_relax = ranked_order[:FLAGS.relax_topn_predictions]
 
     for model_name in to_relax:
         relaxed_output_path = os.path.join(output_dir, f'relaxed_{model_name}.pdb')
         if os.path.exists(relaxed_output_path):
             relaxed_pdbs[model_name] = ''.join(open(relaxed_output_path).readlines())
-            print('%s has been generated!', relaxed_output_path)
+            print(f'{relaxed_output_path} has been generated!')
         else:
             t_0 = time.time()
             relaxed_pdb_str, _, violations = amber_relaxer.process(prot=unrelaxed_proteins[model_name])
@@ -352,7 +382,8 @@ def main(argv):
 
     custom_inputs = custom_params.CustomizedInputs_Multimer()
     custom_inputs.notemplate = FLAGS.notemplate
-
+    custom_inputs.msa_pairing_hetero = FLAGS.msa_pairing_hetero
+    
     template_searcher = None
     template_featurizer = None
     monomer_template_featurizer = None
@@ -366,7 +397,7 @@ def main(argv):
             template_count=FLAGS.monomer_model_count)
         template_max_hits -= FLAGS.monomer_model_count
 
-    if FLAGS.template_stos is not None:
+    if FLAGS.template_stos is not None or FLAGS.notemplate:
 
         template_searcher = hmmsearch.Hmmsearch(
             binary_path=os.path.join(FLAGS.env_dir, 'hmmsearch'),
@@ -385,7 +416,8 @@ def main(argv):
 
         template_searcher = hhsearch.HHSearch(
             binary_path=os.path.join(FLAGS.env_dir, 'hhsearch'),
-            databases=[os.path.join(FLAGS.database_dir, 'pdb70/pdb70')])
+            #databases=[os.path.join(FLAGS.database_dir, 'pdb70/pdb70')])
+            databases=[os.path.join(FLAGS.database_dir, FLAGS.pdb70_database, 'pdb70')])
 
         template_featurizer = templates.HhsearchHitFeaturizer(
             mmcif_dir=os.path.join(FLAGS.database_dir, 'pdb_mmcif/mmcif_files'),
@@ -422,12 +454,15 @@ def main(argv):
     for i, seq in enumerate(sequences):
         seq_id = protein.PDB_CHAIN_IDS[i]
         custom_inputs.monomer_a3ms[seq_id] = FLAGS.monomer_a3ms[i]
-        if custom_inputs.multimer_a3ms is not None:
+        
+        if FLAGS.multimer_a3ms is not None:
             custom_inputs.multimer_a3ms[seq_id] = FLAGS.multimer_a3ms[i]
         else:
-            custom_inputs.multimer_a3ms[seq_id] = FLAGS.monomer_a3ms[i]
+            custom_inputs.multimer_a3ms[seq_id] = None
+
         if FLAGS.template_stos is not None:
             custom_inputs.template_stos[seq_id] = FLAGS.template_stos[i]
+
         if FLAGS.template_hits_files is not None:
             custom_inputs.template_hits_files[seq_id] = FLAGS.template_hits_files[i]
 
@@ -436,13 +471,22 @@ def main(argv):
 
     num_predictions_per_model = FLAGS.num_multimer_predictions_per_model
     for model_name in model_names:
+        if FLAGS.model_ckpt is not None and model_name != FLAGS.model_ckpt:
+            continue
         model_config = config.model_config(model_name)
         model_config.model.num_ensemble_eval = FLAGS.multimer_num_ensemble
         model_config.model.num_recycle = FLAGS.multimer_num_recycle
+        if FLAGS.dropout:
+            #dropout set is_training to True and during training models can be assembled. Here num_ensemble will always be 1 though. But unless this variable is set the program will crash.
+            # model_config.model.num_ensemble_train = FLAGS.multimer_num_ensemble
+            model_config.model.global_config.eval_dropout = True
+            if not FLAGS.dropout_structure_module:
+                model_config.model.heads.structure_module.dropout=0.0
+
         model_params = data.get_model_haiku_params(
             model_name=model_name, data_dir=FLAGS.database_dir)
         model_runner = model.RunModel(model_config, model_params)
-        for i in range(num_predictions_per_model):
+        for i in range(FLAGS.nstruct_start, num_predictions_per_model):
             model_runners[f'{model_name}_pred_{i}'] = model_runner
 
     logging.info('Have %d models: %s', len(model_runners),

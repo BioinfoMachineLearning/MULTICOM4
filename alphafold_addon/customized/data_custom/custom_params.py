@@ -30,3 +30,4 @@ class CustomizedInputs_Multimer:
         self.monomer_model_paths = []
         self.monomer_temp_csvs = []
         self.notemplate = False
+        self.msa_pairing_hetero = True

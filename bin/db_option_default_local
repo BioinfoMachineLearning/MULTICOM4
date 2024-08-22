@@ -107,7 +107,7 @@ afsample_env_dir = /bmlfast/bml_casp16/anaconda3/envs/afsample/bin/
 afsample_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/alphafoldv2.2.0
 
 # alphafold tertiary structure prediction script
-afsample_program = run_alphafold_custom.py
+afsample_program = run_afsample_custom.py
 
 # Common parameters
 alphafold_benchmark = False

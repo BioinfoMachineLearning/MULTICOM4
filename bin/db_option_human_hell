@@ -97,7 +97,7 @@ afsample_env_dir = /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/envs/afsamp
 afsample_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/alphafoldv2.2.0
 
 # alphafold tertiary structure prediction script
-afsample_program = run_alphafold_custom.py
+afsample_program = run_afsample_custom.py
 
 # Common parameters
 alphafold_benchmark = False
@@ -141,9 +141,9 @@ tmsearch_database = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/TM-s
 
 foldseek_program = /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 
-foldseek_pdb_database = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/complex
+foldseek_pdb_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/foldseek_databases/complex/complex
 
-foldseek_pdb_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
+foldseek_pdb_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/Complex/atom
 
 foldseek_af_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db//foldseek_databases/af_db
 
@@ -161,7 +161,7 @@ metaclust_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/
 
 img_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/img/img_new.fasta
 
-JGIclust_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/JGIclust
+JGIclust_database = 
 
 ###########################Complex alignment generation option#######################
 

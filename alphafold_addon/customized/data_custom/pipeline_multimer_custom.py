@@ -294,7 +294,8 @@ class DataPipeline:
             monomer_models_result: Mapping[str, templates_custom.TemplateSearchResult],
             custom_complex_msa_pairids: bool,
             is_homomer_or_monomer: bool,
-            notemplate: bool) -> pipeline_custom.FeatureDict:
+            notemplate: bool,
+            msa_pairing_hetero: bool) -> pipeline_custom.FeatureDict:
         """Runs the monomer pipeline on a single chain."""
         chain_fasta_str = f'>chain_{chain_id}\n{sequence}\n'
         chain_msa_output_dir = os.path.join(msa_output_dir, chain_id)
@@ -305,7 +306,9 @@ class DataPipeline:
 
             chain_template_features = None
             if notemplate:
-                chain_template_features = templates_custom.mk_mock_template(sequence)
+                chain_template_features = self.template_featurizer.get_templates(
+                                            query_sequence=sequence,
+                                            hits=[]).features
             else:
                 chain_template_results = None
                 if chain_template_sto is not None and os.path.exists(chain_template_sto):
@@ -383,7 +386,7 @@ class DataPipeline:
 
             # We only construct the pairing features if there are 2 or more unique
             # sequences.
-            if not is_homomer_or_monomer:
+            if not is_homomer_or_monomer and msa_pairing_hetero:
                 all_seq_msa_features = self._all_seq_msa_features(chain_multimer_msa, chain_msa_output_dir)
                 chain_features.update(all_seq_msa_features)
         return chain_features
@@ -511,7 +514,8 @@ class DataPipeline:
                 monomer_models_result=monomer_models_result,
                 custom_complex_msa_pairids=os.path.exists(custom_inputs.msa_pair_file),
                 is_homomer_or_monomer=is_homomer_or_monomer,
-                notemplate=custom_inputs.notemplate)
+                notemplate=custom_inputs.notemplate,
+                msa_pairing_hetero=custom_inputs.msa_pairing_hetero)
 
             chain_features = convert_monomer_features(chain_features, chain_id=chain_id)
             all_chain_features[chain_id] = chain_features

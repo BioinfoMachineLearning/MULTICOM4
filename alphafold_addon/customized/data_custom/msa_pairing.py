@@ -117,7 +117,7 @@ def pair_sequences_precomputed(examples: List[pipeline.FeatureDict],
 
             pass_filter = True
             for pair_index in pair_indices:
-                if pair_index > max_msa_hits:
+                if pair_index >= max_msa_hits:
                     pass_filter = False
 
             if not pass_filter:

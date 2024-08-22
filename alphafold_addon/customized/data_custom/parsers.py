@@ -19,6 +19,7 @@ import itertools
 import re
 import string
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Set
+import pandas as pd
 
 # Internal import (7716).
 
@@ -618,7 +619,7 @@ def convert_values_to_template_hit(template_df, col_prefix):
     for i in range(len(template_df)):
         index = int(template_df.loc[i, 'index'])
         name = template_df.loc[i, f'name{col_prefix}']
-        if name == "empty":
+        if name == "empty" or pd.isna(name):
             continue
         aligned_cols = template_df.loc[i, f'aligned_cols{col_prefix}']
         sum_probs = template_df.loc[i, f'sum_probs{col_prefix}']

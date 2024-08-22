@@ -4,7 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
-from multicom_dev.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
+from multicom4.common.util import is_file, is_dir, makedir_if_not_exists, clean_dir
 
 
 def run_command(inparams):
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         if model.find('.pdb') > 0:
             process_list.append([args.mmalign_program, args.native_pdb, args.indir + '/' + model])
 
-    pool = Pool(processes=40)
+    pool = Pool(processes=180)
     results = pool.map(run_command, process_list)
     pool.close()
     pool.join()
@@ -43,6 +43,6 @@ if __name__ == '__main__':
         scores += [tmscore]
 
     df = pd.DataFrame({'model': models, 'score': scores})
-
+    df.to_csv('tmscore.csv')
     print(df)
 

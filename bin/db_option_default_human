@@ -41,6 +41,8 @@ qscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/pairwiseQA/q_score
 # tmscore program
 tmscore_program = /bmlfast/bml_casp16/MULTICOM4/tools/tmscore/TMscore
 
+usalign_program = /bmlfast/bml_casp16/MULTICOM4/tools/USalign
+
 calNf_program = /bmlfast/bml_casp16/MULTICOM4/tools/calNf
 
 ################################MSA generation tool###########################
@@ -92,7 +94,7 @@ afsample_env_dir = /bmlfast/bml_casp16/anaconda3/envs/afsample/bin/
 afsample_program_dir = /bmlfast/bml_casp16/MULTICOM4/tools/alphafoldv2.2.0
 
 # alphafold tertiary structure prediction script
-afsample_program = run_alphafold_custom.py
+afsample_program = run_afsample_custom.py
 
 # Common parameters
 alphafold_benchmark = True
@@ -136,15 +138,15 @@ tmsearch_database = /bmlfast/bml_casp16/MULTICOM4/tools/TM-search1.0/PDB/
 
 foldseek_program = /bmlfast/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 
-foldseek_pdb_database = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex
+foldseek_pdb_database = /bmlfast/bml_casp16/tools/multicom3_db/foldseek_databases/complex
 
-foldseek_pdb_database_dir = /bmlfast/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
+foldseek_pdb_database_dir = /bmlfast/bml_casp16/tools/multicom3_db/foldseek_databases/complex/complex_pdb
 
 foldseek_af_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/foldseek_database
 
 foldseek_af_database_dir = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/af_db/pdbs
 
-foldseek_esm_atlas_database = /bmlfast/bml_casp16/tools/multicom3_db/esm_atlas/foldseekdb
+foldseek_esm_atlas_database =/bmlfast/bml_casp16/tools/multicom3_db/foldseek_databases/esm_atlas/foldseekdb
 
 ################################databases option#####################################
 
@@ -152,7 +154,7 @@ bfd_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/bfd/bfd_m
 
 mgnify_database = /bmlfast/bml_casp16/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
 
-metaclust_database = /bmlfast/bml_casp16/tools/multicom3_db/Metaclust_2018_06/metaclust_50
+metaclust_database = /bmlfast/bml_casp16/tools/multicom3_db/Metaclust_2018_06/metaclust.fasta
 
 img_database = /bmlfast/bml_casp16/tools/multicom3_db/img/img_new.fasta
 
