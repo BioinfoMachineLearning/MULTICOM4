@@ -161,7 +161,7 @@ metaclust_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/
 
 img_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/img/img_new.fasta
 
-JGIclust_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/JGIclust
+JGIclust_database = 
 
 ###########################Complex alignment generation option#######################
 

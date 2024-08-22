@@ -91,8 +91,16 @@ alphafold_default_program = run_alphafold_pre.py
 # alphafold tertiary structure prediction script
 afprofile_program = run_AFP.py
 
+afsample_env_dir = /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/envs/afsample/bin/
+
+# alphafold program path
+afsample_program_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/alphafoldv2.2.0
+
+# alphafold tertiary structure prediction script
+afsample_program = run_alphafold_custom.py
+
 # Common parameters
-alphafold_benchmark = True
+alphafold_benchmark = False
 
 use_gpu_relax = False
 
@@ -133,9 +141,9 @@ tmsearch_database = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/TM-s
 
 foldseek_program = /cluster/pixstor/chengji-lab/bml_casp16/anaconda3/envs/multicom4/bin/foldseek
 
-foldseek_pdb_database = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/complex
+foldseek_pdb_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db/foldseek_databases/complex/complex
 
-foldseek_pdb_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/MULTICOM4/tools/foldseek/databases/complex_pdb
+foldseek_pdb_database_dir = /cluster/pixstor/chengji-lab/bml_casp16/update_complex_dbs_newest/databases/Complex/atom
 
 foldseek_af_database = /cluster/pixstor/chengji-lab/bml_casp16/tools/multicom3_db//foldseek_databases/af_db
 
