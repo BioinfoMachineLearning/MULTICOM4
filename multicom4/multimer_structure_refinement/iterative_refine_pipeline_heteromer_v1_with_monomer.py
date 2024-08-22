@@ -396,7 +396,7 @@ class Multimer_iterative_refinement_pipeline(config.pipeline):
                 try:
                     os.chdir(self.params['alphafold_program_dir'])
                     print(cmd)
-                    os.system(cmd)
+                    #os.system(cmd)
                 except Exception as e:
                     print(e)
 
