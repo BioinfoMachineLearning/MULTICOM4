@@ -5,9 +5,6 @@ import numpy as np
 import pandas as pd
 import pickle
 from scipy.stats import pearsonr
-from multicom_dev.common.util import check_file, check_dir, check_dirs, makedir_if_not_exists, check_contents, \
-    read_option_file, is_file, is_dir
-from multicom_dev.monomer_structure_evaluation.pipeline_sep import extract_pkl
 
 
 def extract_pkl(inpkl, outpkl, indices):

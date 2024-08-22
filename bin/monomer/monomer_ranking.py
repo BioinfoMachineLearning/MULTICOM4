@@ -49,12 +49,12 @@ def main(argv):
     makedir_if_not_exists(N1_outdir)
 
     contact_map_file = os.path.join(N1_outdir, 'dncon4', f'{targetname}.dncon2.rr')
-    #if not os.path.exists(contact_map_file):
-    #    raise Exception(f"The contact map file hasn't been generated: {contact_map_file}")
+    if not os.path.exists(contact_map_file):
+        print(f"The contact map file hasn't been generated: {contact_map_file}")
 
     dist_map_file = os.path.join(N1_outdir, 'deepdist', f'{targetname}.txt')
-    #if not os.path.exists(dist_map_file):
-    #    raise Exception(f"The distance map file hasn't been generated: {dist_map_file}")
+    if not os.path.exists(dist_map_file):
+        print(f"The distance map file hasn't been generated: {dist_map_file}")
 
     print("#################################################################################################")
     print(f"1. Start to generate alignments for monomers")

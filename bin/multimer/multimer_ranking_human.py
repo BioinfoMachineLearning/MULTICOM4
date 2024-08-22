@@ -131,6 +131,6 @@ if __name__ == '__main__':
     flags.mark_flags_as_required([
         'option_file',
         'fasta_path',
-        'output_dir'
+        'output_dir',
     ])
     app.run(main)

@@ -33,7 +33,7 @@ class Pairwise_MMalign_qa:
 
     def run(self, input_dir, workdir):
 
-        ranking_pd = pd.DataFrame(columns=['Name', 'MMalign score'])
+        ranking_pd = pd.DataFrame(columns=['model', 'MMalign score'])
 
         pdbs = sorted(os.listdir(input_dir))
 
@@ -48,7 +48,7 @@ class Pairwise_MMalign_qa:
                 if not os.path.exists(scorefile) or len(open(scorefile).readlines()) < 5:
                     process_list.append([self.mmalign_program, input_dir, pdb1, pdb2, scorefile])
 
-        pool = Pool(processes=190)
+        pool = Pool(processes=180)
         results = pool.map(run_command, process_list)
         pool.close()
         pool.join()
@@ -67,7 +67,7 @@ class Pairwise_MMalign_qa:
 
         for i in range(len(pdbs)):
             pdb1 = pdbs[i]
-            ranking = {'Name': pdb1}
+            ranking = {'model': pdb1}
             scores = []
             for pdb2 in pdbs:
                 if pdb1 == pdb2:
@@ -78,6 +78,22 @@ class Pairwise_MMalign_qa:
 
             ranking['MMalign score'] = np.mean(np.array(scores))
 
-            ranking_pd = ranking_pd.append(pd.DataFrame(ranking, index=[i]))
+            # ranking_pd = ranking_pd.append(pd.DataFrame(ranking, index=[i]))
+
+            ranking_pd = pd.concat([ranking_pd, pd.DataFrame(ranking, index=[i])])
 
         return ranking_pd.sort_values(by=['MMalign score'], ascending=False, ignore_index=True)
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--indir', type=str, required=True)
+    parser.add_argument('--workdir', type=str, required=True)
+    parser.add_argument('--outfile', type=str, required=True)
+    parser.add_argument('--mmalign_program', type=str, required=True)
+    args = parser.parse_args()
+    
+    os.makedirs(args.workdir, exist_ok=True)
+    multieva_pd = Pairwise_MMalign_qa(args.mmalign_program).run(input_dir=args.indir, workdir=args.workdir)
+    multieva_pd.to_csv(args.outfile)
+

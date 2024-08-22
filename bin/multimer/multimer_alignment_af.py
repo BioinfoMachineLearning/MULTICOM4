@@ -176,7 +176,8 @@ def main(argv):
         run_monomer_msas_concatenation_pipeline(
             # multimer=','.join([chain_id for chain_id in chain_id_map]),
             chain_id_map=chain_id_map,
-            run_methods=['deepmsa2'],
+            run_methods=concat_methods,
+            #run_methods=['deepmsa2'],
             monomer_aln_dir=N1_outdir, monomer_model_dir=N3_outdir, outputdir=N4_outdir, params=params, is_homomers=is_homomers)
     except Exception as e:
         print(e)

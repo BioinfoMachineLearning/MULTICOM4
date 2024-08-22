@@ -180,7 +180,7 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
             iteration_monomer_a3m = os.path.join(msa_out_path, chain_id + ".iteration.monomer.a3m")
             combine_a3ms([alphafold_monomer_a3ms[chain_idx],
                           msa_temp_monomer],
-                         iteration_monomer_a3m)
+                          iteration_monomer_a3m)
             out_monomer_msas += [iteration_monomer_a3m]
 
         interact_dict = {}
@@ -201,10 +201,12 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
         top_template_files = []
         for template_result, chain_id in zip(template_results, chain_id_map):
             top_template_file = os.path.join(outpath, f"{chain_id}.top{self.max_template_count}")
-            check_and_rank_monomer_templates_local_and_global(template_result=template_result,
+            if not check_and_rank_monomer_templates_local_and_global(template_result=template_result,
                                                               outfile=top_template_file,
                                                               query_sequence=chain_id_map[chain_id].sequence,
-                                                              max_template_count=self.max_template_count)
+                                                              max_template_count=self.max_template_count):
+                template_result['local_alignment'].to_csv(top_template_file)
+                
             top_template_files += [top_template_file]
 
         return top_template_files, out_multimer_msas, out_monomer_msas, interact_csv
@@ -304,9 +306,9 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
 
                 foldseek_res = self.search_templates_foldseek(inpdb=chain_pdb, outdir=os.path.join(monomer_work_dir, 'foldseek'))
 
-                if len(foldseek_res['all_alignment']) == 0:
-                    print(f"Cannot find any templates for {chain_id}")
-                    break
+                # if len(foldseek_res['all_alignment']) == 0:
+                #     print(f"Cannot find any templates for {chain_id}")
+                #     break
 
                 template_results += [foldseek_res]
 
@@ -344,7 +346,7 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
             try:
                 os.chdir(self.params['alphafold_program_dir'])
                 print(cmd)
-                #os.system(cmd)
+                os.system(cmd)
             except Exception as e:
                 print(e)
 
@@ -357,8 +359,8 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
                                            outpath):
 
         chain_template_msas = {}
-        evalue_thresholds = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
-        tmscore_thresholds = [0.8, 0.7, 0.6, 0.5, 0.4]
+        evalue_thresholds = [1e-7]#, 1e-6.5] #, 1e-5] #, 1e-4, 1e-3]
+        tmscore_thresholds = [0.8]#, 0.75] #, 0.6] #, 0.5, 0.4]
         complex_templates_df_filtered = None
         for evalue_threshold, tmscore_threshold in zip(evalue_thresholds, tmscore_thresholds):
             chain_template_msas = {}
@@ -623,7 +625,7 @@ class Multimer_iterative_generation_pipeline_monomer(config.pipeline):
             try:
                 os.chdir(self.params['alphafold_program_dir'])
                 print(cmd)
-                #os.system(cmd)
+                os.system(cmd)
             except Exception as e:
                 print(e)
 

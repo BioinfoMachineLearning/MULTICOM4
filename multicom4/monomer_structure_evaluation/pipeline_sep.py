@@ -124,19 +124,19 @@ class Monomer_structure_evaluation_pipeline:
         """Initializes the data pipeline."""
 
         self.params = params
-        self.alphafold_qa = Alphafold_pkl_qa(ranking_methods=['plddt_avg'])
+        self.alphafold_qa = Alphafold_pkl_qa(ranking_methods=['plddt_avg','af3_ranking_score'])
         self.parwise_qa = params['qscore_program']
         self.tmscore = params['tmscore_program']
         self.bfactorqa = Bfactor_qa()
         self.gate_qa = Gate_qa(params=params)
 
         if run_methods is None:
-            self.run_methods = ["alphafold", "apollo", "bfactor", "gate"]
+            self.run_methods = ["alphafold", "bfactor", "gate"]
         else:
             self.run_methods = run_methods
 
     def run_qas(self, fasta_file, pdbdir, pkldir, output_dir_abs,
-                pdbs_from_monomer, pdbs_from_multimer, pdbs_with_dist,
+                pdbs_from_monomer, pdbs_from_multimer,
                 contact_map_file, dist_map_file):
 
         print("111111111111111111111")
@@ -279,7 +279,7 @@ class Monomer_structure_evaluation_pipeline:
             result_dict["gate_cluster"] = os.path.join(output_dir_abs, 'gate', 'feature', 'tmscore_pairwise', 'pairwise_tmscore.csv')
             result_dict["enqa"] = os.path.join(output_dir_abs, 'gate', 'feature', 'enqa', 'enqa.csv')
             result_dict["gcpnet_ema"] = os.path.join(output_dir_abs, 'gate', 'feature', 'gcpnet_ema', 'esm_plddt.csv')
-
+            result_dict["gate_tmscore_pairwise"] = os.path.join(output_dir_abs, 'gate', 'feature', 'tmscore_pairwise', 'pairwise_tmscore.csv')
 
         if "gate" in self.run_methods and "alphafold" in self.run_methods:
             gate_df = pd.read_csv(result_dict['gate'])
@@ -358,18 +358,19 @@ class Monomer_structure_evaluation_pipeline:
         msadir_multimer = os.path.join(output_dir, 'msa_multimer')
         makedir_if_not_exists(msadir_multimer)
 
-        pdbs_with_dist = []
-
         pdbs_from_monomer = []
         if os.path.exists(monomer_model_dir):
             for method in os.listdir(monomer_model_dir):
                 ranking_json_file = os.path.join(monomer_model_dir, method, "ranking_debug.json")
                 if not os.path.exists(ranking_json_file):
                     continue
+
+                method_model_count = model_count
                 if method.find('af3') == 0 and model_count == 5:
-                    model_count = 10
+                    method_model_count = 10
+    
                 ranking_json = json.loads(open(ranking_json_file).read())
-                for i in range(model_count):
+                for i in range(method_model_count):
                     pdbname = f"{method}_{i}"
                     ranked_pdb = os.path.join(monomer_model_dir, method, f"ranked_{i}.pdb")
                     trg_pdb = os.path.join(pdbdir_monomer, f"{pdbname}.pdb")
@@ -381,7 +382,8 @@ class Monomer_structure_evaluation_pipeline:
                     src_pkl = os.path.join(monomer_model_dir, method, f"result_{model_name}.pkl")
                     if os.path.exists(src_pkl):
                         output_pkl = os.path.join(pkldir_monomer, f"{pdbname}.pkl")
-                        has_distogram = extract_pkl(src_pkl=src_pkl, output_pkl=output_pkl)
+                        os.system(f"cp {src_pkl} {output_pkl}")
+                        # has_distogram = extract_pkl(src_pkl=src_pkl, output_pkl=output_pkl)
                         os.system("ln -s " + os.path.join(pkldir_monomer, pdbname+".pkl") + " " + os.path.join(pkldir, pdbname+".pkl"))
 
                     src_msa = os.path.join(monomer_model_dir, method, 'msas', "monomer_final.a3m")
@@ -389,9 +391,6 @@ class Monomer_structure_evaluation_pipeline:
                         trg_msa = os.path.join(msadir_monomer, f"{pdbname}.a3m")
                         os.system(f"cp {src_msa} {trg_msa}")
                         os.system("ln -s " + os.path.join(msadir_monomer, pdbname+".a3m") + " " + os.path.join(msadir, pdbname+".a3m"))
-
-                    if has_distogram:
-                        pdbs_with_dist += [f"{pdbname}.pdb"]
 
                     pdbs_from_monomer += [f"{pdbname}.pdb"]
 
@@ -435,12 +434,9 @@ class Monomer_structure_evaluation_pipeline:
                             os.system("ln -s " + os.path.join(msadir_multimer, chain_pdb_dict[chain_id]['pdbname'].replace('.pdb', '.a3m')) + " " +
                                       os.path.join(msadir, chain_pdb_dict[chain_id]['pdbname'].replace('.pdb', '.a3m')))
 
-                            if has_distogram:
-                                pdbs_with_dist += [pdbname]
-
         return self.run_qas(fasta_file=fasta_file, pdbdir=pdbdir, pkldir=pkldir, output_dir_abs=output_dir_abs,
                             pdbs_from_monomer=pdbs_from_monomer, pdbs_from_multimer=pdbs_from_multimer,
-                            pdbs_with_dist=pdbs_with_dist, contact_map_file=contact_map_file, dist_map_file=dist_map_file)
+                            contact_map_file=contact_map_file, dist_map_file=dist_map_file)
 
     def reprocess(self, targetname, fasta_file, output_dir):
 
@@ -464,5 +460,4 @@ class Monomer_structure_evaluation_pipeline:
 
         return self.run_qas(fasta_file=fasta_file, pdbdir=pdbdir, pkldir=pkldir, output_dir_abs=output_dir_abs,
                             pdbs_from_monomer=pdbs_from_monomer,
-                            pdbs_from_multimer=pdbs_from_multimer,
-                            pdbs_with_dist=pdbs_from_monomer)
+                            pdbs_from_multimer=pdbs_from_multimer)

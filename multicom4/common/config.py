@@ -297,7 +297,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 400,
+        'predictions_per_model': 10,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -582,7 +582,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 5,
+        'predictions_per_model': 200,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,

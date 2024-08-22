@@ -58,7 +58,7 @@ foreach $text(@content)
 @x_coords = ();
 @y_coords = ();
 @z_coords = ();
-
+@chain_ids = ();
 $i = 0;
 while (@records)
 	{
@@ -66,7 +66,7 @@ while (@records)
 		#print "$text\n";
 		#<STDIN>;
 		$res = substr($text, 17, 3); 
-
+               
 		$atom_name = substr($text, 12, 4);
 
 		if ($atom_name !~ /CA/)
@@ -75,7 +75,7 @@ while (@records)
 		}
 		#$org_aa = substr($seq,$i,1);
 		$i++;
-
+                
 		#extract the xyz coordinates of CA atom
 		$xc = substr($text, 30, 8);
 		$xc =~ s/\s//g;
@@ -87,7 +87,9 @@ while (@records)
 		push @x_coords, $xc;
 		push @y_coords, $yc;
 		push @z_coords, $zc;
-
+                
+		$chain =  substr($text, 21, 1);
+		push @chain_ids, $chain;
 		#conver to one letter
 		$res = uc($res); 
 		
@@ -142,7 +144,7 @@ for ($i = 0; $i < @x_coords; $i++)
 		{
 			print "clash: ($pos1) <-> ($pos2), dist = $dist\n";
 		}
-		elsif ($dist > 4.5 && abs($pos1-$pos2) == 1)
+		elsif ($dist > 4.5 && abs($pos1-$pos2) == 1 && $chain_ids[$i] eq $chain_ids[$j])
 		{
 			print "chain broken: ($pos1) <-> ($pos2), dist = $dist\n";
 		}
