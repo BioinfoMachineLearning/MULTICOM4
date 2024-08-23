@@ -370,7 +370,7 @@ class Monomer_structure_evaluation_pipeline:
                     method_model_count = 10
     
                 ranking_json = json.loads(open(ranking_json_file).read())
-                for i in range(method_model_count):
+                for i in range(1000):
                     pdbname = f"{method}_{i}"
                     ranked_pdb = os.path.join(monomer_model_dir, method, f"ranked_{i}.pdb")
                     trg_pdb = os.path.join(pdbdir_monomer, f"{pdbname}.pdb")
