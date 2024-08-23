@@ -1,0 +1,7 @@
+[submodule "tools/alphafold-v2.3.2"]
+	path = tools/alphafold-v2.3.2
+	url = https://github.com/google-deepmind/alphafold
+	branch = v2.3.2
+[submodule "tools/afsample"]
+	path = tools/afsample
+	url = https://github.com/bjornwallner/alphafoldv2.2.0
