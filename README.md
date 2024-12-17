@@ -4,21 +4,16 @@ MULTICOM4 is an advanced protein structure prediction system built on AlphaFold2
 
 # **Some CASP16 Prediction Examples**
 
-H0215, A1B1, mNeonGreen with Bound Nanobody
+**Colored Chains**: Model predicted by MULTICOM4  
+**Brown**: True structure 
 
-![H0215](imgs/H0215.gif)
+| **Target ID** | **Description**                                | **Visualization**              |
+| ------------- | ---------------------------------------------- | ------------------------------- |
+| **H0215**     | A1B1, mNeonGreen with Bound Nanobody           | ![H0215](imgs/H0215.gif)       |
+| **H0233**     | A2B2C2, Antibody Fab 3H4 complex, virus capsid | ![H0233](imgs/H0233.gif)       |
+| **H0245**     | A1B1, FUNComplex, Shallow MSA                  | ![H0245](imgs/H0245.gif)       |
+| **T0234o**    | A3, Better Stoichiometry Prediction            | ![T0234](imgs/T0234.gif)       |
 
-H0233, A2B2C2, Antibody Fab 3H4 complex, virus capsid protein
-
-![H0233](imgs/H0233.gif)
-
-H0245, A1B1, FUNComplex, Shallow MSA
-
-![H0245](imgs/H0245.gif)
-
-T0234o, A3, Better Stoichiometry Prediction
-
-![T0234](imgs/T0234.gif)
 
 ## **Overall workflow for the MULTICOM Protein structure prediction system**
 
