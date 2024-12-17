@@ -1,5 +1,4 @@
 # **MULTICOM4**
-MULTICOM4 is the updated version of MULTICOM3
 
 ## **Overall workflow for the MULTICOM Protein structure prediction system**
 
