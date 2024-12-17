@@ -5,6 +5,8 @@ MULTICOM4 is an advanced protein structure prediction system built on AlphaFold2
 ![Uploading H0233.gif…]()
 
 
+![H0215](imgs/H0215.gif)
+
 ## **Overall workflow for the MULTICOM Protein structure prediction system**
 
 ![MULTICOM4](imgs/MULTICOM4.png)
@@ -298,13 +300,3 @@ $OUTPUT_DIR/                                   # Your output directory
 * The monomer structures and ranking files are saved in *N7_monomer_structure_evaluation* if you want to check the predictions and rankings for the monomer structures.
 
 # **Some CASP16 Prediction Examples**
-
-H0215, A1B1, mNeonGreen with Bound Nanobody
-
-<video src='imgs/H0215.mp4' width=180/> 
-
-H0233, A2B2C2, Antibody Fab 3H4 complex, virus capsid protein
-
-<video src='imgs/H0233.mp4' width=180/>
-
-
