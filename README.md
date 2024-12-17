@@ -2,7 +2,6 @@
 
 MULTICOM4 is an advanced protein structure prediction system built on AlphaFold2 and 3. It achieved remarkable success in the 16th world-wide Critical Assessment of Techniques for Protein Structure Prediction (CASP16) concluded in December 2024, ranking 1st in protein complex structure prediction without stoichiometry information (Phase 0), 2nd in protein tertiary structure prediction, 2nd in estimating the global fold accuracy of protein complex structures, 3rd in protein complex structure prediction with stoichiometry information (Phase 1), and 5th in protein-ligand structure and binding affinity prediction.
 
-![Uploading H0233.gif…]()
 
 
 ![H0215](imgs/H0215.gif)
