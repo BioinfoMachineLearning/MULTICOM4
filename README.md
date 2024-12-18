@@ -309,7 +309,7 @@ $OUTPUT_DIR/                                   # Your output directory
 
 # Citing this work
 
-**Our CASP16 talk for protein structure prediction:**
+**Our CASP16 talk for protein complex structure prediction:**
 
 https://predictioncenter.org/casp16/doc/presentations/Day-2/Day2-05-Cheng-CASP16_MULTICOM_redacted.pdf
 
@@ -317,6 +317,6 @@ https://predictioncenter.org/casp16/doc/presentations/Day-2/Day2-05-Cheng-CASP16
 
 https://predictioncenter.org/casp16/doc/presentations/Day-2/Day2-15-Neupane-CASP16_MULTICOM_EMA.pptx
 
-**Our CASP16 talk for protein-ligand binding affinity estimation**
+**Our CASP16 talk for protein-ligand binding affinity prediction:**
 
 https://predictioncenter.org/casp16/doc/presentations/Day-3/Day3-14-Morehead-MULTICOM_ligand.pptx
