@@ -1,0 +1,108 @@
+# STOCKHOLM 1.0
+#=GF ID A-i1
+#=GF AU jackhmmer (HMMER 3.3.2)
+
+#=GS UniRef90_A0A1I7UEV0/1-176   DE [subseq from] FBA_2 domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UEV0_9PELO
+#=GS UniRef90_A0A1I7UEV7/1-171   DE [subseq from] FBA_2 domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UEV7_9PELO
+#=GS UniRef90_A0A1I7TX29/77-249  DE [subseq from] F-box domain-containing protein n=2 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7TX29_9PELO
+#=GS UniRef90_A0A1I7U5G5/58-231  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7U5G5_9PELO
+#=GS UniRef90_A0A1I7TSI5/65-242  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7TSI5_9PELO
+#=GS UniRef90_A0A1I7TVK2/13-185  DE [subseq from] FBA_2 domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7TVK2_9PELO
+#=GS UniRef90_A0A1I7TUD9/67-243  DE [subseq from] F-box domain-containing protein n=2 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7TUD9_9PELO
+#=GS UniRef90_A0A1I7TVM9/29-193  DE [subseq from] F-box domain-containing protein n=3 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7TVM9_9PELO
+#=GS UniRef90_A0A1I7UI08/61-231  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UI08_9PELO
+#=GS UniRef90_A0A1I7U7L8/57-188  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7U7L8_9PELO
+#=GS UniRef90_A0A1I7UYZ5/57-192  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UYZ5_9PELO
+#=GS UniRef90_A0A1I7UEV1/37-201  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UEV1_9PELO
+#=GS UniRef90_A0A1I7UEV1/471-640 DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UEV1_9PELO
+#=GS UniRef90_A0A1I7T0W8/59-225  DE [subseq from] F-box domain-containing protein n=2 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7T0W8_9PELO
+#=GS UniRef90_A0A1I7TVN1/69-242  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7TVN1_9PELO
+#=GS UniRef90_A0A1I7UEU9/59-146  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UEU9_9PELO
+#=GS UniRef90_A0A1I7UEU9/151-210 DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UEU9_9PELO
+#=GS UniRef90_A0A1I7UEU7/59-237  DE [subseq from] F-box domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7UEU7_9PELO
+#=GS UniRef90_A0A1I7TVJ7/1-125   DE [subseq from] PRELI/MSF1 domain-containing protein n=1 Tax=Caenorhabditis tropicalis TaxID=1561998 RepID=A0A1I7TVJ7_9PELO
+
+A                                   MEAPRCNEVRMTVGSEGCELYIDGRPCKYEKP--E--N--VEDSLKM--IIGKMCDDLLTFI--P-DFKVNTISFRFNDDH-SYDM-WRPIY----KERFPQALEVDKLIVKSF---H--VWA-Y-L-IGKDI--INYRK--LSVFESHFLTKED--EEGIIKVRVER--EEYT-RT--DGK--T--TS---TRKCHN--
+UniRef90_A0A1I7UEV0/1-176           MESPRCNEVKMTVGSERCELYIDGRPIKYEKP--E--N--LEDSLKM--IIGKMCNDLLTFI--P-DFKVNTISFRFNDDH-SYHM-WRPIY----KERFPQLLEVDTLIVKSF---Y--FWA-W-L-IGEDI--INYDK--LRVYEYHYLMEKD--EDDIMKVEVGR--NEYT-RT--DGK--T--TS---TRNCYI--
+#=GR UniRef90_A0A1I7UEV0/1-176   PP 89******************************..*..*..*******..*************..*.***************.****.*****....******************...*..***.*.*.*****..*****..*************..***********..****.**..***..*..**...******..
+UniRef90_A0A1I7UEV7/1-171           MESPRCNEVRMTVGSEGCELYIDGRPIKYEKP--E--N--LEDSLKM--IIGKMCDDLLTFI--P-DFKVNTISFRFNDDH-SYHM-WRPIY----KERFRQFLEVDTLIVKSF---H--IWA-W-L-IPTDI--LNYDK--LRVRESQYLTKED--EESIMKVRVER--KETV-TI--DGK--K--TY---TMTNFI--
+#=GR UniRef90_A0A1I7UEV7/1-171   PP 89******************************..*..*..*******..*************..*.***************.****.*****....******************...*..***.*.*.*****..*****..*************..***********..****.**..***..*..**...******..
+UniRef90_A0A1I7TX29/77-249          ----CCNELRMTVSSKGCELHVEGYPIKYETPLED--K--LEDSLRM--IMEKMCDDLLFFI--P-DFQLNTITFRFDDHF-SYNI-FRPIY----KQRFPQPLEVHTLVVKQF---D--RSL-Y---VAYDI--INPEK--TRVREKHHLE-EY--ADDIMKVSVER--YECVDIT--DGV--K--AF---TRTHCI--
+#=GR UniRef90_A0A1I7TX29/77-249  PP ....59*************************9656..8..9******..*************..*.***************.****.*****....******************...9..887.7...689**..*****..********96.66..788********..9975279..***..9..99...999889..
+UniRef90_A0A1I7U5G5/58-231          MEPLRVNDIKITVGSEGCEMKIEGYPIKYKTS--E--G----GTLEE--SLNKMFDDLLHFV--P-DFQLNTISFRYNHIP-SYKL-FRSVF----SKRVSQPLTIHNLFIKSF---R--ILE-LCI-AGPDY--LNRKL--LSVLEYHSMEQLD--D-DIIKVKVCR--IKPI-E---IGK--K--AF---TSEITS--
+#=GR UniRef90_A0A1I7U5G5/58-231  PP 67889************************998..8..6....67888..999**********..*.***************.****.*****....******************...*..987.625.69***..*****..********98887..6.69*******..9877.6...599..9..99...9*****..
+UniRef90_A0A1I7TSI5/65-242          -KPPRCNEIKITVGSEGCEMIVEGYSIKYEKP--EEEN--EEGNAEN--IFGKMLDDLLIFV--H-NLQLPTFSIKLTDNL-FNKT-FLAVF----EKCVPQKLKVYTLVVKVF---S--FWD-I-Y-VGPAC--VDREA--NRVVEYHYMEKSA---DDIVKVKVSR--NECT-GE--VGDRWK--TC---TNTVFF--
+#=GR UniRef90_A0A1I7TSI5/65-242  PP .67*****************************..6448..8999***..*************..*.**************9.9999.*****....******************...*..***.*.*.*****..*****..*********9875...67********..****.97..665226..88...999999..
+UniRef90_A0A1I7TVK2/13-185          ---SRCTDIKIAVNSEGCRMIVEGKPIQYRNQ--D--G--LEESLE------KMFDDFLTLI--PLDFQLNSLSVRFDDEL-SHYT-FYTVF----NKRVPQPLKFNTQIVKSF---R--MWE-T-S-LGWRL--VDRES--VRVSEYHILEKL---ENNIIKVHVER--KEST-GD--KGD--R--WA---TFKSTKFV
+#=GR UniRef90_A0A1I7TVK2/13-185  PP ...59*************************99..9..9..999986......99********..*9***************.****.*****....******************...*..***.*.*.*****..*****..*******99886...789********..****.*9..999..9..88...88875433
+UniRef90_A0A1I7TUD9/67-243          ---HRCNEIRMTVDRKGSEMIVEGYSIKYKTP--EGWN--ERKNLEK--MLEKMMDDLLIFV--P-DFQLPKFSVRFNGCL-ANET-FLNVF----KNRIPQKLIVHTLVVKVF---K--FRD-I-F-VSPVC--VEREQ--LHVVEYHYMK-RL--ENKIMHVKVSR--NECT-GE--VGDRWK--TC---TKKVFY--
+#=GR UniRef90_A0A1I7TUD9/67-243  PP ...69***************************..9555..6678999..*************..*.***************.****.*****....******************...*..***.*.*.*****..*****..********85.56..788********..****.87..664226..99...9*****..
+UniRef90_A0A1I7TVM9/29-193          -KPPRCNEIRMNVSLERCEMIAEGYPIEYERP--EGEN--LEECLEK--MMEEMFDDMLIFV--S-DLHLPILSARFNDKL-SNRI-FRSVA----KKRFKKPLTIPSIFIKAF---S-----------GMHI----YQL--LCVAEIHYMEKL---EDDVMRVEVSR--NKYT-GE--EGN--RWESC---TKEISF--
+#=GR UniRef90_A0A1I7TVM9/29-193  PP .67*****************************..5449..*******..*************..*.***************.****.*****....****************99...6...........4444....999..*********986...5679*******..****.**..*98..53267...9999**..
+UniRef90_A0A1I7UI08/61-231          ---YRVNDIKITFDSEECEMKMDGYTIKYKKP--K--G----ESLVK--MINRMFDDLITLL--P-DCQVPNFTIRINGYP-SYKL-FRSLF----LKRVPQPLTVHTYFMKAL---S--SQEMS-A-EGGDF--IKREM--LRVAEYHFMDKL---EDDIMKVKVFR--LEPT-EE--DEC--D--LL---KVIDFI--
+#=GR UniRef90_A0A1I7UI08/61-231  PP ...589**************************..9..6....56777..789**********..*.***************.****.*****....****************99...8..76514.6.79***..*****..*********996...567********..****.*9..988..7..77...777789..
+UniRef90_A0A1I7U7L8/57-188          LESPRVNDIKITVGSEGCEMKIEGYPIKYGKP--D------EESL------DKMMNDLVTFV--P-DFQLNTVSFRFNDSP-SQKL-FRSQY----LKRVSQPMKVQKLVIKMF---N--KND-H-I-MEKEI--VNSSR----IIEYRFLEKLE---DDFIKLKVVH--LECV--------------------------
+#=GR UniRef90_A0A1I7U7L8/57-188  PP 699*****************************..8......5675......6999*******..*.***************.****.*****....******************...*..***.*.*.*****..**876....67899**9865...5578888876..6654..........................
+UniRef90_A0A1I7UYZ5/57-192          LERPRVNDIKITVGSEGCEMKIEGYPIKYGKA--D------EESL------NNMFDDLLRFV--S-DFQLNTISFQFNDNP-SYKL-YRSQF----LKRVPQPMNVQKLVVKVF---N--KND-H-I-MEKEI--VNSSR----IIELHFMEKLE---DDFIKVKVVH--LECV-ER--IG-------------------
+#=GR UniRef90_A0A1I7UYZ5/57-192  PP 589***************************98..7......6776......5899*******..*.***************.****.*****....******************...*..***.*.*.*****..**876....68*****9875...5689999987..7765.55..44...................
+UniRef90_A0A1I7UEV1/37-201          ----CCKELQMTIGLEECELKLEGHSIKYKKS--G------EGTYSM---LTKMLDDLSSFL--S-HSQSHLDTFIINQNN-VKDF-PQTIFIKGQKEFVSESLSVLSLDLQAY---E--IWH-L-P-FWREE--IKCKE--LHISYLRILEKL---EDDIMRVEVKT--RK-C-NA--DAQ--I--KS----NYC-T--
+#=GR UniRef90_A0A1I7UEV1/37-201  PP ....69***********************996..4......566655...67**********..*.*************99.9999.998875554777899************...*..***.*.*.*****..*****..***999999875...56799999987..65.5.67..887..7..65....457.6..
+UniRef90_A0A1I7UEV1/471-640         -----CKELTITIGLEECELKIEGHSIKYKRS--G--E--GFES-----MLMSMTDDLSSFVFDP-QFQLDTFIFKNNTIF--NAM-IRTIY----PGVHHEQV-AESLYELSI---D--LDA-Y-DNLQRSFWTAGRIK--LREFQGSFLYNPTILDDDIMKVEMKT--RKFV-A----GV--R--P----TLKYCT--
+#=GR UniRef90_A0A1I7UEV1/471-640 PP .....9***********************987..5..4..4444.....445799***9877448.899999888866654..468.99999....87655443.466777788...8..888.7.42445541145568..999*****987643367899999988..8886.4....55..4..4....455558..
+UniRef90_A0A1I7T0W8/59-225          -KPPRCDDIKITFGPEGCEMKIDRYTIKYGKA--D------EESL------NEMLDDLMTLL--P-DFQLTNFTIRINDTQ-SYKL-FRTLF----SKRVPESLKVDTYVLKAF---S--FRD-T-A-INVTW---HYKRDLLSVLEYHEMERL---KDDIIKVKVCR--TRPP-GI--VDN--VLRAR---TIEKFM--
+#=GR UniRef90_A0A1I7T0W8/59-225  PP .67***************************98..7......6776......6899*******..*.***************.****.*****....******************...9..998.8.8.87654...5554458******99775...5679*****99..7665.54..333..30134...555678..
+UniRef90_A0A1I7TVN1/69-242          ----RCDDLKITIGPERSQVIINGYTIDYKRP--EGEN--DEECRKI--MIGKMLDDFLPLI--N-DCQLNFFSARFDDYL-SNIL-FHDVF----QERS-KPLKAHTLICKGF---H--HTH-R-F-IETRL--VDWAS--PRFREYHQMEKQA---DDIIKVNLRK--IQCS-GIMPNPW--L--QD---TVTETI--
+#=GR UniRef90_A0A1I7TVN1/69-242  PP ....8***************************..6337..78889**..*************..*.***************.****.*****....**96.689**********...*..**9.9.*.*****..****9..9999999998875...569***9999..8877.5411444..4..55...666667..
+UniRef90_A0A1I7UEU9/59-146          ----CCNEIKITIGLEECELKLEGHSIKYKRS--E--GEDPKEILEW--MLKRMFDDLLTFV--P-NLQTNTYLVQFYDEQLTWPI-FRSVY----KKCVPQPIKA----------------------------------------------------------------------------------------------
+#=GR UniRef90_A0A1I7UEU9/59-146  PP ....59***********************998..7..5115678999..*************..*.**********99986489**.*****....******9865..............................................................................................
+UniRef90_A0A1I7UEU9/151-210         ----------------------------------------------------------------------------------------------------------------------------------------------------HRTMEKY--EEGIIKVKILR--IEWT-DL-LDNK--G--NRRLIIWPSYF--
+#=GR UniRef90_A0A1I7UEU9/151-210 PP ....................................................................................................................................................5555667..9**********..***9.74.2665..5..43111346799..
+UniRef90_A0A1I7UEU7/59-237          ----CCNEIKMTVGLEECELKIEGHSIKYKPS--D--E--GTDSEVMLEMLTKMIDDLS-FLSDP-QFQLDTLIFRHNNASLMYQTDFSQVV----NKRLPQSVSVRSLVLEEFEYNHHSIWY-L-A-FWKSK--MKLND--FHVTQLENLTKL---EDDIMRVKIHK--TKYI-----DSR--I--IR---PWSSCI--
+#=GR UniRef90_A0A1I7UEU7/59-237  PP ....59***********************988..8..7..777755522589*****85.44248.9**********986424543267888....99*************998544145898.8.8.99999..99999..99999999**97...5679*******..*996.....777..7..77...666667..
+UniRef90_A0A1I7TVJ7/1-125           -----------------------------------------------------MLDDVLPFI--H-DYRLNTFSAKFYDYL-SNIT-FHDVF----QERSPP-LKVHTLICKGF---Q--RGT-W-F-VEQRL--VDWVS--IRLREYHVLEKQA--DD-IVKVKFRIVVPTGA-MP--NLW--H--TY---TAIDSI--
+#=GR UniRef90_A0A1I7TVJ7/1-125   PP .....................................................78*******..*.***************.****.*****....****95.9**********...*..***.*.*.*****..*****..*********9986..54.66666555004455.55..556..6..77...888889..
+#=GC PP_cons                        78898*************************99..7..7..8788889..9999*******99..*.*************99.9999.*****....***9*999*9********...9..999.9.9.99999..*9999..**9***9998876..77899999999..9887.77..777..7..77...788888..
+#=GC RF                             xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..x..x..xxxxxxx..xxxxxxxxxxxxx..x.xxxxxxxxxxxxxxx.xxxx.xxxxx....xxxxxxxxxxxxxxxxxx...x..xxx.x.x.xxxxx..xxxxx..xxxxxxxxxxxxx..xxxxxxxxxxx..xxxx.xx..xxx..x..xx...xxxxxx..
+
+A                                   RYFREGQEEIYADEPELLPPAAEIVKAI
+UniRef90_A0A1I7UEV0/1-176           KYFREGQEDIYVDKPELLPSV-------
+#=GR UniRef90_A0A1I7UEV0/1-176   PP ******************965.......
+UniRef90_A0A1I7UEV7/1-171           KYFREGQEETYVDEPV------------
+#=GR UniRef90_A0A1I7UEV7/1-171   PP **************96............
+UniRef90_A0A1I7TX29/77-249          KYFREGQEDVYVDEPNLVPPK-------
+#=GR UniRef90_A0A1I7TX29/77-249  PP ********************7.......
+UniRef90_A0A1I7U5G5/58-231          KYFREGQEDVYVDEPELLPPRE------
+#=GR UniRef90_A0A1I7U5G5/58-231  PP ********************75......
+UniRef90_A0A1I7TSI5/65-242          KYFREDQENIYVDEPELLPPK-------
+#=GR UniRef90_A0A1I7TSI5/65-242  PP ********************6.......
+UniRef90_A0A1I7TVK2/13-185          KYFREGQEDIYVDEPSQLSPKKQ-----
+#=GR UniRef90_A0A1I7TVK2/13-185  PP 9***************9999765.....
+UniRef90_A0A1I7TUD9/67-243          KYFRKGQEDIYVDKPELLPPKK------
+#=GR UniRef90_A0A1I7TUD9/67-243  PP ********************75......
+UniRef90_A0A1I7TVM9/29-193          KYFREGQEDIYVDESY------------
+#=GR UniRef90_A0A1I7TVM9/29-193  PP *************975............
+UniRef90_A0A1I7UI08/61-231          KYFREGQEDIYVDDPELLPPK-------
+#=GR UniRef90_A0A1I7UI08/61-231  PP ********************6.......
+UniRef90_A0A1I7U7L8/57-188          ----------------------------
+#=GR UniRef90_A0A1I7U7L8/57-188  PP ............................
+UniRef90_A0A1I7UYZ5/57-192          ----------------------------
+#=GR UniRef90_A0A1I7UYZ5/57-192  PP ............................
+UniRef90_A0A1I7UEV1/37-201          KYYREGQMDILVDEPVS-----------
+#=GR UniRef90_A0A1I7UEV1/37-201  PP 9**************65...........
+UniRef90_A0A1I7UEV1/471-640         KYFREGQMDILVDEPRLLPPK-------
+#=GR UniRef90_A0A1I7UEV1/471-640 PP 9******************96.......
+UniRef90_A0A1I7T0W8/59-225          KYFREGQEDIYVDDPIL-----------
+#=GR UniRef90_A0A1I7T0W8/59-225  PP 9*************965...........
+UniRef90_A0A1I7TVN1/69-242          KYFREGQEDIYVDEPNLVPPK-------
+#=GR UniRef90_A0A1I7TVN1/69-242  PP 9*******************6.......
+UniRef90_A0A1I7UEU9/59-146          ----------------------------
+#=GR UniRef90_A0A1I7UEU9/59-146  PP ............................
+UniRef90_A0A1I7UEU9/151-210         KYFRERQEDIFVHESELVPA--------
+#=GR UniRef90_A0A1I7UEU9/151-210 PP *****************995........
+UniRef90_A0A1I7UEU7/59-237          KYYREGQRDILVDEPGLLLPK-------
+#=GR UniRef90_A0A1I7UEU7/59-237  PP 9***************99885.......
+UniRef90_A0A1I7TVJ7/1-125           KYFREGQEDIYVDEP-------------
+#=GR UniRef90_A0A1I7TVJ7/1-125   PP **************9.............
+#=GC PP_cons                        ***************99**9655.....
+#=GC RF                             xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+//

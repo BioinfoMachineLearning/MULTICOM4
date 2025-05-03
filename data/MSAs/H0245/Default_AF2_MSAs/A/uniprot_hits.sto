@@ -1,0 +1,133 @@
+# STOCKHOLM 1.0
+#=GF ID A-i1
+#=GF AU jackhmmer (HMMER 3.3.2)
+
+#=GS tr|A0A1I7UEV0|A0A1I7UEV0_9PELO/1-176   DE [subseq from] FBA_2 domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UEV7|A0A1I7UEV7_9PELO/1-171   DE [subseq from] FBA_2 domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TX30|A0A1I7TX30_9PELO/5-177   DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TX29|A0A1I7TX29_9PELO/77-249  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7U5G5|A0A1I7U5G5_9PELO/58-231  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TSI5|A0A1I7TSI5_9PELO/65-242  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TVK2|A0A1I7TVK2_9PELO/13-185  DE [subseq from] FBA_2 domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TUD9|A0A1I7TUD9_9PELO/67-243  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TVM8|A0A1I7TVM8_9PELO/29-197  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TVM9|A0A1I7TVM9_9PELO/29-193  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TVN0|A0A1I7TVN0_9PELO/29-192  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UI08|A0A1I7UI08_9PELO/61-231  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7U7L8|A0A1I7U7L8_9PELO/57-188  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UYZ5|A0A1I7UYZ5_9PELO/57-192  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TUD8|A0A1I7TUD8_9PELO/1-170   DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7T0W7|A0A1I7T0W7_9PELO/59-229  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/37-201  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/471-640 DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7T0W8|A0A1I7T0W8_9PELO/59-225  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TVN1|A0A1I7TVN1_9PELO/69-242  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/59-146  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/151-210 DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7UEU7|A0A1I7UEU7_9PELO/59-237  DE [subseq from] F-box domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+#=GS tr|A0A1I7TVJ7|A0A1I7TVJ7_9PELO/1-125   DE [subseq from] PRELI/MSF1 domain-containing protein OS=Caenorhabditis tropicalis OX=1561998 PE=4 SV=1
+
+A                                              MEAPRCNEVRMTVGSEGCELYIDGRPCKYEKP--E--N--VEDSLKM--IIGKMCDDLLTFI--P-DFKVNTISFRFNDDH-SYDM-WRPIY----KERFPQALEVDKLIVKSF---H--VWA-Y-L-IGKDI--INYRK--LSVFESHFLTKED--EEGIIKVRVER--EEYT-RT--DGK--T--TS---TRKCHN--
+tr|A0A1I7UEV0|A0A1I7UEV0_9PELO/1-176           MESPRCNEVKMTVGSERCELYIDGRPIKYEKP--E--N--LEDSLKM--IIGKMCNDLLTFI--P-DFKVNTISFRFNDDH-SYHM-WRPIY----KERFPQLLEVDTLIVKSF---Y--FWA-W-L-IGEDI--INYDK--LRVYEYHYLMEKD--EDDIMKVEVGR--NEYT-RT--DGK--T--TS---TRNCYI--
+#=GR tr|A0A1I7UEV0|A0A1I7UEV0_9PELO/1-176   PP 89******************************..*..*..*******..*************..*.***************.****.*****....******************...*..***.*.*.*****..*****..*************..***********..****.**..***..*..**...******..
+tr|A0A1I7UEV7|A0A1I7UEV7_9PELO/1-171           MESPRCNEVRMTVGSEGCELYIDGRPIKYEKP--E--N--LEDSLKM--IIGKMCDDLLTFI--P-DFKVNTISFRFNDDH-SYHM-WRPIY----KERFRQFLEVDTLIVKSF---H--IWA-W-L-IPTDI--LNYDK--LRVRESQYLTKED--EESIMKVRVER--KETV-TI--DGK--K--TY---TMTNFI--
+#=GR tr|A0A1I7UEV7|A0A1I7UEV7_9PELO/1-171   PP 89******************************..*..*..*******..*************..*.***************.****.*****....******************...*..***.*.*.*****..*****..*************..***********..****.**..***..*..**...******..
+tr|A0A1I7TX30|A0A1I7TX30_9PELO/5-177           ----CCNELRMTVSSKGCELHVEGYPIKYETPLED--K--LEDSLRM--IMEKMCDDLLFFI--P-DFQLNTITFRFDDHF-SYNI-FRPIY----KQRFPQPLEVHTLVVKQF---D--RSL-Y---VAYDI--INPEK--TRVREKHHLE-EY--ADDIMKVSVER--YECVDIT--DGV--K--AF---TRTHCI--
+#=GR tr|A0A1I7TX30|A0A1I7TX30_9PELO/5-177   PP ....59*************************9656..8..9******..*************..*.***************.****.*****....******************...9..887.7...689**..*****..********96.66..788********..9975279..***..9..99...999889..
+tr|A0A1I7TX29|A0A1I7TX29_9PELO/77-249          ----CCNELRMTVSSKGCELHVEGYPIKYETPLED--K--LEDSLRM--IMEKMCDDLLFFI--P-DFQLNTITFRFDDHF-SYNI-FRPIY----KQRFPQPLEVHTLVVKQF---D--RSL-Y---VAYDI--INPEK--TRVREKHHLE-EY--ADDIMKVSVER--YECVDIT--DGV--K--AF---TRTHCI--
+#=GR tr|A0A1I7TX29|A0A1I7TX29_9PELO/77-249  PP ....59*************************9656..8..9******..*************..*.***************.****.*****....******************...9..887.7...689**..*****..********96.66..788********..9975279..***..9..99...999889..
+tr|A0A1I7U5G5|A0A1I7U5G5_9PELO/58-231          MEPLRVNDIKITVGSEGCEMKIEGYPIKYKTS--E--G----GTLEE--SLNKMFDDLLHFV--P-DFQLNTISFRYNHIP-SYKL-FRSVF----SKRVSQPLTIHNLFIKSF---R--ILE-LCI-AGPDY--LNRKL--LSVLEYHSMEQLD--D-DIIKVKVCR--IKPI-E---IGK--K--AF---TSEITS--
+#=GR tr|A0A1I7U5G5|A0A1I7U5G5_9PELO/58-231  PP 67889************************998..8..6....67888..999**********..*.***************.****.*****....******************...*..987.625.69***..*****..********98887..6.69*******..9877.6...599..9..99...9*****..
+tr|A0A1I7TSI5|A0A1I7TSI5_9PELO/65-242          -KPPRCNEIKITVGSEGCEMIVEGYSIKYEKP--EEEN--EEGNAEN--IFGKMLDDLLIFV--H-NLQLPTFSIKLTDNL-FNKT-FLAVF----EKCVPQKLKVYTLVVKVF---S--FWD-I-Y-VGPAC--VDREA--NRVVEYHYMEKSA---DDIVKVKVSR--NECT-GE--VGDRWK--TC---TNTVFF--
+#=GR tr|A0A1I7TSI5|A0A1I7TSI5_9PELO/65-242  PP .67*****************************..6448..8999***..*************..*.**************9.9999.*****....******************...*..***.*.*.*****..*****..*********9875...67********..****.97..665226..88...999999..
+tr|A0A1I7TVK2|A0A1I7TVK2_9PELO/13-185          ---SRCTDIKIAVNSEGCRMIVEGKPIQYRNQ--D--G--LEESLE------KMFDDFLTLI--PLDFQLNSLSVRFDDEL-SHYT-FYTVF----NKRVPQPLKFNTQIVKSF---R--MWE-T-S-LGWRL--VDRES--VRVSEYHILEKL---ENNIIKVHVER--KEST-GD--KGD--R--WA---TFKSTKFV
+#=GR tr|A0A1I7TVK2|A0A1I7TVK2_9PELO/13-185  PP ...59*************************99..9..9..999986......99********..*9***************.****.*****....******************...*..***.*.*.*****..*****..*******99886...789********..****.*9..999..9..88...88875433
+tr|A0A1I7TUD9|A0A1I7TUD9_9PELO/67-243          ---HRCNEIRMTVDRKGSEMIVEGYSIKYKTP--EGWN--ERKNLEK--MLEKMMDDLLIFV--P-DFQLPKFSVRFNGCL-ANET-FLNVF----KNRIPQKLIVHTLVVKVF---K--FRD-I-F-VSPVC--VEREQ--LHVVEYHYMK-RL--ENKIMHVKVSR--NECT-GE--VGDRWK--TC---TKKVFY--
+#=GR tr|A0A1I7TUD9|A0A1I7TUD9_9PELO/67-243  PP ...69***************************..9555..6678999..*************..*.***************.****.*****....******************...*..***.*.*.*****..*****..********85.56..788********..****.87..664226..99...9*****..
+tr|A0A1I7TVM8|A0A1I7TVM8_9PELO/29-197          -KPPRCNEIRMNVSLERCEMIAEGYPIEYERP--EGEN--LEECLEK--MMEEMFDDMLIFV--S-DLHLPILSARFNDKL-SNRI-FRSVA----KKRFKKPLTIPSIFIKAF---S-----------GMHI----YQL--LCVAEIHYMEKL---EDDVMRVEVSR--NKYT-GE--EGN--RWESC---TKEISF--
+#=GR tr|A0A1I7TVM8|A0A1I7TVM8_9PELO/29-197  PP .67*****************************..5449..*******..*************..*.***************.****.*****....****************99...6...........4444....999..*********986...5679*******..****.**..*98..53267...9999**..
+tr|A0A1I7TVM9|A0A1I7TVM9_9PELO/29-193          -KPPRCNEIRMNVSLERCEMIAEGYPIEYERP--EGEN--LEECLEK--MMEEMFDDMLIFV--S-DLHLPILSARFNDKL-SNRI-FRSVA----KKRFKKPLTIPSIFIKAF---S-----------GMHI----YQL--LCVAEIHYMEKL---EDDVMRVEVSR--NKYT-GE--EGN--RWESC---TKEISF--
+#=GR tr|A0A1I7TVM9|A0A1I7TVM9_9PELO/29-193  PP .67*****************************..5449..*******..*************..*.***************.****.*****....****************99...6...........4444....999..*********986...5679*******..****.**..*98..53267...9999**..
+tr|A0A1I7TVN0|A0A1I7TVN0_9PELO/29-192          -KPPRCNEIRMNVSLERCEMIAEGYPIEYERP--EGEN--LEECLEK--MMEEMFDDMLIFV--S-DLHLPILSARFNDKL-SNRI-FRSVA----KKRFKKPLTIPSIFIKAF---S-----------GMHI----YQL--LCVAEIHYMEKL---EDDVMRVEVSR--NKYT-GE--EGN--RWESC---TKEISF--
+#=GR tr|A0A1I7TVN0|A0A1I7TVN0_9PELO/29-192  PP .67*****************************..5449..*******..*************..*.***************.****.*****....****************99...6...........4444....999..*********986...5679*******..****.**..*98..53267...9999**..
+tr|A0A1I7UI08|A0A1I7UI08_9PELO/61-231          ---YRVNDIKITFDSEECEMKMDGYTIKYKKP--K--G----ESLVK--MINRMFDDLITLL--P-DCQVPNFTIRINGYP-SYKL-FRSLF----LKRVPQPLTVHTYFMKAL---S--SQEMS-A-EGGDF--IKREM--LRVAEYHFMDKL---EDDIMKVKVFR--LEPT-EE--DEC--D--LL---KVIDFI--
+#=GR tr|A0A1I7UI08|A0A1I7UI08_9PELO/61-231  PP ...589**************************..9..6....56777..789**********..*.***************.****.*****....****************99...8..76514.6.79***..*****..*********996...567********..****.*9..988..7..77...777789..
+tr|A0A1I7U7L8|A0A1I7U7L8_9PELO/57-188          LESPRVNDIKITVGSEGCEMKIEGYPIKYGKP--D------EESL------DKMMNDLVTFV--P-DFQLNTVSFRFNDSP-SQKL-FRSQY----LKRVSQPMKVQKLVIKMF---N--KND-H-I-MEKEI--VNSSR----IIEYRFLEKLE---DDFIKLKVVH--LECV--------------------------
+#=GR tr|A0A1I7U7L8|A0A1I7U7L8_9PELO/57-188  PP 699*****************************..8......5675......6999*******..*.***************.****.*****....******************...*..***.*.*.*****..**876....67899**9865...5578888876..6654..........................
+tr|A0A1I7UYZ5|A0A1I7UYZ5_9PELO/57-192          LERPRVNDIKITVGSEGCEMKIEGYPIKYGKA--D------EESL------NNMFDDLLRFV--S-DFQLNTISFQFNDNP-SYKL-YRSQF----LKRVPQPMNVQKLVVKVF---N--KND-H-I-MEKEI--VNSSR----IIELHFMEKLE---DDFIKVKVVH--LECV-ER--IG-------------------
+#=GR tr|A0A1I7UYZ5|A0A1I7UYZ5_9PELO/57-192  PP 589***************************98..7......6776......5899*******..*.***************.****.*****....******************...*..***.*.*.*****..**876....68*****9875...5689999987..7765.55..44...................
+tr|A0A1I7TUD8|A0A1I7TUD8_9PELO/1-170           ----------MTVDRKGSEMIVEGYSIKYKTP--EGWN--ERKNLEK--MLEKMMDDLLIFV--P-DFQLPKFSVRFNGCL-ANET-FLNVF----KNRIPQKLIVHTLVVKVF---K--FRD-I-F-VSPVC--VEREQ--LHVVEYHYMK-RL--ENKIMHVKVSR--NECT-GE--VGDRWK--TC---TKKVFY--
+#=GR tr|A0A1I7TUD8|A0A1I7TUD8_9PELO/1-170   PP ..........7999******************..9555..6678999..*************..*.***************.****.*****....******************...*..***.*.*.*****..*****..********85.56..788********..****.87..664226..99...9*****..
+tr|A0A1I7T0W7|A0A1I7T0W7_9PELO/59-229          -KPPRCDDIKITFGPEGCEMKIDRYTIKYGKA--D------EESL------NEMLDDLMTLL--P-DFQLTNFTIRINDTQ-SYKL-FRTLF----SKRVPESLKVDTYVLKAF---S--FRD-T-A-INVTW---HYKRDLLSVLEYHEMERL---KDDIIKVKVCR--TRPP-GI--VDN--VLRAR---TIEKFM--
+#=GR tr|A0A1I7T0W7|A0A1I7T0W7_9PELO/59-229  PP .67***************************98..7......6776......6899*******..*.***************.****.*****....******************...9..998.8.8.87654...5554458******99775...5679*****99..7665.54..333..30134...555678..
+tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/37-201          ----CCKELQMTIGLEECELKLEGHSIKYKKS--G------EGTYSM---LTKMLDDLSSFL--S-HSQSHLDTFIINQNN-VKDF-PQTIFIKGQKEFVSESLSVLSLDLQAY---E--IWH-L-P-FWREE--IKCKE--LHISYLRILEKL---EDDIMRVEVKT--RK-C-NA--DAQ--I--KS----NYC-T--
+#=GR tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/37-201  PP ....69***********************996..4......566655...67**********..*.*************99.9999.998875554777899************...*..***.*.*.*****..*****..***999999875...56799999987..65.5.67..887..7..65....457.6..
+tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/471-640         -----CKELTITIGLEECELKIEGHSIKYKRS--G--E--GFES-----MLMSMTDDLSSFVFDP-QFQLDTFIFKNNTIF--NAM-IRTIY----PGVHHEQV-AESLYELSI---D--LDA-Y-DNLQRSFWTAGRIK--LREFQGSFLYNPTILDDDIMKVEMKT--RKFV-A----GV--R--P----TLKYCT--
+#=GR tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/471-640 PP .....9***********************987..5..4..4444.....445799***9877448.899999888866654..468.99999....87655443.466777788...8..888.7.42445541145568..999*****987643367899999988..8886.4....55..4..4....455558..
+tr|A0A1I7T0W8|A0A1I7T0W8_9PELO/59-225          -KPPRCDDIKITFGPEGCEMKIDRYTIKYGKA--D------EESL------NEMLDDLMTLL--P-DFQLTNFTIRINDTQ-SYKL-FRTLF----SKRVPESLKVDTYVLKAF---S--FRD-T-A-INVTW---HYKRDLLSVLEYHEMERL---KDDIIKVKVCR--TRPP-GI--VDN--VLRAR---TIEKFM--
+#=GR tr|A0A1I7T0W8|A0A1I7T0W8_9PELO/59-225  PP .67***************************98..7......6776......6899*******..*.***************.****.*****....******************...9..998.8.8.87654...5554458******99775...5679*****99..7665.54..333..30134...555678..
+tr|A0A1I7TVN1|A0A1I7TVN1_9PELO/69-242          ----RCDDLKITIGPERSQVIINGYTIDYKRP--EGEN--DEECRKI--MIGKMLDDFLPLI--N-DCQLNFFSARFDDYL-SNIL-FHDVF----QERS-KPLKAHTLICKGF---H--HTH-R-F-IETRL--VDWAS--PRFREYHQMEKQA---DDIIKVNLRK--IQCS-GIMPNPW--L--QD---TVTETI--
+#=GR tr|A0A1I7TVN1|A0A1I7TVN1_9PELO/69-242  PP ....8***************************..6337..78889**..*************..*.***************.****.*****....**96.689**********...*..**9.9.*.*****..****9..9999999998875...569***9999..8877.5411444..4..55...666667..
+tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/59-146          ----CCNEIKITIGLEECELKLEGHSIKYKRS--E--GEDPKEILEW--MLKRMFDDLLTFV--P-NLQTNTYLVQFYDEQLTWPI-FRSVY----KKCVPQPIKA----------------------------------------------------------------------------------------------
+#=GR tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/59-146  PP ....59***********************998..7..5115678999..*************..*.**********99986489**.*****....******9865..............................................................................................
+tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/151-210         ----------------------------------------------------------------------------------------------------------------------------------------------------HRTMEKY--EEGIIKVKILR--IEWT-DL-LDNK--G--NRRLIIWPSYF--
+#=GR tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/151-210 PP ....................................................................................................................................................5555667..9**********..***9.74.2665..5..43111346799..
+tr|A0A1I7UEU7|A0A1I7UEU7_9PELO/59-237          ----CCNEIKMTVGLEECELKIEGHSIKYKPS--D--E--GTDSEVMLEMLTKMIDDLS-FLSDP-QFQLDTLIFRHNNASLMYQTDFSQVV----NKRLPQSVSVRSLVLEEFEYNHHSIWY-L-A-FWKSK--MKLND--FHVTQLENLTKL---EDDIMRVKIHK--TKYI-----DSR--I--IR---PWSSCI--
+#=GR tr|A0A1I7UEU7|A0A1I7UEU7_9PELO/59-237  PP ....59***********************988..8..7..777755522589*****85.44248.9**********986424543267888....99*************998544145898.8.8.99999..99999..99999999**97...5679*******..*996.....777..7..77...666667..
+tr|A0A1I7TVJ7|A0A1I7TVJ7_9PELO/1-125           -----------------------------------------------------MLDDVLPFI--H-DYRLNTFSAKFYDYL-SNIT-FHDVF----QERSPP-LKVHTLICKGF---Q--RGT-W-F-VEQRL--VDWVS--IRLREYHVLEKQA--DD-IVKVKFRIVVPTGA-MP--NLW--H--TY---TAIDSI--
+#=GR tr|A0A1I7TVJ7|A0A1I7TVJ7_9PELO/1-125   PP .....................................................78*******..*.***************.****.*****....****95.9**********...*..***.*.*.*****..*****..*********9986..54.66666555004455.55..556..6..77...888889..
+#=GC PP_cons                                   77898*************************99..7..7..8888899..9999*********..*.*************99.*99*.*****....*****9************...9..999.9.9.98888..*9999..**9*****98866..6789*****99..9888.77..777..6..77...888889..
+#=GC RF                                        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..x..x..xxxxxxx..xxxxxxxxxxxxx..x.xxxxxxxxxxxxxxx.xxxx.xxxxx....xxxxxxxxxxxxxxxxxx...x..xxx.x.x.xxxxx..xxxxx..xxxxxxxxxxxxx..xxxxxxxxxxx..xxxx.xx..xxx..x..xx...xxxxxx..
+
+A                                              RYFREGQEEIYADEPELLPPAAEIVKAI
+tr|A0A1I7UEV0|A0A1I7UEV0_9PELO/1-176           KYFREGQEDIYVDKPELLPSV-------
+#=GR tr|A0A1I7UEV0|A0A1I7UEV0_9PELO/1-176   PP ******************965.......
+tr|A0A1I7UEV7|A0A1I7UEV7_9PELO/1-171           KYFREGQEETYVDEPV------------
+#=GR tr|A0A1I7UEV7|A0A1I7UEV7_9PELO/1-171   PP **************96............
+tr|A0A1I7TX30|A0A1I7TX30_9PELO/5-177           KYFREGQEDVYVDEPNLVPPK-------
+#=GR tr|A0A1I7TX30|A0A1I7TX30_9PELO/5-177   PP ********************7.......
+tr|A0A1I7TX29|A0A1I7TX29_9PELO/77-249          KYFREGQEDVYVDEPNLVPPK-------
+#=GR tr|A0A1I7TX29|A0A1I7TX29_9PELO/77-249  PP ********************7.......
+tr|A0A1I7U5G5|A0A1I7U5G5_9PELO/58-231          KYFREGQEDVYVDEPELLPPRE------
+#=GR tr|A0A1I7U5G5|A0A1I7U5G5_9PELO/58-231  PP ********************75......
+tr|A0A1I7TSI5|A0A1I7TSI5_9PELO/65-242          KYFREDQENIYVDEPELLPPK-------
+#=GR tr|A0A1I7TSI5|A0A1I7TSI5_9PELO/65-242  PP ********************6.......
+tr|A0A1I7TVK2|A0A1I7TVK2_9PELO/13-185          KYFREGQEDIYVDEPSQLSPKKQ-----
+#=GR tr|A0A1I7TVK2|A0A1I7TVK2_9PELO/13-185  PP 9***************9999765.....
+tr|A0A1I7TUD9|A0A1I7TUD9_9PELO/67-243          KYFRKGQEDIYVDKPELLPPKK------
+#=GR tr|A0A1I7TUD9|A0A1I7TUD9_9PELO/67-243  PP ********************75......
+tr|A0A1I7TVM8|A0A1I7TVM8_9PELO/29-197          KYFREGQEDIYVDESELLPL--------
+#=GR tr|A0A1I7TVM8|A0A1I7TVM8_9PELO/29-197  PP ******************95........
+tr|A0A1I7TVM9|A0A1I7TVM9_9PELO/29-193          KYFREGQEDIYVDESY------------
+#=GR tr|A0A1I7TVM9|A0A1I7TVM9_9PELO/29-193  PP *************975............
+tr|A0A1I7TVN0|A0A1I7TVN0_9PELO/29-192          KYFREGQEDIYVDES-------------
+#=GR tr|A0A1I7TVN0|A0A1I7TVN0_9PELO/29-192  PP *************96.............
+tr|A0A1I7UI08|A0A1I7UI08_9PELO/61-231          KYFREGQEDIYVDDPELLPPK-------
+#=GR tr|A0A1I7UI08|A0A1I7UI08_9PELO/61-231  PP ********************6.......
+tr|A0A1I7U7L8|A0A1I7U7L8_9PELO/57-188          ----------------------------
+#=GR tr|A0A1I7U7L8|A0A1I7U7L8_9PELO/57-188  PP ............................
+tr|A0A1I7UYZ5|A0A1I7UYZ5_9PELO/57-192          ----------------------------
+#=GR tr|A0A1I7UYZ5|A0A1I7UYZ5_9PELO/57-192  PP ............................
+tr|A0A1I7TUD8|A0A1I7TUD8_9PELO/1-170           KYFRKGQEDIYVDKPELLPPKK------
+#=GR tr|A0A1I7TUD8|A0A1I7TUD8_9PELO/1-170   PP ********************75......
+tr|A0A1I7T0W7|A0A1I7T0W7_9PELO/59-229          KYFREGQEDIYVDDPDQLPPK-------
+#=GR tr|A0A1I7T0W7|A0A1I7T0W7_9PELO/59-229  PP 9******************96.......
+tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/37-201          KYYREGQMDILVDEPVS-----------
+#=GR tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/37-201  PP 9**************65...........
+tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/471-640         KYFREGQMDILVDEPRLLPPK-------
+#=GR tr|A0A1I7UEV1|A0A1I7UEV1_9PELO/471-640 PP 9******************96.......
+tr|A0A1I7T0W8|A0A1I7T0W8_9PELO/59-225          KYFREGQEDIYVDDPIL-----------
+#=GR tr|A0A1I7T0W8|A0A1I7T0W8_9PELO/59-225  PP 9*************965...........
+tr|A0A1I7TVN1|A0A1I7TVN1_9PELO/69-242          KYFREGQEDIYVDEPNLVPPK-------
+#=GR tr|A0A1I7TVN1|A0A1I7TVN1_9PELO/69-242  PP 9*******************6.......
+tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/59-146          ----------------------------
+#=GR tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/59-146  PP ............................
+tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/151-210         KYFRERQEDIFVHESELVPA--------
+#=GR tr|A0A1I7UEU9|A0A1I7UEU9_9PELO/151-210 PP *****************995........
+tr|A0A1I7UEU7|A0A1I7UEU7_9PELO/59-237          KYYREGQRDILVDEPGLLLPK-------
+#=GR tr|A0A1I7UEU7|A0A1I7UEU7_9PELO/59-237  PP 9***************99885.......
+tr|A0A1I7TVJ7|A0A1I7TVJ7_9PELO/1-125           KYFREGQEDIYVDEP-------------
+#=GR tr|A0A1I7TVJ7|A0A1I7TVJ7_9PELO/1-125   PP **************9.............
+#=GC PP_cons                                   ***************99**9655.....
+#=GC RF                                        xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+//
