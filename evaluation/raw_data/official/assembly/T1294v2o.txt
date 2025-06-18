@@ -1,0 +1,5 @@
+
+Target: T1294v2o
+
+#   Model              Gr.Code Group                QSglob   QSbest   Mol.Size Stoich.  Symm.     SymmSize ICS(F1)   Prec.Iface Recal.Iface lDDT       DockQ_Avg  IPS(JaccCoef)  QS_Interfaces                            QSglob_perInterface                      TMscore    
+

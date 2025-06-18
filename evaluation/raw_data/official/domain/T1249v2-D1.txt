@@ -1,0 +1,3 @@
+#    Model               GR#   GROUP_NAME             GDT_TS   NP_P    RANK  Z-M1-GDT  Z-MA-GDT  GDT_HA   GDC_SC   GDC_ALL  RMS_CA   RMS_ALL  NP   AL0_P  AL4_P  ALI_P  LGA_S    RMSD[L]  MolProb  LDDT    SphGr     CAD_AA  RPF    TMscore FlexE    QSE      CAD_SS   MP_clash reLLG_lddt reLLG_const 
+
+
