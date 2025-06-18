@@ -44,7 +44,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
         else:
             self.run_methods = run_methods
 
-    def process_single(self, targetname, fasta_path, alndir, img_alndir, outdir, template_dir=None, run_script=False):
+    def process_single(self, targetname, fasta_path, alndir, img_alndir, outdir, template_dir=None, run_script=True):
         
         chain_name = pathlib.Path(fasta_path).stem
 

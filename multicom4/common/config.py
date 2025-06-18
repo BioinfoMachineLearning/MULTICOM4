@@ -38,7 +38,7 @@ class pipeline():
         else:
             return self.homomer_config.common_config[config_name]
 
-MONOMER_PREDICTIONS_PER_MODEL = 200
+MONOMER_PREDICTIONS_PER_MODEL = 2
 
 MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
@@ -297,7 +297,7 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 10,
+        'predictions_per_model': 5,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -582,7 +582,7 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 200,
+        'predictions_per_model': 5,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,

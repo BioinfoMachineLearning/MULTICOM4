@@ -342,7 +342,8 @@ def select_models_monomer_only(qa_result, outputdir, params, is_human):
     af3_ranking_score_df = af3_ranking_score_df.sort_values(by=['score', 'model'], ascending=[False, True])
     af3_ranking_score_df.reset_index(inplace=True, drop=True)
     af3_ranking_score_df.to_csv(os.path.join(outputdir, 'af3_ranking_score.csv'))
-
+    
+    return
     if not is_human:
         
         select_models_by_tmscore(tmscore_program=params['tmscore_program'],

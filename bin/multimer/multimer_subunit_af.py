@@ -102,7 +102,7 @@ def main(argv):
                                                                 templatedir=N2_monomer_outdir,
                                                                 outdir=N3_monomer_outdir,
                                                                 run_methods=monomer_run_methods,
-                                                                run_script=os.path.exists(params['slurm_script_template']),
+                                                                run_script=True,
                                                                 is_subunit=True):
                 print(f"Program failed in step 3: monomer {monomer_id} structure generation")
 

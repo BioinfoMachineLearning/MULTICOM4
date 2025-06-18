@@ -97,7 +97,7 @@ def main(argv):
                                                         templatedir=N2_outdir, 
                                                         outdir=N3_outdir,
                                                         run_methods=run_methods,
-                                                        run_script=os.path.exists(params['slurm_script_template'])):
+                                                        run_script=True):
         print("Program failed in step 3: monomer structure generation")
 
     print("The prediction for monomers has finished!")

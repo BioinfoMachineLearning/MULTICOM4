@@ -45,6 +45,34 @@ def main(argv):
     outdir = FLAGS.output_dir
 
     makedir_if_not_exists(outdir)
+    
+    N1_outdir = os.path.join(outdir, 'N1_monomer_alignments_generation')
+    makedir_if_not_exists(N1_outdir)
+
+    N1_outdir_img = os.path.join(outdir, 'N1_monomer_alignments_generation_img')
+
+    print("#################################################################################################")
+    print(f"1. Start to generate alignments for monomers")
+
+    #result = run_monomer_msa_pipeline(fasta=FLAGS.fasta_path, outdir=N1_outdir, params=params, only_monomer=True)
+
+    #if result is None:
+    #    raise RuntimeError('The monomer alignment generation has failed!')
+
+    print("#################################################################################################")
+    print("2. Start to generate template for monomer")
+
+    N2_outdir = os.path.join(outdir, 'N2_monomer_template_search')
+
+    makedir_if_not_exists(N2_outdir)
+
+    template_file = run_monomer_template_search_pipeline(params=params, targetname=targetname, sequence=sequence,
+                                                         a3m=os.path.join(N1_outdir, targetname+"_uniref90.sto"), outdir=N2_outdir)
+
+    if template_file is None:
+        raise RuntimeError("Program failed in step 2: monomer template search")
+
+    print("The generation for monomer template has finished!")
 
     print("3. Start to generate tertiary structure for monomers using alphafold")
     N3_outdir = os.path.join(outdir, 'N3_monomer_structure_generation')
@@ -59,7 +87,7 @@ def main(argv):
                                                         templatedir=N2_outdir, 
                                                         outdir=N3_outdir,
                                                         run_methods=run_methods,
-                                                        run_script=os.path.exists(params['slurm_script_template'])):
+                                                        run_script=True):
         print("Program failed in step 3: monomer structure generation")
 
 
