@@ -15,9 +15,14 @@ MULTICOM4 is an advanced protein structure prediction system built on AlphaFold2
 | **T0234o**    | A3, Better Stoichiometry Prediction            | ![T0234](imgs/T0234.gif)       |
 
 
-## **The workflow of the MULTICOM Protein structure prediction system used in CASP16**
+## **The workflow of the MULTICOM4 protein complex structure prediction system used in CASP16**
 
 ![MULTICOM4](imgs/MULTICOM4.png)
+
+## **The workflow of the MULTICOM4 protein tertiary structure prediction system used in CASP16**
+
+![MULTICOM4](imgs/TS_module.png)
+
 
 # **Download MULTICOM4 package**
 
