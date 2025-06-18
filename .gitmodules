@@ -5,3 +5,6 @@
 [submodule "tools/afsample"]
 	path = tools/afsample
 	url = https://github.com/bjornwallner/alphafoldv2.2.0
+[submodule "tools/Dense-Homolog-Retrieval"]
+	path = tools/Dense-Homolog-Retrieval
+	url = https://github.com/ml4bio/Dense-Homolog-Retrieval
