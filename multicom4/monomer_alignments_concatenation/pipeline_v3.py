@@ -419,8 +419,7 @@ class Monomer_alignments_concatenation_pipeline:
     def concatenate(self, alignments, is_homomers):
 
         if "deepmsa2" in self.methods:
-            deepmsa2_runner = DeepMSA2_pairing(is_human= True if self.params['is_human'] == "1" else False,
-                                               is_homomers=is_homomers)
+            deepmsa2_runner = DeepMSA2_pairing(is_homomers=is_homomers)
             self.runners['deepmsa2'] = deepmsa2_runner
 
         res_alignments = []

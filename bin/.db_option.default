@@ -1,214 +1,175 @@
 ###########################This is an option file####################################
 
+slurm_script_template = ""
+
+is_human = 0
 ################################tools option#########################################
 
-# clustalo program path
-clustalo_program_dir = SOFTWARE_PATH/tools/clustalo/
-
 # hhblits program path
-hhblits_program = YOUR_ENV/bin/hhblits
+hhblits_program = YOUR_ENV/envs/multicom4/bin/hhblits
 
 # hhfilter program path
-hhfilter_program = YOUR_ENV/bin/hhfilter
+hhfilter_program = YOUR_ENV/envs/multicom4/bin/hhfilter
 
 # hhmake program path
-hhmake_program = YOUR_ENV/bin/hhmake
+hhmake_program = YOUR_ENV/envs/multicom4/bin/hhmake
 
 # hhalign program path
-hhalign_program = YOUR_ENV/bin/hhalign
+hhalign_program = YOUR_ENV/envs/multicom4/bin/hhalign
 
 # jackhmmer program path
-jackhmmer_program = YOUR_ENV/bin/jackhmmer
-
-# tmalign program path
-tmalign_program = SOFTWARE_PATH/tools/tmalign/TMalign
-
-# mmalign program path
-mmalign_program = SOFTWARE_PATH/tools/MMalign
+jackhmmer_program = YOUR_ENV/envs/multicom4/bin/jackhmmer
 
 # hhsearch program path
-hhsearch_program = YOUR_ENV/bin/hhsearch
+hhsearch_program = INSTALLDIR_TOOLS/hhsuite-3.2.0/bin/hhsearch
 
-# deepmsa2 program path
-deepmsa2_program = SOFTWARE_PATH/tools/deepmsa/hhsuite2/scripts/build_MSA2.py
+# tmalign program path
+tmalign_program = INSTALLDIR_TOOLS/tmalign/TMalign
 
-# alphafold environment directory
-alphafold_env_dir = YOUR_ALPHAFOLD_ENV/bin/
+# mmalign program path
+mmalign_program = INSTALLDIR_TOOLS/mmalign/MMalign
 
-# alphafold database directory
-alphafold_database_dir = SOFTWARE_PATH/tools/alphafold_databases/
+# dockq program
+dockq_program = INSTALLDIR_TOOLS/DockQ/DockQ.py
+
+# tmscore program
+tmscore_program = INSTALLDIR_TOOLS/tmscore/TMscore
+
+usalign_program = INSTALLDIR_TOOLS/USalign
+
+calNf_program = INSTALLDIR_TOOLS/calNf
+
+################################MSA generation tool###########################
+
+mmseq_program = YOUR_ENV/envs/multicom4/bin/mmseqs
+
+deepmsa2_path = INSTALLDIR_TOOLS/DeepMSA2
+
+DHR_program_path = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_alignment_generation/tools/DHR_local.sh
+
+DHR_database_path = /bmlfast/DHR/DHR_DATABASE/
+
+################################QA option#####################################
 
 #########################Customized alphafold program###########################
 
+# alphafold environment directory
+alphafold_env_dir = YOUR_ENV/envs/multicom4/bin/
+
+# alphafold database directory
+alphafold_database_dir = INSTALLDIR_DATABASES/alphafold_databases_multicom3
+
 # alphafold program path
-alphafold_program_dir = SOFTWARE_PATH/tools/alphafold
+alphafold_program_dir = INSTALLDIR_TOOLS/alphafold-v2.3.2
 
 # alphafold tertiary structure prediction script
 alphafold_program = run_alphafold_custom.py
 
 # alphafold tertiary structure prediction script
-alphafold_multimer_program = run_alphafold_multimer_custom_sim.py
-
-#########################Original alphafold program###########################
-
-# alphafold program path
-alphafold_default_program_dir = SOFTWARE_PATH/tools/alphafold_default/alphafold
+alphafold_multimer_program = run_alphafold_multimer_custom.py
 
 # alphafold tertiary structure prediction script
-alphafold_default_program = run_alphafold_pre_sim.py
+alphafold_default_program = run_alphafold_pre.py
 
-################################MSA generation tool###########################
+# alphafold tertiary structure prediction script
+afsample_env_dir = YOUR_ENV/envs/afsample/bin/
 
-colabfold_search_program = YOUR_ENV/bin/colabfold_search
+# alphafold program path
+afsample_program_dir = INSTALLDIR_TOOLS/alphafoldv2.2.0
 
-colabfold_split_msas_program = YOUR_ENV/bin/colabfold_split_msas
+# alphafold tertiary structure prediction script
+afsample_program = run_afsample_custom.py
 
-colabfold_databases = SOFTWARE_PATH/tools/ColabFold/databases/
+# Common parameters
+alphafold_benchmark = True
 
-mmseq_program = SOFTWARE_PATH/tools/mmseqs/bin/mmseqs
+use_gpu_relax = True
 
-################################QA option#####################################
+max_template_date = 9999-06-01
 
-# dockq program
-dockq_program = SOFTWARE_PATH/tools/DockQ/DockQ.py
+pdb_release_date_file = INSTALLDIR_DATABASES/multicom4_db/pdb_release_date_filtered.csv
 
-# qscore program
-qscore_program = SOFTWARE_PATH/tools/pairwiseQA/q_score
+# Other tools
 
-# tmscore program
-tmscore_program = SOFTWARE_PATH/tools/TMscore
+esmfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold_local.sh
 
-# enqa_program_python
-enqa_program_python = YOUR_ENQA_ENV_PATH/bin/python
-
-# enqa_program_path
-enqa_program_path = YOUR_ENQA_PATH
-
-# enqa_program_script
-enqa_program_script = predict_batch.py
+esm_msa_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1_local.sh
 
 ######################Monomer template search option#################################
 
-foldseek_program = SOFTWARE_PATH/tools/foldseek/bin/foldseek
+foldseek_program = YOUR_ENV/envs/multicom4/bin/foldseek
 
-foldseek_pdb_database = SOFTWARE_PATH/tools/foldseek/databases/complex
+foldseek_pdb_database = INSTALLDIR_DATABASES/multicom4_db/foldseek_databases/complex
 
-foldseek_pdb_database_dir = SOFTWARE_PATH/tools/foldseek/databases/complex_pdb
+foldseek_pdb_database_dir = INSTALLDIR_DATABASES/multicom4_db/foldseek_databases/complex/complex_pdb
 
-foldseek_af_database = SOFTWARE_PATH/tools/foldseek/databases/af_db
+foldseek_af_database = INSTALLDIR_DATABASES/alphafold_databases_multicom3/af_db/foldseek_database
 
-foldseek_af_database_dir = SOFTWARE_PATH/tools/foldseek/databases/af_pdbs
+foldseek_af_database_dir = INSTALLDIR_DATABASES/alphafold_databases_multicom3/af_db/pdbs
 
-foldseek_complex_comb_database = SOFTWARE_PATH/tools/foldseek/databases/complex_comb
-
-foldseek_complex_comb_database_dir = SOFTWARE_PATH/tools/foldseek/databases/complex_atom_comb
+foldseek_esm_atlas_database = INSTALLDIR_DATABASES/multicom4_db/foldseek_databases/esm_atlas/foldseekdb
 
 ################################databases option#####################################
 
-smallbfd_database = SOFTWARE_PATH/databases/smallbfd/bfd-first_non_consensus_sequences.fasta
+bfd_database = INSTALLDIR_DATABASES/alphafold_databases_multicom3/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
 
-bfd_database = SOFTWARE_PATH/databases/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
+mgnify_database = INSTALLDIR_DATABASES/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
 
-mgnify_database = SOFTWARE_PATH/databases/mgnify/mgy_clusters_2018_12.fa
+metaclust_database = INSTALLDIR_DATABASES/multicom4_db/Metaclust_2018_06/metaclust.fasta
 
-metaclust_database = SOFTWARE_PATH/databases/Metaclust_2018_06/metaclust_50
-
-img_database_path = SOFTWARE_PATH/databases/img/img_new.fasta
+JGIclust_database = INSTALLDIR_DATABASES/multicom4_db/JGIclust
 
 ###########################Complex alignment generation option#######################
 
 ###########################UNIPROT TO PDB database option############################
 
-# uniref database
-uniref_db_dir = SOFTWARE_PATH/databases/UniRef30_2021_03
-
-uniref_db = UniRef30_2021_03
-
-uniref90_fasta = SOFTWARE_PATH/databases/uniref90/uniref90_2021_03.fasta
-
 # uniclust database
-uniclust_db_dir = SOFTWARE_PATH/databases/uniclust30_2018_08
+uniclust_db = INSTALLDIR_DATABASES/multicom4_db/uniclust30_2018_08/uniclust30_2018_08
 
-uniclust_db = uniclust30_2018_08
+# uniref database
+uniref_db = INSTALLDIR_DATABASES/alphafold_databases_multicom3/uniref30/UniRef30_2023_02
 
-uniprot_fasta = SOFTWARE_PATH/databases/uniprot/uniprot.fasta
+uniref90_fasta = INSTALLDIR_DATABASES/alphafold_databases_multicom3/uniref90/uniref90.fasta
 
-# uniprot id mapping file
-uniprot_official_mapping_file = SOFTWARE_PATH/databases/idmapping_selected.tab.2021_06
-
-# complex alignments concatenation method
-concatenate_methods = pdb_interact,species_interact,uniclust_oxmatch,uniprot_distance,string_interact
+uniprot_fasta = INSTALLDIR_DATABASES/alphafold_databases_multicom3/uniprot/uniprot.fasta
 
 ###########################UNIPROT TO PDB database option############################
 
-uniprot2pdb_dir = SOFTWARE_PATH/databases/uniprot2pdb
+uniprot2pdb_mapping_file = INSTALLDIR_DATABASES/multicom4_db/uniprot2pdb/uniprot2pdb.map
 
-uniprot2pdb_mapping_file = SOFTWARE_PATH/databases/uniprot2pdb/uniprot2pdb.map
-
-dimers_list = SOFTWARE_PATH/databases/uniprot2pdb/dimers_cm.list
+complexes_list = /bmlfast/bml_casp16/update_complex_dbs_newest/databases/Complex/cm_lib/complexes_cm.list
 
 ###########################STRING database option####################################
 
-string_dir = SOFTWARE_PATH/databases/STRING
-
-string_links_file = SOFTWARE_PATH/databases/string/protein.links.v11.5.txt
-
-string_aliases_file = SOFTWARE_PATH/databases/string/protein.aliases.v11.5.txt
-
-string2uniprot_map = SOFTWARE_PATH/databases/string/string2uniprot.map
-
-###########################GENO DISTANCE database option############################
-
-geno_dir = SOFTWARE_PATH/databases/geno_distance
-
-uniprot_to_embl_table = SOFTWARE_PATH/databases/geno_distance/idmapping_uniprot_embl.txt
-
-con_pro_cds_dir = SOFTWARE_PATH/databases/geno_distance/con_pro
-
-ena_genome_location_table = SOFTWARE_PATH/databases/geno_distance/cds_pro.txt
-
-genome_distance_threshold = 10000
+string2uniprot_map = INSTALLDIR_DATABASES/multicom4_db/string/string2uniprot.map
 
 #######################End of Complex alignment generation option###################
 
 
-
 ###########################Complex template search option###########################
 
-template_atom_dir = SOFTWARE_PATH/databases/Complex/atom
+###########################Sequence and structure based template search option####################
 
-template_count = 20
+pdb70_hhsuite_database = INSTALLDIR_DATABASES/alphafold_databases_multicom3/pdb70/pdb70
 
-###########################Structure based template search option###################
+pdb70_hhsuite_cluster_tsv = INSTALLDIR_DATABASES/alphafold_databases_multicom3/pdb70/pdb70_clu.tsv
 
-template_heterodimer_list = SOFTWARE_PATH/databases/Complex/work/heterodimers_0.4.list
+pdb_seqs_dir = INSTALLDIR_DATABASES/alphafold_databases_multicom3/pdb_seqres/pdb_seqs
 
-template_homodimer_list = SOFTWARE_PATH/databases/Complex/work/homodimers_0.4.list
+pdb_sort90_hhsuite_database = INSTALLDIR_DATABASES/multicom4_db/pdb_sort90/hhsuitedb3
 
-tmalign_threshold = 0.3
+pdb_sort90_hhsuite_cluster_tsv = INSTALLDIR_DATABASES/multicom4_db/pdb_sort90/sort90_clust
 
-###########################Sequence based template search option####################
+pdb_sort90_atom_dir = INSTALLDIR_DATABASES/multicom4_db/pdb_sort90/atom
 
-pdb70_hhsuite_database = /home/bml_casp15/tools/alphafold_databases/pdb70/pdb70
+pdb_sort90_hmm_dir = INSTALLDIR_DATABASES/multicom4_db/pdb_sort90/hmm
 
-pdb70_hhsuite_cluster_tsv = /home/bml_casp15/tools/alphafold_databases/pdb70/pdb70_clu.tsv
+complex_sort90_hhsuite_database = INSTALLDIR_DATABASES/multicom4_db/pdb_complex/hhsuitedb3
 
-pdb_seqs_dir = /home/bml_casp15/tools/alphafold_databases/pdb_seqres/pdb_seqs
+complex_sort90_hhsuite_cluster_tsv = INSTALLDIR_DATABASES/multicom4_db/pdb_complex/sort90_clust
 
-pdb_sort90_hhsuite_database = /home/bml_casp15/update_complex_dbs/databases/hhsuite_pdb/hhsuitedb3
+complex_sort90_atom_dir = INSTALLDIR_DATABASES/multicom4_db/pdb_complex/atom
 
-pdb_sort90_hhsuite_cluster_tsv = /home/bml_casp15/update_complex_dbs/databases/RCSB_PDB/fr_lib/sort90_clust
-
-pdb_sort90_atom_dir = /home/bml_casp15/update_complex_dbs/databases/RCSB_PDB/atom
-
-pdb_sort90_hmm_dir = /home/bml_casp15/update_complex_dbs/databases/RCSB_PDB/msa/hmm
-
-complex_sort90_hhsuite_database = /home/bml_casp15/update_complex_dbs/databases/hhsuite_complex/hhsuitedb3
-
-complex_sort90_hhsuite_cluster_tsv = /home/bml_casp15/update_complex_dbs/databases/Complex/fr_lib/sort90_clust
-
-complex_sort90_atom_dir = /home/bml_casp15/update_complex_dbs/databases/Complex/atom
-
-complex_sort90_hmm_dir = /home/bml_casp15/update_complex_dbs/databases/Complex/msa/hmm
+complex_sort90_hmm_dir = INSTALLDIR_DATABASES/multicom4_db/pdb_complex/hmm
 
 #######################End of Complex alignment generation option###################

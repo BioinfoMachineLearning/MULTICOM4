@@ -41,9 +41,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
     def __init__(self, params, run_methods=None):
 
-        is_human = True if params['is_human'] == "1" else False
-
-        super().__init__(is_human=is_human)
+        super().__init__()
 
         self.params = params
 

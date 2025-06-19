@@ -23,8 +23,7 @@ class refinement_input_multimer:
 class Multimer_iterative_refinement_pipeline_server(config.pipeline):
 
     def __init__(self, params, config_name):
-        is_human = True if params['is_human'] == "1" else False
-        super().__init__(is_human=is_human)
+        super().__init__()
         self.params = params
         self.config_name = config_name
 
@@ -61,9 +60,7 @@ class Multimer_refinement_model_selection(config.pipeline):
     
     def __init__(self, params, config_name, stoichiometry):
 
-        is_human = True if params['is_human'] == "1" else False
-
-        super().__init__(is_human=is_human)
+        super().__init__()
 
         self.params = params
 

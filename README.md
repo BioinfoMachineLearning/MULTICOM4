@@ -98,6 +98,19 @@ conda install tqdm
 conda install -c conda-forge -c bioconda foldseek
 ```
 
+### **Install third-party packages envorinments**
+
+```python
+# DHR
+conda create --name fastMSA --file tools/Dense-Homolog-Retrieval/requirements.txt -c pytorch -c conda-forge -c bioconda
+
+# ESMFold
+conda env create -f esm.yml
+conda activate esmfold
+pip install "fair-esm[esmfold]"
+pip install 'openfold @ git+https://github.com/aqlaboratory/openfold.git@4b41059694619831a7db195b7e0988fc4ff3a307'
+```
+
 ### **Download Genetic databases in AlphaFold2/AlphaFold-Multimer**
 
 ```
@@ -108,7 +121,7 @@ bash $MULTICOM4_INSTALL_DIR/tools/alphafold-v2.3.2/scripts/download_all_data.sh 
 
 ### **Install the MULTICOM4 addon system and its databases**
 
-```
+```python
 # Note: here the parameters should be the absolute paths
 python download_database_and_tools.py --multicom4db_dir <YOUR_MULTICOM4_DB_DIR>
 
@@ -144,38 +157,32 @@ Assume the following databases have been installed as a part of the AlphaFold2/A
 
 Additional databases will be installed for the MULTICOM system by setup.py:
 *   [AlphaFoldDB](https://alphafold.ebi.ac.uk/): ~53G
+*   [ESM Atlas](https://esmatlas.com/): ~99G
 *   [Metaclust](https://metaclust.mmseqs.org/current_release/): ~114G
 *   [STRING](https://string-db.org/cgi/download?sessionId=bgV6D67b9gi2): ~129G
-*   [pdb_complex](https://www.biorxiv.org/content/10.1101/2023.05.16.541055v1): ~38G
-*   [pdb_sort90](https://www.biorxiv.org/content/10.1101/2023.05.01.538929v1): ~48G
+*   [pdb_complex v2024](https://www.biorxiv.org/content/10.1101/2023.05.16.541055v1): ~38G
+*   [pdb_sort90 v2024](https://www.biorxiv.org/content/10.1101/2023.05.01.538929v1): ~48G
 *   [Uniclust30](https://uniclust.mmseqs.com/): ~87G
+*   [DHR_DATABASE](https://github.com/ml4bio/Dense-Homolog-Retrieval/tree/v1): 1.5T
+*   [JGIclust](https://zhanggroup.org/DeepMSA2/): ~1.1T
 
-# **Important parameter values in db_option**
+# **Key Parameters for Running MULTICOM4**
 
+All parameters for running AlphaFold2/AlphaFold-Multimer are defined in `multicom4/common/config.py`. These configurations were used for large-scale sampling during the CASP16 competition, with the exception of the number of models, which should be adjusted according to the size of the target protein. Users may modify the following parameters as needed:
+
+```python
+# Number of models generated per checkpoint for monomer predictions using AlphaFold2. Default: 100.
+# Note: Each AlphaFold2 predictor will generate 100 * 5 models.
+MONOMER_PREDICTIONS_PER_MODEL = 100
+
+# Configuration for hetero-multimer predictions using AlphaFold-Multimer. Default: 100 models.
+# Note: Each AlphaFold-Multimer predictor will generate 100 * 5 models.
+HETERO_MULTIMER_PREDICTIONS_PER_MODEL = 100
+
+# Configuration for homo-multimer predictions using AlphaFold-Multimer. Default: 100 models.
+# Note: Each AlphaFold-Multimer predictor will generate 100 * 5 models.
+HOMO_MULTIMER_PREDICTIONS_PER_MODEL = 100
 ```
-# AlphaFold2 parameters
-monomer_num_ensemble = 1
-monomer_num_recycle = 3
-num_monomer_predictions_per_model = 1
-monomer_model_preset = monomer
-
-# AlphaFold-Multimer parameters
-multimer_num_ensemble = 1
-multimer_num_recycle = 3
-num_multimer_predictions_per_model = 5
-multimer_model_preset = multimer
-
-# Common parameters
-alphafold_benchmark = True
-use_gpu_relax = True
-models_to_relax = ALL # ALL, BEST, NONE
-max_template_date = 2024-06-01
-```
-Please refer to [AlphaFold2](https://github.com/deepmind/alphafold) to understand the meaning of the parameters. The parameter values stored in bin/db_option file are applied to all the AlphaFold2/AlphaFold-Multimer variants in the MULTICOM4 system to generate predictions. 
-
-For Docker version installation, you can change the default parameter values in [docker/db_option](docker/db_option).
-
-For non Docker version of the installation, the default bin/db_option file is created automatically by configure.py during the installation. The default parameter values above can be changed if needed. 
 
 # **Before running the system for non Docker version**
 
@@ -209,14 +216,13 @@ Then run the following command:
 
 ```bash
 # Please provide absolute path for the input parameters
-python bin/monomer.py \
+sh bin/monomer/run_monomer.sh \
     --option_file=bin/db_option \
     --fasta_path=$YOUR_FASTA \
-    --run_img=False \
     --output_dir=$OUTDIR
 ```
 
-option_file is a file in the MULTICOM package to store some key parameter values for AlphaFold2 and AlphaFold-Multimer. fasta_path is the full path of the file storing the input protein sequence(s) in the FASTA format. output_dir specifies where the prediction results are stored. Please be aware that we have included a parameter (--run_img) that allows you to turn off the usage of the IMG database for faster prediction (--run_img=False). In the case of --run_img=True, the program will pause at the monomer prediction generation stage to wait for the IMG alignment to be created. Generating alignments from IMG may take a much longer time, potentially several days, because the database is very large. So run_img is set to false by default. It is advised that run_img is set to true only if other alignments cannot yield good results.
+option_file is a file in the MULTICOM4 package to store the path of the databases/tools. fasta_path is the full path of the file storing the input protein sequence(s) in the FASTA format. output_dir specifies where the prediction results are stored. 
 
 ## **Output**
 
@@ -227,11 +233,9 @@ $OUTPUT_DIR/                                   # Your output directory
     N3_monomer_structure_generation/           # Working directory for generating monomer structural predictions
     N4_monomer_structure_evaluation/           # Working directory for evaluating the monomer structural predictions
         - alphafold_ranking.csv    # AlphaFold2 pLDDT ranking
-        - pairwise_ranking.tm      # Pairwise (APOLLO) ranking
-        - pairwise_af_avg.ranking  # Average ranking of the two
 ```
 
-* The predictions and ranking files are saved in the *N4_monomer_structure_evaluation* folder. You can check the AlphaFold2 pLDDT score ranking file (alphafold_ranking.csv) to look for the structure with the highest pLDDT score. The *pairwise_ranking.tm* and *pairwise_af_avg.ranking* are the other two ranking files. 
+* The predictions and ranking files are saved in the *N4_monomer_structure_evaluation* folder. You can check the AlphaFold2 pLDDT score ranking file (alphafold_ranking.csv) to look for the structure with the highest pLDDT score.
 
 # **Running the multimer/quaternary structure prediction pipeline**
 
@@ -255,10 +259,9 @@ Then run the following command:
 
 ```bash
 # Please provide absolute path for the input parameters
-python bin/multimer.py \
+sh bin/multimer/run_multimer.sh \
     --option_file=bin/db_option \
     --fasta_path=$YOUR_FASTA \
-    --run_img=False \
     --output_dir=$OUTDIR
 ```
 
@@ -285,7 +288,7 @@ $OUTPUT_DIR/                                   # Your output directory
     N4_monomer_alignments_concatenation/       # Working directory for concatenating the monomer MSAs
     N5_monomer_templates_search/               # Working directory for concatenating the monomer templates
     N6_multimer_structure_generation/          # Working directory for generating multimer structural predictions
-    N7_monomer_structure_evaluation            # Working directory for evaluating monomer structural predictions
+    N7_monomer_only_structure_evaluation       # Working directory for evaluating monomer structural predictions
         - Subunit A
             # Rankings for all the predictions
             - alphafold_ranking.csv            # AlphaFold2 pLDDT ranking 
@@ -302,21 +305,22 @@ $OUTPUT_DIR/                                   # Your output directory
 
         - Subunit B
         - ...
-    N8_multimer_structure_evaluation           # Working directory for evaluating multimer structural predictions
+    N7_multimer_structure_evaluation           # Working directory for evaluating multimer structural predictions
         - alphafold_ranking.csv                # AlphaFold2 pLDDT ranking
         - multieva.csv                         # Pairwise ranking using MMalign
         - pairwise_af_avg.ranking              # Average ranking of the two
 ```
 
-* The predictions and ranking files are saved in *N8_multimer_structure_evaluation*, similarly, you can check the AlphaFold-Multimer confidence score ranking file (alphafold_ranking.csv) to look for the structure with the highest predicted confidence score generated by AlphaFold-Multimer. The *multieva.csv* and *pairwise_af_avg.ranking* are the other two ranking files.
+* The predictions and ranking files are saved in *N7_multimer_structure_evaluation*, similarly, you can check the AlphaFold-Multimer confidence score ranking file (alphafold_ranking.csv) to look for the structure with the highest predicted confidence score generated by AlphaFold-Multimer. The *multieva.csv* and *pairwise_af_avg.ranking* are the other two ranking files.
 
-* The monomer structures and ranking files are saved in *N7_monomer_structure_evaluation* if you want to check the predictions and rankings for the monomer structures.
+* The monomer structures and ranking files are saved in *N7_monomer_only_structure_evaluation* if you want to check the predictions and rankings for the monomer structures.
 
-# Citing this work
+# CASP16 Talks
 
 **Our CASP16 talk for protein complex structure prediction:**
 
 https://predictioncenter.org/casp16/doc/presentations/Day-2/Day2-05-Cheng-CASP16_MULTICOM_redacted.pdf
+
 
 **Our CASP16 talk for protein model quality assessment:**
 
@@ -325,3 +329,27 @@ https://predictioncenter.org/casp16/doc/presentations/Day-2/Day2-15-Neupane-CASP
 **Our CASP16 talk for protein-ligand binding affinity prediction:**
 
 https://predictioncenter.org/casp16/doc/presentations/Day-3/Day3-14-Morehead-MULTICOM_ligand.pptx
+
+
+# Citing this work
+
+
+```
+@article{liu2025improving,
+  title={Improving AlphaFold2-and AlphaFold3-Based Protein Complex Structure Prediction With MULTICOM4 in CASP16},
+  author={Liu, Jian and Neupane, Pawan and Cheng, Jianlin},
+  journal={Proteins: Structure, Function, and Bioinformatics},
+  year={2025},
+  publisher={Wiley Online Library}
+}
+
+
+@article{liu2025boosting,
+  title={Boosting AlphaFold Protein Tertiary Structure Prediction through MSA Engineering and Extensive Model Sampling and Ranking in CASP16},
+  author={Liu, Jian and Neupane, Pawan and Cheng, Jianlin},
+  journal={bioRxiv},
+  pages={2025--06},
+  year={2025},
+  publisher={Cold Spring Harbor Laboratory}
+}
+```

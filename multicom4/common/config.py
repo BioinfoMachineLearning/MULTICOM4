@@ -6,19 +6,16 @@ from multicom4.common.config_human import *
 
 class pipeline():
 
-    def __init__(self, is_human=False, is_subunit=False):
+    def __init__(self, is_subunit=False):
 
         self.monomer_config = MONOMER_CONFIG
         
-        if is_human:
-            self.monomer_config = MONOMER_HUMAN_CONFIG 
-            
         if is_subunit:
             self.monomer_config = MONOMER_SUBUNIT_CONFIG
 
-        self.heteromer_config = HETEROMULTIMER_HUMAN_CONFIG if is_human else HETEROMULTIMER_CONFIG
+        self.heteromer_config = HETEROMULTIMER_CONFIG
 
-        self.homomer_config = HOMOMULTIMER_HUMAN_CONFIG if is_human else HOMOMULTIMER_CONFIG
+        self.homomer_config = HOMOMULTIMER_CONFIG
 
     def get_monomer_config(self, predictor_config, config_name):
         if config_name in predictor_config:
@@ -38,7 +35,7 @@ class pipeline():
         else:
             return self.homomer_config.common_config[config_name]
 
-MONOMER_PREDICTIONS_PER_MODEL = 2
+MONOMER_PREDICTIONS_PER_MODEL = 100
 
 MONOMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
@@ -76,20 +73,6 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'msa_source': 'colabfold_web',
             'template_source': 'notemplate',
         },
-        # 'colabfold': {
-        #     'msa_source': 'colabfold',
-        # },
-        # 'colab_seq_temp': {
-        #     'msa_source': 'colabfold',
-        #     'template_source': 'pdb_sort90'
-        # },
-        # 'img': {
-        #     'msa_source': 'img',
-        # },
-        # 'img_seq_temp': {
-        #     'msa_source': 'img',
-        #     'template_source': 'pdb_sort90'
-        # },
         'dhr': {
             'msa_source': 'dhr',
         },
@@ -193,9 +176,6 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
         'deepmsa_q4JGI_hms':{
             'msa_source': 'q4JGI.hms',
         },
-        # 'default_tmsearch': {
-        #     'template_source': 'tmsearch',
-        # },
         'def_esm_msa': {
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',
@@ -250,54 +230,15 @@ MONOMER_CONFIG = ml_collections.ConfigDict({
             'domain_msa_source': 'deepmsa2_dMSA',
             'msa_source': 'dmsa_dom_manual',
         },
-        # 'foldseek_refine': {
-        #     'number_of_input_models': 5,
-        #     'max_iteration': 1,
-        #     'max_template_count': 50,
-        #     'progressive_threshold': 2000,
-        #     'number_of_output_models': 5,
-        #     'relax_topn_predictions': 1,
-        #     'foldseek_database': 'pdb+afdb',
-        #     'msa_source': 'foldseek',
-        #     'template_source': 'foldseek',
-        #     'predictions_per_model': 4,
-        # },
-        # 'foldseek_refine_esm': {
-        #     'number_of_input_models': 5,
-        #     'max_iteration': 5,
-        #     'max_template_count': 50,
-        #     'progressive_threshold': 2000,
-        #     'number_of_output_models': 5,
-        #     'relax_topn_predictions': 1,
-        #     'foldseek_database': 'esm_atlas',
-        #     'plddt_threshold': 0.0,
-        #     'ptm_threshold': 0.0,
-        #     'msa_source': 'foldseek',
-        #     'template_source': 'default',
-        #     'predictions_per_model': 5,
-        # },
-        # 'foldseek_refine_esm_h': {
-        #     'number_of_input_models': 5,
-        #     'max_iteration': 5,
-        #     'max_template_count': 50,
-        #     'progressive_threshold': 2000,
-        #     'number_of_output_models': 5,
-        #     'relax_topn_predictions': 1,
-        #     'foldseek_database': 'esm_atlas',
-        #     'msa_source': 'foldseek',
-        #     'template_source': 'default',
-        #     'plddt_threshold': 0.7,
-        #     'ptm_threshold': 0.7,
-        #     'predictions_per_model': 5,
-        # },
     }
 })
 
+HETERO_MULTIMER_PREDICTIONS_PER_MODEL = 100
 HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 5,
+        'predictions_per_model': HETERO_MULTIMER_PREDICTIONS_PER_MODEL,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -324,9 +265,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
         'def_mul_comp': {
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        # 'def_mul_af': {
-        #     'template_source': 'alphafold_model_templates'
-        # },
         'def_mul_drop_s': {
             'dropout': True,
             'dropout_structure_module': True,
@@ -391,10 +329,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'species_interact_uniref_a3m',
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        # 'spec_af': {
-        #     'msa_paired_source': 'species_interact_uniref_a3m',
-        #     'template_source': 'alphafold_model_templates'
-        # },
         'spec_inter_ref_sto': {
             'msa_paired_source': 'species_interact_uniref_sto',
         },
@@ -423,10 +357,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'string_interact_uniref_sto',
             'template_source': 'sequence_based_template_pdb_complex',
         },
-        # 'str_af': {
-        #     'msa_paired_source': 'string_interact_uniref_sto',
-        #     'template_source': 'alphafold_model_templates',
-        # },
         'str_inter_prot_sto': {
             'msa_paired_source': 'string_interact_uniprot_sto',
         },
@@ -493,35 +423,6 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
         },
-        # 'AFProfile': 
-        # {
-        #     'confidence_threshold': 0.95,
-        #     'max_iteration': 100,
-        #     'learning_rate': 0.0001,
-        # },
-        'def_mul_refine': {
-            'number_of_input_models': 5,
-            'max_iteration': 1,
-            'max_template_count': 50,
-            'progressive_threshold': 2000,
-            'number_of_output_models': 5,
-            'relax_topn_predictions': 1,
-            'predictions_per_model': 40,
-            'foldseek_database': 'pdb+afdb',
-            'msa_source': 'foldseek',
-            'template_source': 'foldseek',
-        },
-        'af3_refine': {
-            'max_iteration': 1,
-            'max_template_count': 50,
-            'progressive_threshold': 2000,
-            'number_of_output_models': 5,
-            'relax_topn_predictions': 5,
-            'predictions_per_model': 40,
-            'foldseek_database': 'pdb+afdb',
-            'msa_source': 'foldseek',
-            'template_source': 'foldseek',
-        },
         'afsample_v1': {
             'model_preset': "multimer_v1",
             'dropout': True,
@@ -578,11 +479,12 @@ HETEROMULTIMER_CONFIG = ml_collections.ConfigDict({
     }
 })
 
+HOMO_MULTIMER_PREDICTIONS_PER_MODEL = 100
 HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
     'common_config': {
         'num_ensemble': 1,
         'num_recycle': 20,
-        'predictions_per_model': 5,
+        'predictions_per_model': HOMO_MULTIMER_PREDICTIONS_PER_MODEL,
         'model_preset': 'multimer',
         'relax_topn_predictions': 5,
         'dropout': False,
@@ -608,9 +510,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         'def_mul_comp': {
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        # 'def_mul_af': {
-        #     'template_source': 'alphafold_model_templates'
-        # },
         'def_mul_drop_s': {
             'dropout': True,
             'dropout_structure_module': True,
@@ -644,15 +543,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
         'pdb_inter_prot_sto': {
             'msa_paired_source': 'pdb_interact_uniprot_sto',
         },
-        # 'uniprot_distance_uniref_a3m': {
-        #     'msa_paired_source': 'uniprot_distance_uniref_a3m',
-        # },
-        # 'uniprot_distance_uniref_sto': {
-        #     'msa_paired_source': 'uniprot_distance_uniref_sto',
-        # },
-        # 'uniprot_distance_uniprot_sto': {
-        #     'msa_paired_source': 'uniprot_distance_uniprot_sto',
-        # },
         'spec_inter_ref_a3m': {
             'msa_paired_source': 'species_interact_uniref_a3m',
         },
@@ -672,45 +562,12 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'msa_paired_source': 'species_interact_uniref_a3m',
             'template_source': 'sequence_based_template_pdb_complex'
         },
-        # 'spec_af': {
-        #     'msa_paired_source': 'species_interact_uniref_a3m',
-        #     'template_source': 'alphafold_model_templates'
-        # },
         'spec_inter_ref_sto': {
             'msa_paired_source': 'species_interact_uniref_sto',
         },
         'spec_inter_prot_sto': {
             'msa_paired_source': 'species_interact_uniprot_sto',
         },
-        # 'string_interact_uniref_a3m': {
-        #     'msa_paired_source': 'string_interact_uniref_a3m',
-        # },
-        # 'string_interact_uniref_sto': {
-        #     'msa_paired_source': 'string_interact_uniref_sto',
-        # },
-        # 'str_struct': {
-        #     'msa_paired_source': 'string_interact_uniref_sto',
-        #     'template_source': 'foldseek_structure_based_template'
-        # },
-        # 'str_pdb70': {
-        #     'msa_paired_source': 'string_interact_uniref_sto',
-        #     'template_source': 'sequence_based_template_pdb70'
-        # },
-        # 'str_pdb': {
-        #     'msa_paired_source': 'string_interact_uniref_sto',
-        #     'template_source': 'sequence_based_template_pdb_sort90'
-        # },
-        # 'str_comp': {
-        #     'msa_paired_source': 'string_interact_uniref_sto',
-        #     'template_source': 'sequence_based_template_pdb_complex',
-        # },
-        # 'str_af': {
-        #     'msa_paired_source': 'string_interact_uniref_sto',
-        #     'template_source': 'alphafold_model_templates',
-        # },
-        # 'string_interact_uniprot_sto': {
-        #     'msa_paired_source': 'string_interact_uniprot_sto',
-        # },
         'deepmsa2': {   # common parameters for all deepmsa2 predictors
             'max_pairs': 20,
         },
@@ -718,12 +575,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'input_msa_source': 'default',
             'msa_paired_source': 'esm_msa',
         },
-        # 'AFProfile': 
-        # {
-        #     'confidence_threshold': 0.95,
-        #     'max_iteration': 100,
-        #     'learning_rate': 0.0001,
-        # },
         'folds_iter': {   # common parameters for all deepmsa2 predictors
             'msa_paired_source': 'foldseek',
             'template_source': 'foldseek',
@@ -771,27 +622,6 @@ HOMOMULTIMER_CONFIG = ml_collections.ConfigDict({
             'template_source': 'notemplate',
             'foldseek_database': "esm_atlas",
             'number_of_input': 2,
-        },
-        'def_mul_refine': {
-            'number_of_input_models': 5,
-            'max_iteration': 1,
-            'max_template_count': 50,
-            'progressive_threshold': 2000,
-            'number_of_output_models': 5,
-            'relax_topn_predictions': 1,
-            'foldseek_database': 'pdb+afdb',
-            'msa_source': 'foldseek',
-            'template_source': 'foldseek',
-        },
-        'af3_refine': {
-            'max_iteration': 1,
-            'max_template_count': 50,
-            'progressive_threshold': 2000,
-            'number_of_output_models': 5,
-            'relax_topn_predictions': 5,
-            'foldseek_database': 'pdb+afdb',
-            'msa_source': 'foldseek',
-            'template_source': 'foldseek',
         },
         'afsample_v1': {
             'model_preset': "multimer_v1",
@@ -878,20 +708,6 @@ MONOMER_SUBUNIT_CONFIG = ml_collections.ConfigDict({
             'msa_source': 'original',
             'template_source': 'pdb_sort90'
         },
-        # 'colabfold': {
-        #     'msa_source': 'colabfold',
-        # },
-        # 'colab_seq_temp': {
-        #     'msa_source': 'colabfold',
-        #     'template_source': 'pdb_sort90'
-        # },
-        # 'img': {
-        #     'msa_source': 'img',
-        # },
-        # 'img_seq_temp': {
-        #     'msa_source': 'img',
-        #     'template_source': 'pdb_sort90'
-        # },
         'dhr': {
             'msa_source': 'dhr',
         },
@@ -995,9 +811,6 @@ MONOMER_SUBUNIT_CONFIG = ml_collections.ConfigDict({
         'deepmsa_q4JGI_hms':{
             'msa_source': 'q4JGI.hms',
         },
-        # 'default_tmsearch': {
-        #     'template_source': 'tmsearch',
-        # },
         'def_esm_msa': {
             'input_msa_source': 'default',
             'msa_source': 'esm_msa',

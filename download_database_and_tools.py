@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     ### (1) Download basic tools
     os.chdir(tools_dir)
-    tools_lst = ["DockQ", "foldseek", "mmalign", "pairwiseQA", "tmalign", "tmscore", "deepmsa", "colabfold", "hhsuite-3.2.0"]
+    tools_lst = ["DockQ", "foldseek", "mmalign", "tmalign", "tmscore", "DeepMSA2", "hhsuite-3.2.0", "afsample"]
     for tool in tools_lst:
         logfile = os.path.join(log_dir, tool + '.done')
         if os.path.exists(logfile):
@@ -73,16 +73,8 @@ if __name__ == '__main__':
     ### (2) Download databases
     os.chdir(database_dir)
 
-    img_fasta_url = "http://sysbio.rnet.missouri.edu/multicom_cluster/multicom3_db_tools/databases/img/img_new.fasta"
-    img_dir = "img"
-    makedir_if_not_exists(img_dir)
-    os.chdir(img_dir)
-    if not os.path.exists("img_new.fasta"):
-        os.system("wget " + img_fasta_url)
-    print("Downloading img ....Done")
-
     #### Download db_lst
-    db_lst = ["af_pdbs","Metaclust_2018_06","myg_uniref100_04_2020","pdb_complex","pdb_sort90","string","uniprot2pdb"]
+    db_lst = ["af_pdbs","Metaclust_2018_06","myg_uniref100_04_2020","pdb_complex_2024","pdb_sort90_2024","string","uniprot2pdb","DHR_DATABASE","JGIclust"]
     for db in db_lst:
         print("Download "+db)
         if os.path.exists(os.path.join(database_dir, db)):
@@ -93,13 +85,6 @@ if __name__ == '__main__':
     print("Download uniclust30_2018_08_hhsuite\n")
     if not os.path.exists(os.path.join(database_dir, 'uniclust30_2018_08')):
         direct_download("uniclust30_2018_08_hhsuite","https://gwdu111.gwdg.de/~compbiol/uniclust/2018_08/uniclust30_2018_08_hhsuite.tar.gz",database_dir)
-
-    #### Download ColabFold database
-    print("Download ColabFold database\n")
-    colabfold_db_dir = os.path.join(database_dir, 'colabfold')
-    os.makedirs(colabfold_db_dir, exist_ok=True)
-    download_script = os.path.join(tools_dir, "colabfold/setup_databases.sh")
-    os.system(f"sh {download_script} {colabfold_db_dir}")
 
     #### Download pdb_release_date_filtered.csv
     os.chdir(database_dir)

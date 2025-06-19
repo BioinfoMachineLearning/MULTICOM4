@@ -22,9 +22,7 @@ class Multimer_iterative_generation_pipeline_monomer_old(config.pipeline):
 
     def __init__(self, params, max_template_count=50, is_homomers=False, config_name=""):
         
-        is_human = True if params['is_human'] == "1" else False
-
-        super().__init__(is_human=is_human)
+        super().__init__()
         
         self.params = params
 

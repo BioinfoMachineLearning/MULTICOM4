@@ -329,7 +329,7 @@ def select_models_by_cluster(ranking_df_file, cluster_result_file, outputdir, pr
     selected_df.to_csv(os.path.join(outputdir, f'{prefix}_selected.csv'))
     return selected_models
 
-def select_models_monomer_only(qa_result, outputdir, params, is_human):
+def select_models_monomer_only(qa_result, outputdir, params):
 
     af3_ranking_score_dict = {'model': [], 'score': []}
     af_ranking_df = pd.read_csv(qa_result['alphafold'])
@@ -342,121 +342,11 @@ def select_models_monomer_only(qa_result, outputdir, params, is_human):
     af3_ranking_score_df = af3_ranking_score_df.sort_values(by=['score', 'model'], ascending=[False, True])
     af3_ranking_score_df.reset_index(inplace=True, drop=True)
     af3_ranking_score_df.to_csv(os.path.join(outputdir, 'af3_ranking_score.csv'))
-    
-    return
-    if not is_human:
-        
-        select_models_by_tmscore(tmscore_program=params['tmscore_program'],
-                                 ranking_df_file=qa_result["alphafold"],
-                                 outputdir=outputdir,
-                                 prefix="ai",
-                                 tmscore_threshold=0.8,
-                                 af3_ranking_score_df=af3_ranking_score_df)
-
-        select_models_by_cluster(ranking_df_file=qa_result["gate"],
-                                 cluster_result_file=qa_result["gate_cluster"],
-                                 outputdir=outputdir,
-                                 af3_ranking_score_df=af3_ranking_score_df,
-                                 prefix="gate",
-                                 use_af3_model_idx=4)
-        
-        select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
-                                 cluster_result_file=qa_result["gate_cluster"],
-                                 outputdir=outputdir,
-                                 af3_ranking_score_df=af3_ranking_score_df,
-                                 prefix="llm",
-                                 use_af3_model_idx=0)
-
-
-    else:
-
-        gate_af3_ranking_score_df = cal_average_score([af3_ranking_score_df, pd.read_csv(qa_result['gate'])])
-        gate_af3_ranking_score_file = os.path.join(outputdir, 'gate_af3_ranking.csv') 
-        gate_af3_ranking_score_df.to_csv(gate_af3_ranking_score_file)
-        qa_result['gate_af3_ranking'] = gate_af3_ranking_score_file
-
-        data_dict = {'model': [], 'source': [], 'source_rank': []}
-
-        need_sort_qas = ['gcpnet_ema', 'enqa']
-        for i in range(10):
-            for qa_method in ['gate_af3_ranking', 'gate_af_avg', 'gate', 'gcpnet_ema', 'enqa', 'gate_tmscore_pairwise']:
-                if qa_method == 'gate_tmscore_pairwise':
-                    df = pd.read_csv(qa_result[qa_method], index_col=[0])
-                    pairwise_dict = {'model': [], 'score': []}
-                    for model_idx, model in enumerate(df.columns):
-                        tmscores = [df[model][i] for i in range(len(df[model])) if i != model_idx]
-                        pairwise_dict['model'] += [model]
-                        pairwise_dict['score'] += [np.mean(np.array(tmscores))]
-                    pairwise_df = pd.DataFrame(pairwise_dict)
-                    pairwise_df = pairwise_df.sort_values(by=['score'], ascending=False)
-                    pairwise_df.reset_index(inplace=True, drop=True)
-                    print(qa_method)
-                    print(pairwise_df)
-                    ranked_model = pairwise_df.loc[i, 'model']
-                    data_dict['model'] += [ranked_model + '.pdb' if ranked_model.find('.pdb') < 0 else ranked_model]
-                    data_dict['source'] += [qa_method]
-                    data_dict['source_rank'] += [str(i)]
-                    pairwise_df.to_csv(os.path.join(outputdir, 'pairwise_ranking_monomer.csv'))
-                else:
-                    df = pd.read_csv(qa_result[qa_method])
-                    if qa_method in need_sort_qas:
-                        df = df.sort_values(by=['score'], ascending=False)
-                        df.reset_index(inplace=True, drop=True)
-                    print(qa_method)
-                    print(df)
-                    ranked_model = df.loc[i, 'model']
-                    data_dict['model'] += [ranked_model + '.pdb' if ranked_model.find('.pdb') < 0 else ranked_model]
-                    data_dict['source'] += [qa_method]
-                    data_dict['source_rank'] += [str(i)]
-
-        ranking_df = pd.DataFrame(data_dict)
-        ranking_df.to_csv(os.path.join(outputdir, 'multicom_ranking.csv'))
-
-        multicom_selected_models = []
-        multicom_selected_model_paths = []
-        for i in range(len(ranking_df)):
-            model = ranking_df.loc[i, 'model']
-            if model in multicom_selected_models:
-                continue
-            multicom_selected_models += [model]
-            multicom_selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
-
-        for i in range(NUM_FINAL_MODELS):
-            final_pdb = os.path.join(outputdir, f'multicom{i+1}.pdb')
-            os.system("cp " + multicom_selected_model_paths[i] + " " + final_pdb)
-        
-        selected_df = pd.DataFrame({'selected_models': multicom_selected_models})
-        selected_df.to_csv(os.path.join(outputdir, 'multicom_selected.csv'))
-
-        select_models_by_tmscore(tmscore_program=params['tmscore_program'],
-                                 ranking_df_file=qa_result["alphafold"],
-                                 outputdir=outputdir,
-                                 prefix="multicom_human",
-                                 tmscore_threshold=0.8,
-                                 af3_ranking_score_df=af3_ranking_score_df)
-
-# def select_models_with_multimer(qa_result, outputdir, params):
-    
-#     select_models_by_tmscore(tmscore_program=params['tmscore_program'],
-#                              ranking_df_file=qa_result["alphafold_multimer"],
-#                              outputdir=outputdir,
-#                              prefix="ai",
-#                              tmscore_threshold=0.8)
-
-#     select_models_by_cluster(ranking_df_file=qa_result["gate_multimer"],
-#                              cluster_result_file=qa_result["gate_cluster"],
-#                              outputdir=outputdir,
-#                              prefix="gate")
-    
-#     select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg_multimer"],
-#                              cluster_result_file=qa_result["gate_cluster"],
-#                              outputdir=outputdir,
-#                              prefix="llm")
 
 
 def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monomer_dir, outputdir, 
                                     contact_map_file, dist_map_file,
-                                    run_methods=None, is_human=False,
+                                    run_methods=None,
                                     input_multimer_dir="",
                                     generate_final_models=False, model_count=5):
 
@@ -476,7 +366,7 @@ def run_monomer_evaluation_pipeline(params, targetname, fasta_file, input_monome
     if generate_final_models:
         if input_multimer_dir == "" or not os.path.exists(input_multimer_dir):
             select_models_monomer_only(qa_result=qa_result, outputdir=outputdir, 
-                                       params=params, is_human=is_human)
+                                       params=params)
         # else:
             # select_models_with_multimer(qa_result=qa_result, outputdir=outputdir, params=params)
 
@@ -864,7 +754,7 @@ def select_models_by_usalign(usalign_program, ranking_df_file, outputdir, prefix
 
 def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
                                      indir, outdir, run_methods=None, 
-                                     is_homomer=False, model_count=5, is_human=False):
+                                     is_homomer=False, model_count=5):
     makedir_if_not_exists(outdir)
     pipeline = Multimer_structure_evaluation_pipeline(params=params, run_methods=run_methods)
     multimer_qa_result = None
@@ -881,13 +771,13 @@ def run_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
     select_models_multimer(chain_id_map=chain_id_map, 
                            qa_result=multimer_qa_result, 
                            outputdir=outdir, params=params, 
-                           is_homomer=is_homomer, is_human=is_human)
+                           is_homomer=is_homomer)
 
     return multimer_qa_result
 
 def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
                                        outdir, run_methods=None, 
-                                       is_homomer=False, is_human=False):
+                                       is_homomer=False):
     makedir_if_not_exists(outdir)
     pipeline = Multimer_structure_evaluation_pipeline(params=params, run_methods=run_methods)
     multimer_qa_result = None
@@ -900,7 +790,7 @@ def rerun_multimer_evaluation_pipeline(params, fasta_path, chain_id_map,
     select_models_multimer(chain_id_map=chain_id_map, 
                            qa_result=multimer_qa_result, 
                            outputdir=outdir, params=params, 
-                           is_homomer=is_homomer, is_human=True)
+                           is_homomer=is_homomer)
 
     return multimer_qa_result
 
@@ -946,7 +836,7 @@ def cal_average_score(dfs):
     ensemble_df.reset_index(inplace=True, drop=True)
     return ensemble_df
 
-def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homomer, is_human):
+def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homomer):
     
     af3_ranking_score_dict = {'model': [], 'score': []}
     af_ranking_df = pd.read_csv(qa_result['alphafold'])
@@ -959,86 +849,6 @@ def select_models_multimer(chain_id_map, qa_result, outputdir, params, is_homome
     af3_ranking_score_df = af3_ranking_score_df.sort_values(by=['score', 'model'], ascending=[False, True])
     af3_ranking_score_df.reset_index(inplace=True, drop=True)
     af3_ranking_score_df.to_csv(os.path.join(outputdir, 'af3_ranking_score.csv'))
-
-    if not is_human:
-        ai_selected_models = select_models_by_usalign(usalign_program=params['usalign_program'],
-                                                    ranking_df_file=qa_result["alphafold"],
-                                                    outputdir=outputdir,
-                                                    prefix="ai",
-                                                    af3_ranking_score_df=af3_ranking_score_df,
-                                                    tmscore_threshold=0.8)
-
-        select_models_by_cluster(ranking_df_file=qa_result["gate"],
-                                 cluster_result_file=qa_result["gate_cluster"],
-                                 outputdir=outputdir,
-                                 af3_ranking_score_df=af3_ranking_score_df,
-                                 prefix="gate",
-                                 use_af3_model_idx=4)
-        
-        select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
-                                 cluster_result_file=qa_result["gate_cluster"],
-                                 outputdir=outputdir,
-                                 af3_ranking_score_df=af3_ranking_score_df,
-                                 prefix="llm",
-                                 use_af3_model_idx=0)
-
-    else:
-
-
-        gate_af3_ranking_score_df = cal_average_score([af3_ranking_score_df, pd.read_csv(qa_result['gate'])])
-        gate_af3_ranking_score_file = os.path.join(outputdir, 'gate_af3_ranking.csv') 
-        gate_af3_ranking_score_df.to_csv(gate_af3_ranking_score_file)
-        qa_result['gate_af3_ranking'] = gate_af3_ranking_score_file
-
-        data_dict = {'model': [], 'source': [], 'source_rank': []}
-
-        need_sort_qas = ['gcpnet_ema', 'enqa']
-        for i in range(10):
-            for qa_method in ['gate_af3_ranking', 'gate_af_avg', 'gate', 'gcpnet_ema', 'enqa', 'gate_noaf', 'multieva']:
-                df = pd.read_csv(qa_result[qa_method])
-                if qa_method in need_sort_qas:
-                    df = df.sort_values(by=['score_norm'], ascending=False)
-                    df.reset_index(inplace=True, drop=True)
-                ranked_model = ""
-                if qa_method == "multieva":
-                    ranked_model = df.loc[i, 'Name']
-                else:
-                    ranked_model = df.loc[i, 'model']
-
-                data_dict['model'] += [ranked_model + '.pdb' if ranked_model.find('.pdb') < 0 else ranked_model]
-                data_dict['source'] += [qa_method]
-                data_dict['source_rank'] += [str(i)]
-
-        ranking_df = pd.DataFrame(data_dict)
-        ranking_df.to_csv(os.path.join(outputdir, 'multicom_ranking.csv'))
-
-        multicom_selected_models = []
-        multicom_selected_model_paths = []
-        for i in range(len(ranking_df)):
-            model = ranking_df.loc[i, 'model']
-            if model in multicom_selected_models:
-                continue
-            multicom_selected_models += [model]
-            multicom_selected_model_paths += [os.path.join(outputdir, 'pdb', model)]
-
-        for i in range(NUM_FINAL_MODELS):
-            final_pdb = os.path.join(outputdir, f'multicom{i+1}.pdb')
-            os.system("cp " + multicom_selected_model_paths[i] + " " + final_pdb)
-        
-        selected_df = pd.DataFrame({'selected_models': multicom_selected_models, 'selected_models_path': multicom_selected_model_paths})
-        selected_df.to_csv(os.path.join(outputdir, 'multicom_selected.csv'))
-
-        multicom_human_selected_models = select_models_by_usalign(usalign_program=params['usalign_program'],
-                                                                  ranking_df_file=qa_result["alphafold"],
-                                                                  outputdir=outputdir,
-                                                                  prefix="multicom_human",
-                                                                  af3_ranking_score_df=af3_ranking_score_df,
-                                                                  tmscore_threshold=0.8)
-
-        # llm_selected_models = select_models_by_cluster(ranking_df_file=qa_result["gate_af_avg"],
-        #                         cluster_result_file=qa_result["gate_cluster"],
-        #                         outputdir=outputdir,
-        #                         prefix="llm")
 
 def extract_monomer_models_from_complex(complex_pdb, complex_pkl, chain_id_map, chain_group, workdir):
 

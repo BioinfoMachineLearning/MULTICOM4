@@ -17,9 +17,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
 
     def __init__(self, params, run_methods=None, is_subunit=False):
         
-        is_human = True if params['is_human'] == "1" else False
-
-        super().__init__(is_human=is_human, is_subunit=is_subunit)
+        super().__init__(is_subunit=is_subunit)
 
         self.params = params
 

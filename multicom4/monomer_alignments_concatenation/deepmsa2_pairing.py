@@ -37,9 +37,9 @@ def combineMSAs(MSA_Tags, is_homomers=False):  # dict
 
 class DeepMSA2_pairing(config.pipeline):
 
-    def __init__(self, is_human, is_homomers=False):
+    def __init__(self, is_homomers=False):
 
-        super().__init__(is_human=is_human)
+        super().__init__()
 
         self.deepmsa2_config = self.homomer_config.predictors.deepmsa2 if is_homomers else self.heteromer_config.predictors.deepmsa2
 
