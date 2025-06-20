@@ -185,7 +185,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
                         os.makedirs(method_out_dir, exist_ok=True)
 
                         if not os.path.exists(esm_msa_path):
-                            cmd = f"sh {self.params['esm_msa_program']} {input_msa_path} {esm_msa_path}"
+                            cmd = f"{self.params['esmfold_binary_path']} {self.params['esm_msa_program']} --ina3m {input_msa_path} --outfile {esm_msa_path}"
                             os.system(cmd)
                             if not os.path.exists(esm_msa_path):
                                 print(f"Failed to generate the esm msa: {esm_msa_path}")
@@ -269,7 +269,7 @@ class Monomer_structure_prediction_pipeline_v2(config.pipeline):
             elif run_method ==  "esmfold":
                 os.makedirs(method_out_dir, exist_ok=True)
                 if not complete_result(method_out_dir, 5):
-                    cmd = f"sh {self.params['esmfold_program']} {fasta_path} {method_out_dir}"
+                    cmd = f"{self.params['esmfold_binary_path']} {self.params['esmfold_program']} --fasta {fasta_path} --outdir {method_out_dir}"
                     cmds += [cmd]
 
             elif run_method == "deepfold":

@@ -5,9 +5,6 @@ from multiprocessing import current_process
 from tqdm import tqdm
 from multicom4.common.util import is_file, is_dir, makedir_if_not_exists, check_contents, read_option_file, check_dirs
 from multicom4.monomer_alignment_generation.alignment import *
-from multicom4.monomer_alignment_generation.rosettafold_msa_runner import *
-from multicom4.monomer_alignment_generation.colabfold_msa_runner import *
-from multicom4.monomer_alignment_generation.img_msa_runner import *
 from multicom4.monomer_alignment_generation.deepmsa2_runner import *
 from multicom4.monomer_alignment_generation.dhr_runner import *
 from multicom4.tool import hhblits

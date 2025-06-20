@@ -52,12 +52,12 @@ if __name__ == '__main__':
     makedir_if_not_exists(bin_dir)
     makedir_if_not_exists(log_dir)
 
-    print("MULTICOM3 database path : "+ database_dir)
-    print("MULTICOM3 tool path : "+ tools_dir)
+    print("MULTICOM4 database path : "+ database_dir)
+    print("MULTICOM4 tool path : "+ tools_dir)
 
     ### (1) Download basic tools
     os.chdir(tools_dir)
-    tools_lst = ["DockQ", "foldseek", "mmalign", "tmalign", "tmscore", "DeepMSA2", "hhsuite-3.2.0", "afsample"]
+    tools_lst = ["DockQ", "mmalign", "tmalign", "tmscore", "DeepMSA2", "hhsuite-3.2.0", "afsample"]
     for tool in tools_lst:
         logfile = os.path.join(log_dir, tool + '.done')
         if os.path.exists(logfile):
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     os.chdir(database_dir)
 
     #### Download db_lst
-    db_lst = ["af_pdbs","Metaclust_2018_06","myg_uniref100_04_2020","pdb_complex_2024","pdb_sort90_2024","string","uniprot2pdb","DHR_DATABASE","JGIclust"]
+    db_lst = ["af_pdbs","Metaclust_2018_06","myg_uniref100_04_2020","pdb_complex_2024","pdb_sort90_2024","string","uniprot2pdb","DHR_DATABASE","JGIclust","foldseek_databases"]
     for db in db_lst:
         print("Download "+db)
         if os.path.exists(os.path.join(database_dir, db)):

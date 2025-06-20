@@ -1,0 +1,176 @@
+###########################This is an option file####################################
+
+slurm_script_template = ""
+
+################################tools option#########################################
+
+# hhblits program path
+hhblits_program = /home/jl4mc/mambaforge/envs/multicom4/bin/hhblits
+
+# hhfilter program path
+hhfilter_program = /home/jl4mc/mambaforge/envs/multicom4/bin/hhfilter
+
+# hhmake program path
+hhmake_program = /home/jl4mc/mambaforge/envs/multicom4/bin/hhmake
+
+# hhalign program path
+hhalign_program = /home/jl4mc/mambaforge/envs/multicom4/bin/hhalign
+
+# jackhmmer program path
+jackhmmer_program = /home/jl4mc/mambaforge/envs/multicom4/bin/jackhmmer
+
+# hhsearch program path
+hhsearch_program = /home/bml_casp15/MULTICOM4/tools/hhsuite-3.2.0/bin/hhsearch
+
+# tmalign program path
+tmalign_program = /home/bml_casp15/MULTICOM4/tools/tmalign/TMalign
+
+# mmalign program path
+mmalign_program = /home/bml_casp15/MULTICOM4/tools/mmalign/MMalign
+
+# dockq program
+dockq_program = /home/bml_casp15/MULTICOM4/tools/DockQ/DockQ.py
+
+# tmscore program
+tmscore_program = /home/bml_casp15/MULTICOM4/tools/tmscore/TMscore
+
+usalign_program = /home/bml_casp15/MULTICOM4/tools/USalign
+
+calNf_program = /home/bml_casp15/MULTICOM4/tools/calNf
+
+################################MSA generation tool###########################
+
+mmseq_program = /home/jl4mc/mambaforge/envs/multicom4/bin/mmseqs
+
+deepmsa2_path = /home/bml_casp15/MULTICOM4/tools/DeepMSA2
+
+DHR_program_path = /home/bml_casp15/MULTICOM4/tools/Dense-Homolog-Retrieval
+
+DHR_program_path = /home/bml_casp15/MULTICOM4/tools/Dense-Homolog-Retrieval
+
+DHR_database_path = /home/bml_casp15/MULTICOM4/multicom4_db/DHR_DATABASE/
+
+################################QA option#####################################
+
+#########################Customized alphafold program###########################
+
+# alphafold environment directory
+alphafold_env_dir = /home/jl4mc/mambaforge/envs/multicom4/bin/
+
+# alphafold database directory
+alphafold_database_dir = /home/bml_casp15/tools/alphafold_databases_multicom3
+
+# alphafold program path
+alphafold_program_dir = /home/bml_casp15/MULTICOM4/tools/alphafold-v2.3.2
+
+# alphafold tertiary structure prediction script
+alphafold_program = run_alphafold_custom.py
+
+# alphafold tertiary structure prediction script
+alphafold_multimer_program = run_alphafold_multimer_custom.py
+
+# alphafold tertiary structure prediction script
+alphafold_default_program = run_alphafold_pre.py
+
+# alphafold tertiary structure prediction script
+afsample_env_dir = /home/jl4mc/mambaforge/envs/afsample/bin/
+
+# alphafold program path
+afsample_program_dir = /home/bml_casp15/MULTICOM4/tools/afsample
+
+# alphafold tertiary structure prediction script
+afsample_program = run_afsample_custom.py
+
+# Common parameters
+alphafold_benchmark = True
+
+use_gpu_relax = True
+
+max_template_date = 9999-06-01
+
+pdb_release_date_file = /home/bml_casp15/MULTICOM4/multicom4_db/multicom4_db/pdb_release_date_filtered.csv
+
+# Other tools
+
+esmfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold_local.sh
+
+esm_msa_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1_local.sh
+
+######################Monomer template search option#################################
+
+foldseek_program = /home/jl4mc/mambaforge/envs/multicom4/bin/foldseek
+
+foldseek_pdb_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/complex
+
+foldseek_pdb_database_dir = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/complex/complex_pdb
+
+foldseek_af_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/af_db/
+
+foldseek_af_database_dir = /home/bml_casp15/MULTICOM4/multicom4_db/af_pdbs
+
+foldseek_esm_atlas_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/esm_atlas/foldseekdb
+
+################################databases option#####################################
+
+bfd_database = /home/bml_casp15/tools/alphafold_databases_multicom3/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
+
+mgnify_database = /home/bml_casp15/tools/alphafold_databases_multicom3/mgnify/mgy_clusters_2023_02.fa
+
+metaclust_database = /home/bml_casp15/MULTICOM4/multicom4_db/Metaclust_2018_06/metaclust.fasta
+
+JGIclust_database = /home/bml_casp15/MULTICOM4/multicom4_db/JGIclust
+
+###########################Complex alignment generation option#######################
+
+###########################UNIPROT TO PDB database option############################
+
+# uniclust database
+uniclust_db = /home/bml_casp15/MULTICOM4/multicom4_db/uniclust30_2018_08/uniclust30_2018_08
+
+# uniref database
+uniref_db = /home/bml_casp15/tools/alphafold_databases_multicom3/uniref30/UniRef30_2023_02
+
+uniref90_fasta = /home/bml_casp15/tools/alphafold_databases_multicom3/uniref90/uniref90.fasta
+
+uniprot_fasta = /home/bml_casp15/tools/alphafold_databases_multicom3/uniprot/uniprot.fasta
+
+###########################UNIPROT TO PDB database option############################
+
+uniprot2pdb_mapping_file = /home/bml_casp15/MULTICOM4/multicom4_db/uniprot2pdb/uniprot2pdb.map
+
+complexes_list = /home/bml_casp15/MULTICOM4/multicom4_db/uniprot2pdb/complexes_cm.list
+
+###########################STRING database option####################################
+
+string2uniprot_map = /home/bml_casp15/MULTICOM4/multicom4_db/string/string2uniprot.map
+
+#######################End of Complex alignment generation option###################
+
+
+###########################Complex template search option###########################
+
+###########################Sequence and structure based template search option####################
+
+pdb70_hhsuite_database = /home/bml_casp15/tools/alphafold_databases_multicom3/pdb70/pdb70
+
+pdb70_hhsuite_cluster_tsv = /home/bml_casp15/tools/alphafold_databases_multicom3/pdb70/pdb70_clu.tsv
+
+pdb_seqs_dir = /home/bml_casp15/tools/alphafold_databases_multicom3/pdb_seqres/pdb_seqs
+
+pdb_sort90_hhsuite_database = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_sort90_2024/hhsuitedb3
+
+pdb_sort90_hhsuite_cluster_tsv = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_sort90_2024/sort90_clust
+
+pdb_sort90_atom_dir = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_sort90_2024/atom
+
+pdb_sort90_hmm_dir = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_sort90_2024/hmm
+
+complex_sort90_hhsuite_database = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_complex_2024/hhsuitedb3
+
+complex_sort90_hhsuite_cluster_tsv = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_complex_2024/sort90_clust
+
+complex_sort90_atom_dir = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_complex_2024/atom
+
+complex_sort90_hmm_dir = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_complex_2024/hmm
+
+#######################End of Complex alignment generation option###################

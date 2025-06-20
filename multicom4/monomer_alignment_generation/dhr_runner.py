@@ -28,17 +28,17 @@ class DHR_runner:
 
 
     def query(self, input_fasta_path: str, output_a3m_path: str) -> Mapping[str, Any]:
-        """Queries the database using Colabfold."""
+        """Queries the database using DHR."""
 
         # targetname = open(input_fasta_path).readlines()[0].rstrip('\n').lstrip('>')
 
         # outpath = os.path.dirname(os.path.abspath(output_a3m_path))
 
         if not os.path.exists(output_a3m_path):
-            cmd = ['bash', self.DHR_program_path,
-                input_fasta_path,
-                self.DHR_database_path,
-                output_a3m_path
+            cmd = [self.DHR_binary_path, self.DHR_program_path,
+                '--input_path', input_fasta_path,
+                '--database_path', self.DHR_database_path,
+                '--output_a3m_path', output_a3m_path
             ]
 
             logging.info('DHR subprocess "%s"', ' '.join(cmd))

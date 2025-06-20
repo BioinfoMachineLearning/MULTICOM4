@@ -2,7 +2,6 @@
 
 import copy
 import ml_collections
-from multicom4.common.config_human import *
 
 class pipeline():
 

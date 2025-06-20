@@ -45,13 +45,14 @@ if __name__ == '__main__':
 
     # Set directory of multicom databases and tools
     install_dir = os.path.dirname(os.path.realpath(__file__))
-    args.multicom3db_dir = os.path.abspath(args.multicom3db_dir)
+    args.multicom4db_dir = os.path.abspath(args.multicom4db_dir)
     args.afdb_dir = os.path.abspath(args.afdb_dir)
     
     # configure db_option file
     db_option_file_template = os.path.join(install_dir, 'bin/.db_option.default')
     newlines = []
     keywords_dict = {'YOUR_ENV': os.path.abspath(args.envdir.rstrip('/')),
+                     'ROOTDIR': install_dir,
                     'INSTALLDIR_TOOLS': os.path.join(install_dir, 'tools'),
                     'INSTALLDIR_DATABASES': args.multicom4db_dir.rstrip('/'),
                     'AFDB_DIR': args.afdb_dir.rstrip('/'),

@@ -96,6 +96,7 @@ cd ~/miniconda3/envs/multicom4/lib/python3.8/site-packages/ && patch -p0 < $MULT
 ```
 conda install tqdm
 conda install -c conda-forge -c bioconda foldseek
+conda install scikit-learn
 ```
 
 ### **Install third-party packages envorinments**
