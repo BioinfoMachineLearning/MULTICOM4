@@ -31,6 +31,8 @@ mmalign_program = /home/bml_casp15/MULTICOM4/tools/mmalign/MMalign
 # dockq program
 dockq_program = /home/bml_casp15/MULTICOM4/tools/DockQ/DockQ.py
 
+qscore_program = /home/bml_casp15/MULTICOM4/tools/pairwiseQA/q_score
+
 # tmscore program
 tmscore_program = /home/bml_casp15/MULTICOM4/tools/tmscore/TMscore
 

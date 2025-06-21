@@ -31,6 +31,8 @@ mmalign_program = INSTALLDIR_TOOLS/mmalign/MMalign
 # dockq program
 dockq_program = INSTALLDIR_TOOLS/DockQ/DockQ.py
 
+qscore_program = INSTALLDIR_TOOLS/pairwiseQA/q_score
+
 # tmscore program
 tmscore_program = INSTALLDIR_TOOLS/tmscore/TMscore
 
