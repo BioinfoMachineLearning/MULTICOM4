@@ -60,6 +60,7 @@ class Monomer_alignment_generation_pipeline:
                  colabfold_split_msas_binary,
                  mmseq_binary,
                  deepmsa2_path,
+                 dhr_binary_path,
                  dhr_program_path,
                  uniref90_database_path,
                  mgnify_database_path,
@@ -177,7 +178,7 @@ class Monomer_alignment_generation_pipeline:
                                                    JGIclust_database_path=JGIclust_database_path)
 
         if len(dhr_database_path) > 0:
-            self.dhr_runner = DHR_runner(DHR_program_path=dhr_program_path, DHR_database_path=dhr_database_path)
+            self.dhr_runner = DHR_runner(DHR_binary_path=dhr_binary_path, DHR_program_path=dhr_program_path, DHR_database_path=dhr_database_path)
 
     def process(self, input_fasta_path, msa_output_dir, multiprocess=True):
         """Runs alignment tools on the input sequence and creates features."""

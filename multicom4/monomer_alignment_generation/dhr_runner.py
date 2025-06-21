@@ -14,9 +14,11 @@ class DHR_runner:
     """Python wrapper of the HHblits binary."""
 
     def __init__(self,
+                 DHR_binary_path,
                  DHR_program_path,
                  DHR_database_path):
 
+        self.DHR_binary_path = DHR_binary_path
         self.DHR_program_path = DHR_program_path
         self.DHR_database_path = DHR_database_path
 

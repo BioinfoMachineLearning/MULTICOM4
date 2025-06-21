@@ -67,6 +67,7 @@ def run_monomer_msa_pipeline(fasta, outdir, params, only_monomer=False, run_auxi
                                                          colabfold_split_msas_binary="",
                                                          mmseq_binary=mmseq_binary,
                                                          deepmsa2_path=deepmsa2_path,
+                                                         dhr_binary_path=params['dhr_binary_path'],
                                                          dhr_program_path=dhr_program_path,
                                                          uniref90_database_path=uniref90_fasta,
                                                          mgnify_database_path=mgnify,
