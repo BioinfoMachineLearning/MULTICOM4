@@ -88,7 +88,7 @@ use_gpu_relax = True
 
 max_template_date = 9999-06-01
 
-pdb_release_date_file = /home/bml_casp15/MULTICOM4/multicom4_db/multicom4_db/pdb_release_date_filtered.csv
+pdb_release_date_file = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_release_date_filtered.csv
 
 # Other tools
 
