@@ -221,12 +221,12 @@ Then run the following command:
 ```bash
 # Please provide absolute path for the input parameters
 sh bin/monomer/run_monomer.sh \
-    --option_file=bin/db_option \
-    --fasta_path=$YOUR_FASTA \
-    --output_dir=$OUTDIR
+    bin/db_option \
+    $fasta_path \
+    $output_dir
 ```
 
-option_file is a file in the MULTICOM4 package to store the path of the databases/tools. fasta_path is the full path of the file storing the input protein sequence(s) in the FASTA format. output_dir specifies where the prediction results are stored. 
+db_option is a file in the MULTICOM4 package to store the path of the databases/tools. fasta_path is the full path of the file storing the input protein sequence(s) in the FASTA format. output_dir specifies where the prediction results are stored. 
 
 ## **Output**
 
@@ -264,9 +264,9 @@ Then run the following command:
 ```bash
 # Please provide absolute path for the input parameters
 sh bin/multimer/run_multimer.sh \
-    --option_file=bin/db_option \
-    --fasta_path=$YOUR_FASTA \
-    --output_dir=$OUTDIR
+    bin/db_option \
+    $fasta_path \
+    $output_dir
 ```
 
 ## **Output**

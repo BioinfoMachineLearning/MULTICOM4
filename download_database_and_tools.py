@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     ### (1) Download basic tools
     os.chdir(tools_dir)
-    tools_lst = ["DockQ", "mmalign", "tmalign", "tmscore", "DeepMSA2", "hhsuite-3.2.0", "afsample"]
+    tools_lst = ["DockQ", "mmalign", "tmalign", "tmscore", "DeepMSA2", "hhsuite-3.2.0", "afsample", "Dense-Homolog-Retrieval"]
     for tool in tools_lst:
         logfile = os.path.join(log_dir, tool + '.done')
         if os.path.exists(logfile):
