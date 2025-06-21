@@ -44,7 +44,7 @@ mmseq_program = YOUR_ENV/envs/multicom4/bin/mmseqs
 
 deepmsa2_path = INSTALLDIR_TOOLS/DeepMSA2
 
-DHR_binary_path = YOUR_ENV/envs/fastMSA/bin/python
+DHR_binary_path = YOUR_ENV/envs/alphafold_DHR/bin/python
 
 DHR_program_path = INSTALLDIR_TOOLS/Dense-Homolog-Retrieval/retrieve.py
 

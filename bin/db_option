@@ -44,9 +44,9 @@ mmseq_program = /home/jl4mc/mambaforge/envs/multicom4/bin/mmseqs
 
 deepmsa2_path = /home/bml_casp15/MULTICOM4/tools/DeepMSA2
 
-DHR_program_path = /home/bml_casp15/MULTICOM4/tools/Dense-Homolog-Retrieval
+DHR_binary_path = /home/jl4mc/mambaforge/envs/alphafold_DHR/bin/python
 
-DHR_program_path = /home/bml_casp15/MULTICOM4/tools/Dense-Homolog-Retrieval
+DHR_program_path = /home/bml_casp15/MULTICOM4/tools/Dense-Homolog-Retrieval/retrieve.py
 
 DHR_database_path = /home/bml_casp15/MULTICOM4/multicom4_db/DHR_DATABASE/
 
@@ -92,9 +92,11 @@ pdb_release_date_file = /home/bml_casp15/MULTICOM4/multicom4_db/multicom4_db/pdb
 
 # Other tools
 
-esmfold_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold_local.sh
+esmfold_binary_path = /home/jl4mc/mambaforge/envs/esmfold/bin/python
 
-esm_msa_program = /bmlfast/bml_casp16/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1_local.sh
+esmfold_program = /home/bml_casp15/MULTICOM4/multicom4/monomer_structure_generation/tools/esmfold.py
+
+esm_msa_program = /home/bml_casp15/MULTICOM4/multicom4/monomer_structure_generation/tools/esm_msa_alg1.py
 
 ######################Monomer template search option#################################
 

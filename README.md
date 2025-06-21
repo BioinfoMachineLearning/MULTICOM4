@@ -97,16 +97,19 @@ cd ~/miniconda3/envs/multicom4/lib/python3.8/site-packages/ && patch -p0 < $MULT
 conda install tqdm
 conda install -c conda-forge -c bioconda foldseek
 conda install scikit-learn
+
+#if running jackhmmer returns error: libgsl.so.25: cannot open shared object file: No such file or directory
+conda install -c conda-forge gsl=2.5
 ```
 
 ### **Install third-party packages envorinments**
 
 ```python
 # DHR
-conda create --name fastMSA --file tools/Dense-Homolog-Retrieval/requirements.txt -c pytorch -c conda-forge -c bioconda
+mamba env create -f tools/Dense-Homolog-Retrieval/env.yml
 
 # ESMFold
-conda env create -f esm.yml
+conda env create -f envs/esm.yml
 conda activate esmfold
 pip install "fair-esm[esmfold]"
 pip install 'openfold @ git+https://github.com/aqlaboratory/openfold.git@4b41059694619831a7db195b7e0988fc4ff3a307'
