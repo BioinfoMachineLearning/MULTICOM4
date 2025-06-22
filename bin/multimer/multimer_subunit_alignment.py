@@ -11,7 +11,7 @@ from multicom4.common.pipeline import run_monomer_msa_pipeline, run_monomer_temp
     run_monomer_msas_concatenation_pipeline, run_monomer_templates_concatenation_pipeline, \
     run_multimer_structure_generation_pipeline_v2, \
     run_multimer_structure_generation_pipeline_foldseek, \
-    run_multimer_evaluation_pipeline, run_monomer_msa_pipeline_img, foldseek_iterative_monomer_input, \
+    run_multimer_evaluation_pipeline, foldseek_iterative_monomer_input, \
     copy_same_sequence_msas
 
 from absl import flags
@@ -22,7 +22,6 @@ import pandas as pd
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_boolean('run_img', True, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -83,13 +82,6 @@ def main(argv):
             result = run_monomer_msa_pipeline(monomer_fasta, N1_monomer_outdir, params)
             if result is None:
                 raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
-
-            if FLAGS.run_img:
-                N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
-                makedir_if_not_exists(N1_monomer_outdir_img)
-                img_msas[chain_id] = run_monomer_msa_pipeline_img(params=params,
-                                                                fasta=monomer_fasta,
-                                                                outdir=N1_monomer_outdir_img)
 
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
             makedir_if_not_exists(N2_monomer_outdir)
