@@ -108,7 +108,7 @@ pip install charset_normalizer==3.3.1
 
 ```python
 # DHR
-mamba env create -f tools/Dense-Homolog-Retrieval/env.yml
+conda env create -f tools/Dense-Homolog-Retrieval/env.yml
 
 # ESMFold
 conda env create -f envs/esm.yml
@@ -116,6 +116,9 @@ conda activate esmfold
 pip install "fair-esm[esmfold]"
 pip install 'openfold @ git+https://github.com/aqlaboratory/openfold.git@4b41059694619831a7db195b7e0988fc4ff3a307'
 pip install transformers
+
+# AFsample
+conda env create -f tools/afsample/afsample.yml
 ```
 
 ### **Download Genetic databases in AlphaFold2/AlphaFold-Multimer**
@@ -125,6 +128,12 @@ pip install transformers
 
 bash $MULTICOM4_INSTALL_DIR/tools/alphafold-v2.3.2/scripts/download_all_data.sh <YOUR_ALPHAFOLD_DB_DIR>
 ```
+
+AFsample also uses both v2.1.0 and v2.2.0 AlphaFold-Multimer model weights. Download them using the links below and extract them in the params/ folder in the $YOUR_ALPHAFOLD_DB_DIR.
+
+The v2.2.0 AlphaFold-Multimer model weights: https://storage.googleapis.com/alphafold/alphafold_params_2022-03-02.tar 
+
+The v2.1.0 AlphaFold-Multimer model weights: https://storage.googleapis.com/alphafold/alphafold_params_2022-01-19.tar
 
 ### **Install the MULTICOM4 addon system and its databases**
 
