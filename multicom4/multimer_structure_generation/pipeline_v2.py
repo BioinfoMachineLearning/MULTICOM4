@@ -271,7 +271,7 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
                                 
                                 esm_msa_path = os.path.join(msadir, f'{monomer}.esm.paired.a3m')
                                 if not os.path.exists(esm_msa_path):
-                                    cmd = f"sh {self.params['esm_msa_program']} {default_alphafold_multimer_a3m} {esm_msa_path}"
+                                    cmd = f"{self.params['esmfold_binary_path']} {self.params['esm_msa_program']} --ina3m {default_alphafold_multimer_a3m} --outfile {esm_msa_path}"
                                     print(cmd)
                                     os.system(cmd)
                                     if not os.path.exists(esm_msa_path):
