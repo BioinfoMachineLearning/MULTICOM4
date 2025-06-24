@@ -38,7 +38,7 @@ tmscore_program = INSTALLDIR_TOOLS/tmscore/TMscore
 
 usalign_program = INSTALLDIR_TOOLS/USalign
 
-calNf_program = INSTALLDIR_TOOLS/calNf
+calNf_program = INSTALLDIR_TOOLS/DeepMSA2/bin/calNf
 
 ################################MSA generation tool###########################
 
@@ -104,11 +104,11 @@ esm_msa_program = ROOTDIR/multicom4/monomer_structure_generation/tools/esm_msa_a
 
 foldseek_program = YOUR_ENV/envs/multicom4/bin/foldseek
 
-foldseek_pdb_database = INSTALLDIR_DATABASES/foldseek_databases/complex
+foldseek_pdb_database = INSTALLDIR_DATABASES/foldseek_databases/complex/complex
 
-foldseek_pdb_database_dir = INSTALLDIR_DATABASES/foldseek_databases/complex/complex_pdb
+foldseek_pdb_database_dir = INSTALLDIR_DATABASES/pdb_complex_2024/atom
 
-foldseek_af_database = INSTALLDIR_DATABASES/foldseek_databases/af_db/
+foldseek_af_database = INSTALLDIR_DATABASES/foldseek_databases/af_db/af_db
 
 foldseek_af_database_dir = INSTALLDIR_DATABASES/af_pdbs
 

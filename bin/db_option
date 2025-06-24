@@ -38,7 +38,7 @@ tmscore_program = /home/bml_casp15/MULTICOM4/tools/tmscore/TMscore
 
 usalign_program = /home/bml_casp15/MULTICOM4/tools/USalign
 
-calNf_program = /home/bml_casp15/MULTICOM4/tools/calNf
+calNf_program = /home/bml_casp15/MULTICOM4/tools/DeepMSA2/bin/calNf
 
 ################################MSA generation tool###########################
 
@@ -104,11 +104,11 @@ esm_msa_program = /home/bml_casp15/MULTICOM4/multicom4/monomer_structure_generat
 
 foldseek_program = /home/jl4mc/mambaforge/envs/multicom4/bin/foldseek
 
-foldseek_pdb_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/complex
+foldseek_pdb_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/complex/complex
 
-foldseek_pdb_database_dir = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/complex/complex_pdb
+foldseek_pdb_database_dir = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_complex_2024/atom
 
-foldseek_af_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/af_db/
+foldseek_af_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/af_db/af_db
 
 foldseek_af_database_dir = /home/bml_casp15/MULTICOM4/multicom4_db/af_pdbs
 

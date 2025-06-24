@@ -22,7 +22,6 @@ import pandas as pd
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_boolean('run_img', False, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -50,10 +49,8 @@ def main(argv):
     makedir_if_not_exists(FLAGS.output_dir)
 
     N1_outdir = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation')
-    N1_outdir_img = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation_img') 
     N2_outdir = os.path.join(FLAGS.output_dir, 'N2_monomer_template_search')
     N3_outdir = os.path.join(FLAGS.output_dir, 'N3_monomer_structure_generation')
-    img_msas = {}
 
     print("#################################################################################################")
 
@@ -80,7 +77,6 @@ def main(argv):
             with open(monomer_fasta, "w") as fw:
                 write_fasta({chain_id: monomer_sequence}, fw)
             N1_monomer_outdir = os.path.join(N1_outdir, monomer_id)
-            N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
 
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
 
@@ -90,11 +86,11 @@ def main(argv):
                                                                 targetname=targetname,
                                                                 fasta_path=monomer_fasta,
                                                                 alndir=N1_monomer_outdir,
-                                                                img_alndir=N1_monomer_outdir_img,
+                                                                img_alndir="",
                                                                 templatedir=N2_monomer_outdir,
                                                                 outdir=N3_monomer_outdir,
                                                                 run_methods=monomer_run_methods,
-                                                                run_script=os.path.exists(params['slurm_script_template']),
+                                                                run_script=True,
                                                                 is_subunit=True):
                 print(f"Program failed in step 3: monomer {monomer_id} structure generation")
 

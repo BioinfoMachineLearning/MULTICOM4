@@ -49,10 +49,8 @@ def main(argv):
     makedir_if_not_exists(FLAGS.output_dir)
 
     N1_outdir = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation')
-    N1_outdir_img = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation_img') 
     N2_outdir = os.path.join(FLAGS.output_dir, 'N2_monomer_template_search')
     N3_outdir = os.path.join(FLAGS.output_dir, 'N3_monomer_structure_generation')
-    img_msas = {}
 
     print("#################################################################################################")
 
@@ -78,7 +76,7 @@ def main(argv):
                             'deepmsa_qMSA_jac', 'deepmsa_qMSA_hh3', 'deepmsa_qMSA_hms',
                             'deepmsa_DeepJGI_hms', 'deepmsa_DeepJGI', 'deepmsa_q3JGI', 
                             'deepmsa_q4JGI', 'deepmsa_q3JGI_hms', 'deepmsa_q4JGI_hms',
-                            'paddle-helix', 'esmfold', 'deepfold', 'megafold', 'def_esm_msa']
+                            'esmfold', 'def_esm_msa']
 
     for chain_id in chain_id_map:
         monomer_id = chain_id
@@ -94,12 +92,6 @@ def main(argv):
             if result is None:
                 raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
 
-            N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
-            makedir_if_not_exists(N1_monomer_outdir_img)
-            img_msas[chain_id] = run_monomer_msa_pipeline_img(params=params,
-                                                                fasta=monomer_fasta,
-                                                                outdir=N1_monomer_outdir_img)
-
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
             makedir_if_not_exists(N2_monomer_outdir)
             template_file = run_monomer_template_search_pipeline(targetname=monomer_id, sequence=monomer_id,
@@ -114,7 +106,7 @@ def main(argv):
                                                                 targetname=targetname,
                                                                 fasta_path=monomer_fasta,
                                                                 alndir=N1_monomer_outdir,
-                                                                img_alndir=N1_monomer_outdir_img,
+                                                                img_alndir="",
                                                                 templatedir=N2_monomer_outdir,
                                                                 outdir=N3_monomer_outdir,
                                                                 run_methods=monomer_run_methods, is_subunit=True):
@@ -139,9 +131,6 @@ def main(argv):
                                     trgdir=N1_monomer_deepmsa_outdir,
                                     srcname=processed_seuqences[monomer_sequence],
                                     trgname=monomer_id, rename_prefix=False)
-
-            N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
-            makedir_if_not_exists(N1_monomer_outdir_img)
 
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
             makedir_if_not_exists(N2_monomer_outdir)

@@ -49,11 +49,9 @@ def main(argv):
     makedir_if_not_exists(FLAGS.output_dir)
 
     N1_outdir = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation')
-    N1_outdir_img = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation_img') 
     N2_outdir = os.path.join(FLAGS.output_dir, 'N2_monomer_template_search')
     N3_outdir = os.path.join(FLAGS.output_dir, 'N3_monomer_structure_generation')
-    img_msas = {}
-
+    
     print("#################################################################################################")
 
     print("#################################################################################################")

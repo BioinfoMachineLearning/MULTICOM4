@@ -22,7 +22,6 @@ import pandas as pd
 flags.DEFINE_string('option_file', None, 'option file')
 flags.DEFINE_string('fasta_path', None, 'Path to multimer fasta')
 flags.DEFINE_string('output_dir', None, 'Output directory')
-flags.DEFINE_boolean('run_img', True, 'Whether to use IMG alignment to generate models')
 FLAGS = flags.FLAGS
 
 
@@ -50,10 +49,8 @@ def main(argv):
     makedir_if_not_exists(FLAGS.output_dir)
 
     N1_outdir = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation')
-    N1_outdir_img = os.path.join(FLAGS.output_dir, 'N1_monomer_alignments_generation_img') 
     N2_outdir = os.path.join(FLAGS.output_dir, 'N2_monomer_template_search')
     N3_outdir = os.path.join(FLAGS.output_dir, 'N3_monomer_structure_generation')
-    img_msas = {}
 
     print("#################################################################################################")
 
@@ -95,13 +92,6 @@ def main(argv):
             #if result is None:
             #    raise RuntimeError(f"Program failed in step 1: monomer {monomer_id} alignment generation")
 
-            if FLAGS.run_img:
-                N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
-                makedir_if_not_exists(N1_monomer_outdir_img)
-                img_msas[chain_id] = run_monomer_msa_pipeline_img(params=params,
-                                                                fasta=monomer_fasta,
-                                                                outdir=N1_monomer_outdir_img)
-
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
             makedir_if_not_exists(N2_monomer_outdir)
             #template_file = run_monomer_template_search_pipeline(targetname=monomer_id, sequence=monomer_id,
@@ -142,9 +132,6 @@ def main(argv):
             #                        trgdir=N1_monomer_deepmsa_outdir,
             #                        srcname=processed_seuqences[monomer_sequence],
             #                        trgname=monomer_id, rename_prefix=False)
-
-            N1_monomer_outdir_img = os.path.join(N1_outdir_img, monomer_id)
-            makedir_if_not_exists(N1_monomer_outdir_img)
 
             N2_monomer_outdir = os.path.join(N2_outdir, monomer_id)
             makedir_if_not_exists(N2_monomer_outdir)
