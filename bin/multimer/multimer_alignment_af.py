@@ -199,7 +199,7 @@ def main(argv):
                                                                 template_dir=N5_outdir,
                                                                 monomer_model_dir=N3_outdir,
                                                                 output_dir=N6_outdir,
-                                                                run_script=os.path.exists(params['slurm_script_template'])):
+                                                                run_script=True):
             print("Program failed in step 7")
 
     else:
@@ -215,7 +215,7 @@ def main(argv):
                                                              template_dir=N5_outdir,
                                                              monomer_model_dir=N3_outdir,
                                                              output_dir=N6_outdir,
-                                                             run_script=os.path.exists(params['slurm_script_template'])):
+                                                             run_script=True):
             print("Program failed in step 7")
         
 if __name__ == '__main__':
