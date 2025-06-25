@@ -54,13 +54,13 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
             self.run_methods = ['afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not', 'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not',
                                 'def_mul_comp', 'def_mul_drop_nos', 'def_mul_drop_s', 'def_mul_esm_msa', 'def_mul_nopair',
                                 'def_mul_not_drop_nos', 'def_mul_not_drop_s', 'def_mul_notemp', 'def_mul_pdb', 'def_mul_pdb70',
-                                'def_mul_struct', 'def_mul_tmsearch', 'default_multimer', 'pdb_inter_prot_sto', 'pdb_inter_ref_a3m',
+                                'def_mul_struct', 'default_multimer', 'pdb_inter_prot_sto', 'pdb_inter_ref_a3m',
                                 'pdb_inter_ref_sto', 'spec_comp', 'spec_inter_prot_sto', 'spec_inter_ref_a3m', 'spec_inter_ref_sto',
                                 'spec_pdb', 'spec_pdb70', 'spec_struct', 'str_comp', 'str_inter_prot_sto',
                                 'str_inter_ref_a3m', 'str_inter_ref_sto', 'str_pdb', 'str_pdb70', 'str_struct',
                                 'uniclust_ox_a3m', 'unidist_prot_sto', 'unidist_ref_a3m', 'unidist_ref_sto']
 
-            self.run_methods += ['esmfold']
+            # self.run_methods += ['esmfold']
         else:
             self.run_methods = run_methods
             
@@ -394,15 +394,16 @@ class Multimer_structure_prediction_pipeline_v2(config.pipeline):
 
                     cmds += [base_cmd]
             
-            elif method == "esmfold":
-                # run esmfold
-                method_out_dir = os.path.join(output_dir, "esmfold")
-                os.makedirs(method_out_dir, exist_ok=True)
-                for num_recycle in [4, 10, 50]:
-                    outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
-                    if not os.path.exists(outpdb):
-                        cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
-                        cmds += [cmd]
+            # elif method == "esmfold":
+            #     # run esmfold
+            #     method_out_dir = os.path.join(output_dir, "esmfold")
+            #     os.makedirs(method_out_dir, exist_ok=True)
+            #     for num_recycle in [4, 10, 50]:
+            #         outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
+            #         if not os.path.exists(outpdb):
+            #             cmd = f"sh {self.params['esmfold_program']} --fasta {fasta_path} --outdir {outpdb} {num_recycle}"
+            #             cmd = f"{self.params['esmfold_binary_path']} {self.params['esmfold_program']} --ina3m {default_alphafold_multimer_a3m} --outfile {esm_msa_path}"      
+            #             cmds += [cmd]
 
             if len(cmds) > 0:
                 predictor_commands[method] = cmds

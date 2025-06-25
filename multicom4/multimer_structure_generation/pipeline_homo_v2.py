@@ -54,11 +54,11 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
             self.run_methods = ['afsample_v1', 'afsample_v1_not', 'afsample_v1_r21_not', 'afsample_v2', 'afsample_v2_not', 'afsample_v2_r21_not',
                                 'def_mul_comp', 'def_mul_drop_nos', 'def_mul_drop_s', 'def_mul_esm_msa', 'def_mul_not_drop_nos',
                                 'def_mul_not_drop_s', 'def_mul_notemp', 'def_mul_pdb', 'def_mul_pdb70', 'def_mul_struct',
-                                'def_mul_tmsearch', 'default_multimer', 'pdb_inter_prot_sto', 'pdb_inter_ref_a3m', 'pdb_inter_ref_sto',
+                                'default_multimer', 'pdb_inter_prot_sto', 'pdb_inter_ref_a3m', 'pdb_inter_ref_sto',
                                 'spec_comp', 'spec_inter_prot_sto', 'spec_inter_ref_a3m', 'spec_inter_ref_sto', 'spec_pdb',
                                 'spec_pdb70', 'spec_struct', 'uniclust_ox_a3m']
             
-            self.run_methods += ['esmfold']
+            # self.run_methods += ['esmfold']
         else:
             self.run_methods = run_methods
             
@@ -245,7 +245,8 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                             esm_msa_path = os.path.join(msadir, f'{monomer}.esm.final.a3m')
                             if not os.path.exists(esm_msa_path):
-                                cmd = f"sh {self.params['esm_msa_program']} {default_alphafold_monomer_a3m} {esm_msa_path}"
+                                cmd = f"{self.params['esmfold_binary_path']} {self.params['esm_msa_program']} --ina3m {default_alphafold_monomer_a3m} --outfile {esm_msa_path}"
+                                print(cmd)
                                 os.system(cmd)
                                 if not os.path.exists(esm_msa_path):
                                     print(f"Failed to generate the esm msa: {esm_msa_path}")
@@ -337,56 +338,56 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
 
                     cmds += [base_cmd]
 
-            elif method == "esmfold":
-                # run esmfold
-                method_out_dir = os.path.join(output_dir, "esmfold")
-                os.makedirs(method_out_dir, exist_ok=True)
-                for num_recycle in [4, 10, 50]:
-                    outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
-                    if not os.path.exists(outpdb):
-                        cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
-                        cmds += [cmd]
+            # elif method == "esmfold":
+            #     # run esmfold
+            #     method_out_dir = os.path.join(output_dir, "esmfold")
+            #     os.makedirs(method_out_dir, exist_ok=True)
+            #     for num_recycle in [4, 10, 50]:
+            #         outpdb = os.path.join(method_out_dir, f"{num_recycle}.pdb")
+            #         if not os.path.exists(outpdb):
+            #             cmd = f"sh {self.params['esmfold_program']} {fasta_path} {outpdb} {num_recycle}"
+            #             cmds += [cmd]
 
-            elif method == "def_mul_refine":
-                method_out_dir = os.path.join(output_dir, method)
-                # refine default top-ranked models
-                refinement_inputs = []
-                default_workdir = os.path.join(output_dir, 'default_multimer')
-                ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
-                if not os.path.exists(ranking_json_file):
-                    continue
-                ranking_json = json.loads(open(ranking_json_file).read())
+            # elif method == "def_mul_refine":
+            #     method_out_dir = os.path.join(output_dir, method)
+            #     # refine default top-ranked models
+            #     refinement_inputs = []
+            #     default_workdir = os.path.join(output_dir, 'default_multimer')
+            #     ranking_json_file = os.path.join(default_workdir, "ranking_debug.json")
+            #     if not os.path.exists(ranking_json_file):
+            #         continue
+            #     ranking_json = json.loads(open(ranking_json_file).read())
 
-                for i in range(self.heteromer_config.predictors.def_mul_refine.number_of_input_models):
-                    pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
-                    model_name = list(ranking_json["order"])[i]
-                    pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
-                    msa_paths = {}
-                    for chain_id in chain_id_map:
-                        monomer_msa = os.path.join(default_workdir, 'msas', chain_id, "monomer_final.a3m")
-                        paired_msa = os.path.join(default_workdir, 'msas', f"{chain_id}.paired.a3m")
-                        msa_paths[chain_id] = dict(paired_msa=paired_msa,
-                                                   monomer_msa=monomer_msa)
+            #     for i in range(self.heteromer_config.predictors.def_mul_refine.number_of_input_models):
+            #         pdb_path = os.path.join(default_workdir, f"ranked_{i}.pdb")
+            #         model_name = list(ranking_json["order"])[i]
+            #         pkl_path = os.path.join(default_workdir, f"result_{model_name}.pkl")
+            #         msa_paths = {}
+            #         for chain_id in chain_id_map:
+            #             monomer_msa = os.path.join(default_workdir, 'msas', chain_id, "monomer_final.a3m")
+            #             paired_msa = os.path.join(default_workdir, 'msas', f"{chain_id}.paired.a3m")
+            #             msa_paths[chain_id] = dict(paired_msa=paired_msa,
+            #                                        monomer_msa=monomer_msa)
 
-                    refine_input = iterative_refine_pipeline_multimer.refinement_input_multimer(chain_id_map=chain_id_map,
-                                                                                                fasta_path=fasta_path,
-                                                                                                pdb_path=pdb_path,
-                                                                                                pkl_path=pkl_path,
-                                                                                                msa_paths=msa_paths)
-                    refinement_inputs += [refine_input]
+            #         refine_input = iterative_refine_pipeline_multimer.refinement_input_multimer(chain_id_map=chain_id_map,
+            #                                                                                     fasta_path=fasta_path,
+            #                                                                                     pdb_path=pdb_path,
+            #                                                                                     pkl_path=pkl_path,
+            #                                                                                     msa_paths=msa_paths)
+            #         refinement_inputs += [refine_input]
 
-                refine_dir = os.path.join(method_out_dir, 'workdir')
-                makedir_if_not_exists(refine_dir)
+            #     refine_dir = os.path.join(method_out_dir, 'workdir')
+            #     makedir_if_not_exists(refine_dir)
 
-                pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=self.params, config_name=method)
-                pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="homomer")
+            #     pipeline = iterative_refine_pipeline_multimer.Multimer_iterative_refinement_pipeline_server(params=self.params, config_name=method)
+            #     pipeline.search(refinement_inputs=refinement_inputs, outdir=refine_dir, stoichiometry="homomer")
 
-                final_dir = os.path.join(method_out_dir, 'finaldir')
-                makedir_if_not_exists(final_dir)
+            #     final_dir = os.path.join(method_out_dir, 'finaldir')
+            #     makedir_if_not_exists(final_dir)
 
-                pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection()
-                pipeline.select_v1(indir=refine_dir, outdir=final_dir)
-                pipeline.make_predictor_results(final_dir, method_out_dir)
+            #     pipeline = iterative_refine_pipeline_multimer.Multimer_refinement_model_selection()
+            #     pipeline.select_v1(indir=refine_dir, outdir=final_dir)
+            #     pipeline.make_predictor_results(final_dir, method_out_dir)
             
             if len(cmds) > 0:
                 predictor_commands[method] = cmds
