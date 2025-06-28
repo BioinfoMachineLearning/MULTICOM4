@@ -108,7 +108,7 @@ foldseek_pdb_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databas
 
 foldseek_pdb_database_dir = /home/bml_casp15/MULTICOM4/multicom4_db/pdb_complex_2024/atom
 
-foldseek_af_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/af_db/af_db
+foldseek_af_database = /home/bml_casp15/MULTICOM4/multicom4_db/foldseek_databases/af_db
 
 foldseek_af_database_dir = /home/bml_casp15/MULTICOM4/multicom4_db/af_pdbs
 

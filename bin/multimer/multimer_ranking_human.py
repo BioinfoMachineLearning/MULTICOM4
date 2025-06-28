@@ -99,8 +99,7 @@ def main(argv):
     multimer_qa_result = run_multimer_evaluation_pipeline(fasta_path=FLAGS.fasta_path,
                                                           params=params, run_methods=run_methods,
                                                           chain_id_map=chain_id_map,
-                                                          indir=N6_outdir, outdir=N7_outdir,
-                                                          is_human=True)
+                                                          indir=N6_outdir, outdir=N7_outdir)
 
     print("#################################################################################################")
 

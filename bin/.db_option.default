@@ -108,7 +108,7 @@ foldseek_pdb_database = INSTALLDIR_DATABASES/foldseek_databases/complex/complex
 
 foldseek_pdb_database_dir = INSTALLDIR_DATABASES/pdb_complex_2024/atom
 
-foldseek_af_database = INSTALLDIR_DATABASES/foldseek_databases/af_db/af_db
+foldseek_af_database = INSTALLDIR_DATABASES/foldseek_databases/af_db
 
 foldseek_af_database_dir = INSTALLDIR_DATABASES/af_pdbs
 
