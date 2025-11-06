@@ -106,7 +106,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                                         f"--num_multimer_predictions_per_model={num_multimer_predictions_per_model} " \
                                         f"--model_preset={model_preset} " \
                                         f"--relax_topn_predictions={relax_topn_predictions} " \
-                                        f"--models_to_relax=NONE "
+                                        f"--models_to_relax=TOPN "
 
                 msa_paired_source = self.get_homomer_config(predictor_config, 'msa_paired_source')
                 template_source = self.get_homomer_config(predictor_config, 'template_source')
@@ -217,7 +217,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                             f"--max_iter={max_iteration} " \
                             f"--learning_rate={learning_rate} " \
                             f"--output_dir={outdir} " \
-                            f"--models_to_relax=NONE " \
+                            f"--models_to_relax=TOPN " \
                             f"--relax_topn_predictions={relax_topn_predictions} "
 
                     if not complete_result(outdir, max_iteration):
@@ -460,7 +460,7 @@ class Multimer_structure_prediction_homo_pipeline_v2(config.pipeline):
                               f"--num_multimer_predictions_per_model {num_multimer_predictions_per_model} " \
                               f"--model_preset={model_preset} " \
                               f"--relax_topn_predictions={relax_topn_predictions} " \
-                              f"--models_to_relax=NONE "
+                              f"--models_to_relax=TOPN "
 
         monomers = [chain_id for chain_id in chain_id_map]
   
