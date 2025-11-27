@@ -357,9 +357,9 @@ https://predictioncenter.org/casp16/doc/presentations/Day-3/Day3-14-Morehead-MUL
 @article{liu2025boosting,
   title={Boosting AlphaFold Protein Tertiary Structure Prediction through MSA Engineering and Extensive Model Sampling and Ranking in CASP16},
   author={Liu, Jian and Neupane, Pawan and Cheng, Jianlin},
-  journal={bioRxiv},
-  pages={2025--06},
+  journal={Communications Biology},
+  pages={1587},
   year={2025},
-  publisher={Cold Spring Harbor Laboratory}
+  publisher={Nature Springer}
 }
 ```
