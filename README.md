@@ -104,23 +104,6 @@ conda install -c conda-forge gsl=2.5
 pip install charset_normalizer==3.3.1
 ```
 
-### **Install third-party packages envorinments**
-
-```python
-# DHR
-conda env create -f tools/Dense-Homolog-Retrieval/env.yml
-
-# ESMFold
-conda env create -f envs/esm.yml
-conda activate esmfold
-pip install "fair-esm[esmfold]"
-pip install 'openfold @ git+https://github.com/aqlaboratory/openfold.git@4b41059694619831a7db195b7e0988fc4ff3a307'
-pip install transformers
-
-# AFsample
-conda env create -f tools/afsample/afsample.yml
-```
-
 ### **Download Genetic databases in AlphaFold2/AlphaFold-Multimer**
 
 ```
@@ -159,6 +142,22 @@ The configure.py python script will
 * Copy the alphafold_addon scripts
 * Create the configuration file (bin/db_option) for running the system
 
+### **Install third-party packages envorinments**
+
+```python
+# DHR
+conda env create -f tools/Dense-Homolog-Retrieval/env.yml
+
+# ESMFold
+conda env create -f envs/esm.yml
+conda activate esmfold
+pip install "fair-esm[esmfold]"
+pip install 'openfold @ git+https://github.com/aqlaboratory/openfold.git@4b41059694619831a7db195b7e0988fc4ff3a307'
+pip install transformers
+
+# AFsample
+conda env create -f tools/afsample/afsample.yml
+```
 # **Genetic databases used by MULTICOM4**
 
 Assume the following databases have been installed as a part of the AlphaFold2/AlphaFold-Multimer installation
